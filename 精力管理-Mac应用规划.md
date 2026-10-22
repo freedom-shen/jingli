@@ -1,8 +1,8 @@
 # 精力管理 · Mac 应用规划
 
-> 版本：v2.3（实现基线）  
+> 版本：v2.4（可开工）  
 > 日期：2026-10-22  
-> 状态：技术栈与默认值已锁定；MCP 可选；每阶段 commit + push；范围收敛为「只管今天」；图标已就绪  
+> 状态：规划完成；技术栈 / 默认值 / 图标 / Git 已就绪；**可以开始 Phase 0**  
 > 输入材料：`精力管理 · Mac 应用设计稿 (1).pdf`、`精力管理 · Mac 应用设计稿.pdf`（v1，含项目页）、`精力管理 · App 图标.pdf`、`项目与任务管理器.html`、`项目与任务管理器-文字稿.txt`
 >
 > **2026-10-22 范围调整：应用只管理「今天」。不保留历史、不做 7 天 / 30 天图表、不迁移旧番茄历史。PDF 的「近 7 天柱状图」移出 v1。**
@@ -1294,9 +1294,11 @@ git clone --mirror <private-repo-url> /Volumes/ssd/backups/jingli.git
 
 ## 13. 下一步
 
-如果方向认可，直接做 Phase 0 的五件事（不写业务代码）：
+可以开始：按 **第 15 节 P0-1 ~ P0-7** 执行，不再需要拍板。
 
-1. 第 10 节默认值已定，不再需要拍板；按该表执行。
+Phase 0 的五件事（不写业务代码）：
+
+1. 第 10 节默认值已定；按该表执行。
 2. 一页 PRD：把「只管今天」、跨天规则、迁移边界写死。
 3. 数据模型 + 迁移 JSON schema + `Tests/Fixtures/` 样例。
 4. SwiftUI 工程骨架 + 设计 token + 空页面导航 + `--snapshot` 模式。
@@ -1304,7 +1306,7 @@ git clone --mirror <private-repo-url> /Volumes/ssd/backups/jingli.git
 
 **每一步结束都 `commit` + `push`；不要攒到最后。** Phase 0 每完成一个 spike，也单独 commit + push。
 
-开工前建议先做 4 个 spike（每个 0.5–1 天），验证最危险的假设：
+开工前先做 4 个 spike（每个 0.5–1 天），验证最危险的假设：
 
 - [ ] **Shortcuts 勿扰**：创建 `Jingli Focus On/Off`，用 `shortcuts run` 开关勿扰；验证已有 Focus、自动化权限被拒、重命名。
 - [ ] **全局 NSPanel**：覆盖全屏应用 / 所有 Space / Stage Manager；第一次点击可点；不抢键盘焦点。
@@ -1313,7 +1315,7 @@ git clone --mirror <private-repo-url> /Volumes/ssd/backups/jingli.git
 
 这 4 个 spike 过了，才算真正「不缺」；没过就先调整方案（例如勿扰降级为手动开关、或调整截图方案）。**SwiftUI 已定，不再改栈。**
 
-现在不缺的是**规划**；还缺的是 **Phase 0 的实物和这 4 个 spike 的验证**。
+现在不缺的是**规划**；缺的是 **P0 的实物和这 4 个 spike 的验证**。第一阶段目标：P0-1 ~ P0-7 全过，然后进 P1。
 
 ---
 
@@ -1326,3 +1328,125 @@ git clone --mirror <private-repo-url> /Volumes/ssd/backups/jingli.git
 | 2026-10-22 | **范围收敛为「只管今天」** | 产品本来就是一天的工具；历史不是需求 | 不做 7 天 / 30 天图表；不迁移旧番茄历史；跨天清空；Phase 4 改为完整一天 + 跨天重置 |
 
 对应 ADR：`docs/adr/0001-native-swiftui.md`（已创建）。
+
+---
+
+## 15. 剩余工作清单（开工 → 闭环）
+
+### 15.1 当前状态
+
+- 文档、决策、图标、Git：完成。
+- 代码、Xcode 工程、测试脚本：0%。
+- 仓库：规划 + ADR + 图标；还没有 App 工程。
+
+### 15.2 开工门槛（P0，2–3 天）
+
+| # | 事项 | 完成标志 |
+|---|---|---|
+| P0-1 | Shortcuts 勿扰 spike | 真实 Focus On/Off；已有 Focus / 权限拒绝 / 重命名都有结论 |
+| P0-2 | 全局 NSPanel spike | 全屏 / 所有 Space / Stage Manager 可见；第一次点击可点；不抢焦点 |
+| P0-3 | 截图 spike | SwiftUI 页面 + NSPanel + 菜单栏可稳定抓图；连续两次无差异 |
+| P0-4 | 数据 spike | SQLite + socket + CLI 并发写；任务/项目导入；旧番茄历史不导 |
+| P0-5 | Xcode 工程 + JingliCore | 空页面能跑；`swift test` 能过 |
+| P0-6 | 数据模型 / 迁移 / fixtures | 建库、迁移、种子数据可用 |
+| P0-7 | snapshot + self-test | `self-test --fast` 跑通；第一条截图基线 |
+
+P0 完成：merge `main` + push + tag `v0.0.1-phase0`（可选）。
+
+### 15.3 P1 核心闭环（5–7 天）
+
+- [ ] 任务 / 项目 CRUD
+- [ ] 开启一天（按项目分组，主线全局 4）
+- [ ] 今日页（主线 / 临时）
+- [ ] 计时器（开始 / 暂停 / 继续 / 废弃；共享 `1/n`；幂等）
+- [ ] 菜单栏倒计时
+- [ ] 浮动番茄钟（置顶、拖动、位置记忆）
+- [ ] 全局完成弹窗（`+1/n`、休息、再来一轮、关闭）
+- [ ] 勿扰联动（On/Off、已有 Focus 保留）
+- [ ] 通知 + 声音
+- [ ] 重启 / 睡眠唤醒恢复
+- [ ] 完整一天验收
+
+P1 完成：merge `main` + push + tag `v0.1.0`。
+
+### 15.4 P2 完整 v1（4–6 天）
+
+- [ ] 项目页 / 未分类
+- [ ] 今日统计（KPI + 今日记录，无 7 天图）
+- [ ] 设置页（计时固定 25、通知、开机自启、Agent、勿扰）
+- [ ] 导入（只导任务 / 项目 / 今日计划）
+- [ ] 跨天重置
+- [ ] AppIcon 进 Assets
+- [ ] 12–15 个截图基线
+- [ ] 设置 / 弹窗 / 菜单栏 / 窄屏 / 空状态 / onboarding 设计补齐
+
+P2 完成：merge `main` + push + tag `v0.2.0`。
+
+### 15.5 P3 Agent（4–5 天）
+
+- [ ] Unix socket + JSON-RPC
+- [ ] CLI（today / task / day / focus / stats）
+- [ ] SKILL.md
+- [ ] 审计 / 撤销
+- [ ] `⌘K` 命令条
+- [ ] CLI contract 测试
+- [ ] 端到端：「帮我排今天的主线」
+
+P3 完成：merge `main` + push + tag `v0.3.0`。
+
+### 15.6 P4 交付闭环（2–3 天）
+
+- [ ] 完整一天 dogfood + 跨天重置
+- [ ] 手工 gate：全局弹窗 / 勿扰 / 通知 / 多显示器
+- [ ] 性能：内存 < 150MB、计时误差 < 1s
+- [ ] 可访问性：键盘 / VoiceOver 基本可用
+- [ ] 签名 / 公证 / 干净机器启动
+- [ ] README / CHANGELOG
+- [ ] 备份 / 恢复演练
+- [ ] release gate + tag `v1.0.0`
+
+### 15.7 设计缺口
+
+- [ ] 设置页
+- [ ] 任务 / 项目编辑弹窗
+- [ ] 删除确认弹窗
+- [ ] 菜单栏面板
+- [ ] 窄屏 1280 布局
+- [ ] 空状态 / 错误状态
+- [ ] 首次启动 onboarding（通知、勿扰快捷指令、开机自启）
+- [ ] 图标的 macOS squircle 透明边角版本（可选）
+
+### 15.8 测试缺口
+
+- [ ] `Tests/Fixtures/` 夹具
+- [ ] 单元测试（计时、分摊、跨天）
+- [ ] 15 个截图基线
+- [ ] 3–5 条 XCUITest 交互 smoke
+- [ ] CLI contract 测试
+- [ ] `docs/test-plan.md`
+- [ ] `docs/manual-test.md`
+- [ ] `docs/known-unautomatable.md`
+- [ ] `scripts/release-gate.sh`
+
+### 15.9 闭环定义（DoD）
+
+- **功能**：一个完整工作日能从头用到尾，跨天重置正确。
+- **工程**：unit + snapshot + CLI 测试通过；每阶段 commit + push。
+- **交付**：签名 app 能在干净机器打开，图标正常，备份能恢复。
+- **验证**：真实完整一天 + 跨天重置；勿扰 / 全局弹窗 / 通知手工过一遍。
+
+### 15.10 最短路径
+
+- **完整 v1**：2–3 周（每天 2–3 小时）。
+- **个人 MVP**：Phase 0 + P1 + 今日统计，1–1.5 周；CLI 可后补。
+- **不阻塞**：MCP、精力层、英文、iCloud。
+
+### 15.11 开始条件
+
+- [x] 技术栈：SwiftUI + AppKit
+- [x] 默认值：第 10 节
+- [x] 图标：`Design/AppIcon/`
+- [x] Git：已绑定，每阶段 commit + push
+- [ ] P0-1 ~ P0-7
+
+P0-1 ~ P0-7 完成即可进入 P1，不需要再拍板。
