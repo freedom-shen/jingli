@@ -1,8 +1,8 @@
 # 精力管理 · Mac 应用规划
 
-> 版本：v2.8（Phase 0 进行中）  
+> 版本：v2.9（Phase 0 进行中）  
 > 日期：2026-10-22  
-> 状态：P0-5 / P0-6 / P0-3 完成；P0-2 代码完成（全屏 / Space 手工待验）；剩余 P0-1、P0-4、P0-7  
+> 状态：P0-3 / P0-5 / P0-6 / P0-7 完成；P0-2 代码完成；剩余 P0-1、P0-4 + P0-2 手工验证  
 > 输入材料：`精力管理 · Mac 应用设计稿 (1).pdf`、`精力管理 · Mac 应用设计稿.pdf`（v1，含项目页）、`精力管理 · App 图标.pdf`、`项目与任务管理器.html`、`项目与任务管理器-文字稿.txt`
 >
 > **2026-10-22 范围调整：应用只管理「今天」。不保留历史、不做 7 天 / 30 天图表、不迁移旧番茄历史。PDF 的「近 7 天柱状图」移出 v1。**
@@ -1340,7 +1340,8 @@ Phase 0 的五件事（不写业务代码）：
 - **P0-6 已完成**：SQLite schema / migration / rollover / purge + `Tests/Fixtures/`，11 个测试通过。
 - **P0-2 代码 spike 已完成**：`level=1000`、`collectionBehavior=321`（可跨 Space / 全屏）、first-mouse override；全屏 / Stage Manager 手工验证待做。
 - **P0-3 已完成**：`--snapshot` 抓主窗口 1440×900 + 浮窗 260×360；连续两次截图 0 像素差异；`jingli-snapshot-diff` 可用。
-- 其余 P0（P0-1、P0-4、P0-7）待做。
+- **P0-7 已完成**：`scripts/self-test.sh --fast/--full` 跑通；基线 `phase0-main.png` / `phase0-panel.png`。
+- 剩余 P0：P0-1（Shortcuts 勿扰）、P0-4（socket / CLI 并发）；P0-2 的全屏 / Space 手工验证待做。
 
 ### 15.2 开工门槛（P0，2–3 天）
 
@@ -1352,7 +1353,7 @@ Phase 0 的五件事（不写业务代码）：
 | P0-4 | 数据 spike | SQLite + socket + CLI 并发写；任务/项目导入；旧番茄历史不导 |
 | P0-5 | ✅ Xcode 工程 + JingliCore（2026-10-22） | 空页面能跑；build/test 通过；app 可启动 |
 | P0-6 | ✅ 数据模型 / 迁移 / fixtures（2026-10-22） | schema、rollover、purge、项目删除保任务；11 tests |
-| P0-7 | snapshot + self-test | `self-test --fast` 跑通；第一条截图基线 |
+| P0-7 | ✅ snapshot + self-test（2026-10-22） | `self-test --fast/--full` 通过；2 张基线；0 差异 |
 
 P0 完成：merge `main` + push + tag `v0.0.1-phase0`（可选）。
 

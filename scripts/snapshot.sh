@@ -4,7 +4,9 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 BUILD_DIR="${BUILD_DIR:-/tmp/jingli-dd}"
 APP="$BUILD_DIR/Build/Products/Debug/Jingli.app"
-OUT="${1:-$ROOT/artifacts/snapshot-spike}"
+OUT="$ROOT/artifacts/snapshot"
+BASELINE_DIR="$ROOT/Tests/Snapshots"
+MODE="${1:-compare}"
 
 if [ ! -d "$APP" ]; then
   echo "missing app at $APP; run xcodebuild first" >&2
@@ -12,7 +14,10 @@ if [ ! -d "$APP" ]; then
 fi
 
 rm -rf "$OUT"
-mkdir -p "$OUT/run1" "$OUT/run2"
+mkdir -p "$OUT/current"
+if [ "$MODE" = "--determinism" ]; then
+  mkdir -p "$OUT/second"
+fi
 
 (
   cd "$ROOT/Packages/JingliCore"
@@ -42,19 +47,48 @@ run_once() {
   fi
 }
 
-run_once "$OUT/run1"
-run_once "$OUT/run2"
+compare_images() {
+  local baselineMain="$1"
+  local baselinePanel="$2"
+  local currentDir="$3"
+  local tag="$4"
+  "$DIFF" \
+    --baseline "$baselineMain" \
+    --current "$currentDir/main.png" \
+    --diff "$OUT/$tag-main.diff.png" \
+    --max-mismatch 0 | tee "$OUT/$tag-main.json"
+  "$DIFF" \
+    --baseline "$baselinePanel" \
+    --current "$currentDir/panel.png" \
+    --diff "$OUT/$tag-panel.diff.png" \
+    --max-mismatch 0 | tee "$OUT/$tag-panel.json"
+}
 
-"$DIFF" \
-  --baseline "$OUT/run1/main.png" \
-  --current "$OUT/run2/main.png" \
-  --diff "$OUT/main.diff.png" \
-  --max-mismatch 0 | tee "$OUT/main.json"
-
-"$DIFF" \
-  --baseline "$OUT/run1/panel.png" \
-  --current "$OUT/run2/panel.png" \
-  --diff "$OUT/panel.diff.png" \
-  --max-mismatch 0 | tee "$OUT/panel.json"
-
-echo "snapshots: $OUT"
+case "$MODE" in
+  --update)
+    run_once "$OUT/current"
+    mkdir -p "$BASELINE_DIR"
+    cp "$OUT/current/main.png" "$BASELINE_DIR/phase0-main.png"
+    cp "$OUT/current/panel.png" "$BASELINE_DIR/phase0-panel.png"
+    echo "updated baselines: $BASELINE_DIR/phase0-main.png, phase0-panel.png"
+    ;;
+  --determinism)
+    run_once "$OUT/current"
+    run_once "$OUT/second"
+    compare_images "$OUT/current/main.png" "$OUT/current/panel.png" "$OUT/second" "determinism"
+    echo "determinism passed (0 mismatch)"
+    ;;
+  compare|--compare)
+    if [ ! -f "$BASELINE_DIR/phase0-main.png" ] || [ ! -f "$BASELINE_DIR/phase0-panel.png" ]; then
+      echo "missing baselines; run scripts/snapshot.sh --update" >&2
+      exit 2
+    fi
+    run_once "$OUT/current"
+    compare_images "$BASELINE_DIR/phase0-main.png" "$BASELINE_DIR/phase0-panel.png" "$OUT/current" "baseline"
+    echo "snapshot passed"
+    ;;
+  *)
+    echo "usage: scripts/snapshot.sh [compare|--update|--determinism]" >&2
+    exit 2
+    ;;
+esac
