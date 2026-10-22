@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.4.0 — 2026-10-22
+
+发布候选：功能主体完成，自动化闭环通过，等待真实一天人工验收。
+
+- 版本号 `0.4.0`；Release 构建通过，Developer ID 签名 + zip 打包脚本可用。
+- `scripts/release-gate.sh`：full self-test + Release 构建 + bundle / 签名检查。
+- `scripts/release-build.sh`：可选 Developer ID 签名、zip、notarytool 公证。
+- `docs/test-plan.md` / `docs/manual-test.md` / `docs/known-unautomatable.md`。
+
 ## v0.3.0 — 2026-10-22
 
 功能主体完成，进入人工验收阶段。

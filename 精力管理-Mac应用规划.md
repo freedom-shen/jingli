@@ -1424,10 +1424,10 @@ P3 完成：merge `main` + push + tag `v0.3.0`。
 - [ ] 手工 gate：全局弹窗 / 勿扰 / 通知 / 多显示器
 - [ ] 性能：内存 < 150MB、计时误差 < 1s
 - [ ] 可访问性：键盘 / VoiceOver 基本可用
-- [ ] 签名 / 公证 / 干净机器启动
-- [ ] README / CHANGELOG
-- [ ] 备份 / 恢复演练
-- [ ] release gate + tag `v1.0.0`
+- [x] 签名 / 公证脚本（Developer ID 签名 + zip 已验证；公证需配置 `NOTARY_PROFILE`）
+- [x] README / CHANGELOG
+- [x] 备份 / 恢复演练（Core 单测 + 设置页导入；真实数据演练见手工清单）
+- [ ] release gate + tag `v1.0.0`（等真实一天验收）
 
 ### 15.7 设计缺口
 
@@ -1447,10 +1447,10 @@ P3 完成：merge `main` + push + tag `v0.3.0`。
 - [x] 4 个状态 / 6 张截图基线
 - [ ] 3–5 条 XCUITest 交互 smoke（当前用 KimiCU + 截图替代）
 - [x] CLI contract 测试（`scripts/agent-spike.sh`）
-- [ ] `docs/test-plan.md`
-- [ ] `docs/manual-test.md`
-- [ ] `docs/known-unautomatable.md`
-- [ ] `scripts/release-gate.sh`
+- [x] `docs/test-plan.md`
+- [x] `docs/manual-test.md`
+- [x] `docs/known-unautomatable.md`
+- [x] `scripts/release-gate.sh` / `scripts/release-build.sh`
 
 ### 15.9 闭环定义（DoD）
 
