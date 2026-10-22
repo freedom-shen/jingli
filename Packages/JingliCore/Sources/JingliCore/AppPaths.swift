@@ -18,4 +18,8 @@ public enum AppPaths {
     public static var socketURL: URL {
         supportDirectory.appendingPathComponent("agent.sock")
     }
+
+    public static var backupDirectory: URL {
+        supportDirectory.appendingPathComponent("Backups", isDirectory: true)
+    }
 }

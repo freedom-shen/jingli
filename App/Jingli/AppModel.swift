@@ -484,6 +484,35 @@ final class AppModel: ObservableObject {
         refreshStats()
     }
 
+    func openSettings() {
+        page = .settings
+    }
+
+    func runBackupNow() -> URL? {
+        try? BackupService(
+            database: store.database,
+            backupDirectory: AppPaths.backupDirectory
+        ).exportJSON()
+    }
+
+    func importBackup(from url: URL) -> ImportSummary? {
+        guard let summary = try? BackupService(
+            database: store.database,
+            backupDirectory: AppPaths.backupDirectory
+        ).importJSON(from: url) else {
+            return nil
+        }
+        reload()
+        return summary
+    }
+
+    func latestBackup() -> BackupInfo? {
+        try? BackupService(
+            database: store.database,
+            backupDirectory: AppPaths.backupDirectory
+        ).listBackups().first
+    }
+
     func refreshStats() {
         stats = try? store.todayStats()
     }
@@ -567,6 +596,7 @@ enum AppPage: Equatable {
     case projects
     case project(String)
     case stats
+    case settings
 }
 
 enum TaskFocusState {

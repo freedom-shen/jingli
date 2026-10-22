@@ -54,6 +54,8 @@ struct RootView: View {
             ProjectDetailView(model: model)
         case .stats:
             StatsView(model: model)
+        case .settings:
+            SettingsView(model: model)
         case .day:
             if let snapshot = model.snapshot {
                 if snapshot.dayStarted {
@@ -113,6 +115,10 @@ struct RootView: View {
                     model.openStats()
                 }
 
+                iconButton("gearshape", label: "设置", identifier: "settings-button") {
+                    model.openSettings()
+                }
+
                 iconButton("plus", label: "新建任务", identifier: "new-task-button") {
                     model.openTaskEditor()
                 }
@@ -131,7 +137,7 @@ struct RootView: View {
                 iconButton("pencil", label: "编辑项目", identifier: "edit-project-button") {
                     model.openProjectEditor(model.currentProject())
                 }
-            case .stats:
+            case .stats, .settings:
                 EmptyView()
             }
 
@@ -205,6 +211,8 @@ struct RootView: View {
             return model.currentProject()?.name ?? "项目"
         case .stats:
             return "统计"
+        case .settings:
+            return "设置"
         case .day:
             return model.dayStarted ? "今日任务" : "开启一天"
         }

@@ -16,6 +16,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         startAgentServer()
+        runDailyBackup()
 
         if CommandLine.arguments.contains("--show-panel") {
             DispatchQueue.main.async {
@@ -32,6 +33,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         false
+    }
+
+    private func runDailyBackup() {
+        guard ProcessInfo.processInfo.environment["JINGLI_NO_BACKUP"] != "1" else { return }
+        let service = BackupService(
+            database: AppServices.shared.database,
+            backupDirectory: AppPaths.backupDirectory
+        )
+        try? service.dailyBackup()
     }
 
     private func startAgentServer() {
