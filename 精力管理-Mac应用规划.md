@@ -1352,7 +1352,7 @@ Phase 0 的五件事（不写业务代码）：
 | 截图回归 | `day-start` / `today-running` / `stats` / `completion` 共 6 张基线；`--determinism` 连续两次 0 像素差异 |
 | 浮窗位置 | 拖到 `100,300` 后重启 → 恢复；保存坐标在屏幕外时回退默认位置且不覆盖原值 |
 | 跨天 | 注入昨日未完成任务 + 旧 session + `last_seen_day` → 启动后任务回未安排、session/day_plan 清空、`last_seen_day=今天` |
-| 勿扰 | 用 fake `shortcuts` 验证：start → On；pause 不调用；abandon / finish / quit → Off；重启活跃轮次 → 补 On；已有 Focus 时 unit test 保证不接管 |
+| 勿扰 | 真实 `Jingli Focus On/Off` 已创建；用 `Assertions.json` 验证 App 内 start → 1 个 assertion、pause/resume 保持、finish / abandon / stop → 0，再来一轮 → 1；fake shortcuts 另测已有 Focus 不接管 |
 | 完成弹窗 | 全局 NSPanel，`+0.5` 分摊、休息 / 再来一轮 / 回到清单均实测 |
 | 项目 CRUD | 手动新建「工作 / 本周重点」、改名、删除；删除后任务 `project_id` 变 NULL |
 | 任务详情 | `...` 打开 sheet，改标题 / 备注保存成功；完成任务写 `done=1` |
@@ -1469,7 +1469,7 @@ P3 完成：merge `main` + push + tag `v0.3.0`。
 
 自动化能做的都已做完（`scripts/release-gate.sh` 通过、v0.4.x 已打 tag）。下面这些必须由人参与：
 
-1. 按 `docs/focus-shortcuts.md` 创建 `Jingli Focus On` / `Jingli Focus Off`，然后跑 `scripts/focus-spike.sh`。
+1. ~~按 `docs/focus-shortcuts.md` 创建两个快捷指令~~（已完成，`scripts/focus-spike.sh` 通过）。
 2. 首次开始番茄钟时允许系统通知；可先在设置页「发送测试通知」。
 3. 按 `docs/manual-test.md` 过一遍：全屏 / 多 Space / Stage Manager、真实睡眠唤醒、通知操作按钮。
 4. 用真实 25 分钟完整过一天（至少 4 轮、2 次共享、1 次中途加 / 移任务，跨零点更好）。

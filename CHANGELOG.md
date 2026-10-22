@@ -45,6 +45,11 @@
 - 快照窗口固定 key 状态，避免前台 App 影响禁用按钮渲染。
 - 自测扩展：47 个 Core 测试、App 测试、扩展 agent spike（plan / start / focus / pause / resume / stop / undo）。
 
+### 已验证
+
+- 真实 `Jingli Focus On / Off` 已创建：App 开始专注 → 勿扰 assertion +1，暂停/继续保持，完成 / 废弃 / 停止 → 0，再来一轮 → 1。
+- `scripts/focus-spike.sh` 升级为读取系统断言，On/Off 真实校验；检测到已有勿扰时自动跳过。
+
 ### 已知限制
 
 - 真实勿扰快捷指令尚未创建，需按 `docs/focus-shortcuts.md` 手动建两个 Shortcuts。
