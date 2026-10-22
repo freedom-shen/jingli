@@ -2,6 +2,8 @@ import SwiftUI
 
 @main
 struct JingliApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+
     var body: some Scene {
         WindowGroup("精力管理") {
             RootView()

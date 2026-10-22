@@ -7,8 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0B7B8F7EA2AE9DC695147F99 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDE6A7E06DB79DA4FE43E59 /* AppDelegate.swift */; };
 		115F92C67CB33A4D41CA3C3D /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69C109D6B349355695ABB984 /* Theme.swift */; };
 		272F9FAE80A662AF8FC4CD1C /* JingliCore in Frameworks */ = {isa = PBXBuildFile; productRef = 00854301257684596A8AE39D /* JingliCore */; };
+		28C0E6164778C1B4CF4792E4 /* FloatingPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4E251DE0C315724C6D9C37 /* FloatingPanel.swift */; };
+		52A23BD3CE1C7F2F7DC6CC11 /* FloatingPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0ABF6A9D1C7AB24D1BDC9F2 /* FloatingPanelView.swift */; };
 		8BD20B4455E057AB5D7E093D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 71C1D692A0AB7C393EE3CCE0 /* Assets.xcassets */; };
 		A5465BE37DBAA78A1FB3C1A9 /* JingliApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC9618A2DBBE55DDF8631873 /* JingliApp.swift */; };
 		CE4F61388333ED626B1C2209 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94DA84C0289342098B879CF7 /* RootView.swift */; };
@@ -28,12 +31,15 @@
 
 /* Begin PBXFileReference section */
 		1BF08515B42BC266448DC3CF /* JingliTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JingliTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B4E251DE0C315724C6D9C37 /* FloatingPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingPanel.swift; sourceTree = "<group>"; };
 		69C109D6B349355695ABB984 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		71C1D692A0AB7C393EE3CCE0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		83D70C90B6CB19BF9F0720D9 /* Jingli.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Jingli.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8ECA132F9266F52FDF28D189 /* JingliCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = JingliCore; path = ../Packages/JingliCore; sourceTree = SOURCE_ROOT; };
+		8EDE6A7E06DB79DA4FE43E59 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		94DA84C0289342098B879CF7 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		BDD74A624DACE35D5575E551 /* JingliTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JingliTests.swift; sourceTree = "<group>"; };
+		C0ABF6A9D1C7AB24D1BDC9F2 /* FloatingPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingPanelView.swift; sourceTree = "<group>"; };
 		CC9618A2DBBE55DDF8631873 /* JingliApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JingliApp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -57,6 +63,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		13D23E6610CDDB365D4D03CE /* Floating */ = {
+			isa = PBXGroup;
+			children = (
+				4B4E251DE0C315724C6D9C37 /* FloatingPanel.swift */,
+				C0ABF6A9D1C7AB24D1BDC9F2 /* FloatingPanelView.swift */,
+			);
+			path = Floating;
+			sourceTree = "<group>";
+		};
 		55E4ADA9813DD50298B67C62 /* Design */ = {
 			isa = PBXGroup;
 			children = (
@@ -84,10 +99,12 @@
 		DBB32DD9EEC13BD511B4A2F0 /* Jingli */ = {
 			isa = PBXGroup;
 			children = (
+				8EDE6A7E06DB79DA4FE43E59 /* AppDelegate.swift */,
 				71C1D692A0AB7C393EE3CCE0 /* Assets.xcassets */,
 				CC9618A2DBBE55DDF8631873 /* JingliApp.swift */,
 				94DA84C0289342098B879CF7 /* RootView.swift */,
 				55E4ADA9813DD50298B67C62 /* Design */,
+				13D23E6610CDDB365D4D03CE /* Floating */,
 			);
 			path = Jingli;
 			sourceTree = "<group>";
@@ -212,6 +229,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0B7B8F7EA2AE9DC695147F99 /* AppDelegate.swift in Sources */,
+				28C0E6164778C1B4CF4792E4 /* FloatingPanel.swift in Sources */,
+				52A23BD3CE1C7F2F7DC6CC11 /* FloatingPanelView.swift in Sources */,
 				A5465BE37DBAA78A1FB3C1A9 /* JingliApp.swift in Sources */,
 				CE4F61388333ED626B1C2209 /* RootView.swift in Sources */,
 				115F92C67CB33A4D41CA3C3D /* Theme.swift in Sources */,

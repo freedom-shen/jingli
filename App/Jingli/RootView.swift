@@ -17,6 +17,20 @@ struct RootView: View {
                     Text("主线已选 0 / 4")
                         .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(Theme.textSecondary)
+
+                    Button("显示浮窗") {
+                        FloatingPanelController.shared.show()
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                    .accessibilityIdentifier("show-floating-panel")
+
+                    Button("隐藏浮窗") {
+                        FloatingPanelController.shared.hide()
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                    .accessibilityIdentifier("hide-floating-panel")
                 }
 
                 Text("Phase 0 骨架已就绪。下一步接入任务、计时与截图模式。")
