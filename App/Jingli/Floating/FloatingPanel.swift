@@ -10,15 +10,7 @@ enum FloatingPanelConfiguration {
     ]
     static let size = NSSize(width: 260, height: 360)
     static let margin: CGFloat = 24
-}
-
-/// Spike 验证用：把实际窗口层级 / collectionBehavior / frame 写到 JSON。
-struct PanelSpikeReport: Codable {
-    let level: Int
-    let collectionBehavior: UInt
-    let frame: [Double]
-    let screenFrame: [Double]
-    let timestamp: String
+    static let originDefaultsKey = "jingli.floatingPanel.origin"
 }
 
 final class FloatingPanel: NSPanel {
@@ -56,25 +48,17 @@ final class FloatingPanelController {
     static let shared = FloatingPanelController()
 
     private var panel: FloatingPanel?
+    private var moveObserver: NSObjectProtocol?
 
     private init() {}
 
     func show() {
         if let panel {
             panel.orderFrontRegardless()
-            writeReport(for: panel)
             return
         }
 
-        let screen = NSScreen.screens.first {
-            $0.frame.contains(NSEvent.mouseLocation)
-        } ?? NSScreen.main
-        let visible = screen?.visibleFrame ?? .zero
-        let origin = NSPoint(
-            x: visible.maxX - FloatingPanelConfiguration.size.width - FloatingPanelConfiguration.margin,
-            y: visible.minY + FloatingPanelConfiguration.margin
-        )
-        let frame = NSRect(origin: origin, size: FloatingPanelConfiguration.size)
+        let frame = NSRect(origin: restoredOrigin(), size: FloatingPanelConfiguration.size)
 
         let panel = FloatingPanel(contentRect: frame)
         let content = FloatingPanelView(
@@ -87,37 +71,60 @@ final class FloatingPanelController {
         panel.setFrame(frame, display: true)
         panel.orderFrontRegardless()
         self.panel = panel
-        writeReport(for: panel)
+
+        moveObserver = NotificationCenter.default.addObserver(
+            forName: NSWindow.didMoveNotification,
+            object: panel,
+            queue: .main
+        ) { [weak panel] _ in
+            guard let panel else { return }
+            MainActor.assumeIsolated {
+                FloatingPanelController.shared.persistOrigin(of: panel)
+            }
+        }
     }
 
     func hide() {
         panel?.orderOut(nil)
     }
 
-    private func writeReport(for panel: NSPanel) {
-        let report = PanelSpikeReport(
-            level: panel.level.rawValue,
-            collectionBehavior: panel.collectionBehavior.rawValue,
-            frame: [
-                Double(panel.frame.origin.x),
-                Double(panel.frame.origin.y),
-                Double(panel.frame.size.width),
-                Double(panel.frame.size.height)
-            ],
-            screenFrame: [
-                Double(panel.screen?.visibleFrame.origin.x ?? 0),
-                Double(panel.screen?.visibleFrame.origin.y ?? 0),
-                Double(panel.screen?.visibleFrame.size.width ?? 0),
-                Double(panel.screen?.visibleFrame.size.height ?? 0)
-            ],
-            timestamp: ISO8601DateFormatter().string(from: Date())
-        )
+    private func restoredOrigin() -> NSPoint {
+        let fallback = defaultOrigin()
+        guard
+            let saved = UserDefaults.standard.array(forKey: FloatingPanelConfiguration.originDefaultsKey),
+            saved.count == 2,
+            let x = (saved[0] as? NSNumber)?.doubleValue,
+            let y = (saved[1] as? NSNumber)?.doubleValue
+        else {
+            return fallback
+        }
 
-        guard let data = try? JSONEncoder().encode(report) else { return }
-        let directory = FileManager.default
-            .urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("Jingli", isDirectory: true)
-        try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        try? data.write(to: directory.appendingPathComponent("panel-spike.json"))
+        let frame = NSRect(
+            origin: NSPoint(x: x, y: y),
+            size: FloatingPanelConfiguration.size
+        )
+        let visible = NSScreen.screens.contains {
+            $0.visibleFrame.intersects(frame)
+        }
+        return visible ? frame.origin : fallback
+    }
+
+    private func defaultOrigin() -> NSPoint {
+        let screen = NSScreen.screens.first {
+            $0.frame.contains(NSEvent.mouseLocation)
+        } ?? NSScreen.main
+        let visible = screen?.visibleFrame ?? .zero
+        return NSPoint(
+            x: visible.maxX - FloatingPanelConfiguration.size.width - FloatingPanelConfiguration.margin,
+            y: visible.minY + FloatingPanelConfiguration.margin
+        )
+    }
+
+    private func persistOrigin(of panel: NSPanel) {
+        guard panel.isVisible else { return }
+        UserDefaults.standard.set(
+            [panel.frame.origin.x, panel.frame.origin.y],
+            forKey: FloatingPanelConfiguration.originDefaultsKey
+        )
     }
 }
