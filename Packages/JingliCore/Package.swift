@@ -6,7 +6,8 @@ let package = Package(
     platforms: [.macOS(.v15)],
     products: [
         .library(name: "JingliCore", targets: ["JingliCore"]),
-        .executable(name: "jingli-snapshot-diff", targets: ["SnapshotDiff"])
+        .executable(name: "jingli-snapshot-diff", targets: ["SnapshotDiff"]),
+        .executable(name: "jingli", targets: ["jingli"])
     ],
     dependencies: [
         .package(url: "https://github.com/groue/GRDB.swift.git", from: "7.11.1")
@@ -25,6 +26,11 @@ let package = Package(
         .executableTarget(
             name: "SnapshotDiff",
             path: "Sources/SnapshotDiff"
+        ),
+        .executableTarget(
+            name: "jingli",
+            dependencies: ["JingliCore"],
+            path: "Sources/jingli"
         )
     ]
 )

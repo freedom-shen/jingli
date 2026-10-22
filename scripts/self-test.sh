@@ -35,4 +35,7 @@ if [ "$MODE" = "--full" ]; then
   "$ROOT/scripts/snapshot.sh" --determinism | tee "$LOG_DIR/determinism.json"
 fi
 
+echo "== agent spike =="
+"$ROOT/scripts/agent-spike.sh" | tee "$LOG_DIR/agent-spike.log"
+
 echo "self-test passed ($MODE)"
