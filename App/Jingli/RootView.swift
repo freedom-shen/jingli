@@ -25,6 +25,9 @@ struct RootView: View {
         .sheet(isPresented: $model.isProjectEditorPresented) {
             ProjectEditorView(model: model, project: model.editingProject)
         }
+        .sheet(item: $model.detailTask) { task in
+            TaskDetailView(model: model, task: task)
+        }
         .alert(
             "出错了",
             isPresented: Binding(

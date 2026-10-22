@@ -261,6 +261,43 @@ public extension WorkspaceStore {
         }
     }
 
+    /// 今日已计入这件任务的番茄数（按分摊份额累加）。
+    func creditTotal(taskID: String, today: String = DayKey.make()) throws -> Double {
+        try database.queue.read { db in
+            try Double.fetchOne(
+                db,
+                sql: """
+                SELECT COALESCE(SUM(fst.share), 0)
+                FROM focus_session_task fst
+                JOIN focus_session fs ON fs.id = fst.session_id
+                WHERE fst.task_id = ? AND fs.session_date = ? AND fs.status = 'completed'
+                """,
+                arguments: [taskID, today]
+            ) ?? 0
+        }
+    }
+
+    @discardableResult
+    func updateTask(id: String, title: String, note: String) throws -> Task? {
+        let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { throw StoreError.emptyTitle }
+
+        return try database.queue.write { db in
+            try db.execute(
+                sql: "UPDATE task SET title = ?, note = ? WHERE id = ?",
+                arguments: [String(trimmed.prefix(160)), String(note.prefix(2000)), id]
+            )
+            guard let updated = try Row.fetchOne(
+                db,
+                sql: "SELECT * FROM task WHERE id = ?",
+                arguments: [id]
+            ) else {
+                return nil
+            }
+            return Task(row: updated)
+        }
+    }
+
     @discardableResult
     func toggleTask(id: String) throws -> Task? {
         try database.queue.write { db in

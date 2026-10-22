@@ -180,3 +180,54 @@ extension WorkspaceDayTests {
         )
     }
 }
+
+extension WorkspaceDayTests {
+    func testUpdateTaskTrimsTitleAndPersistsNote() throws {
+        let database = try JingliDatabase.inMemory()
+        let store = WorkspaceStore(database: database)
+        let task = try store.createTask(title: "原标题", lane: "main")
+
+        let updated = try store.updateTask(id: task.id, title: "  新标题  ", note: "备注内容")
+        XCTAssertEqual(updated?.title, "新标题")
+        XCTAssertEqual(updated?.note, "备注内容")
+
+        XCTAssertThrowsError(try store.updateTask(id: task.id, title: "   ", note: "")) { error in
+            guard case StoreError.emptyTitle = error else {
+                return XCTFail("unexpected error: \(error)")
+            }
+        }
+    }
+
+    func testCreditTotalSumsSharedPomodorosForToday() throws {
+        let database = try JingliDatabase.inMemory()
+        let store = WorkspaceStore(database: database)
+        let task = try store.createTask(title: "共享任务", lane: "main")
+        let other = try store.createTask(title: "另一件", lane: "main")
+
+        try database.queue.write { db in
+            try db.execute(
+                sql: """
+                INSERT INTO focus_session
+                    (id, session_date, started_at, duration_sec, status)
+                VALUES ('s1', '2026-10-22', '2026-10-22T09:00:00Z', 1500, 'completed')
+                """)
+            try db.execute(
+                sql: "INSERT INTO focus_session_task (session_id, task_id, share) VALUES ('s1', ?, 0.5)",
+                arguments: [task.id])
+            try db.execute(
+                sql: "INSERT INTO focus_session_task (session_id, task_id, share) VALUES ('s1', ?, 0.5)",
+                arguments: [other.id])
+            try db.execute(
+                sql: """
+                INSERT INTO focus_session
+                    (id, session_date, started_at, duration_sec, status)
+                VALUES ('s2', '2026-10-22', '2026-10-22T10:00:00Z', 1500, 'abandoned')
+                """)
+            try db.execute(
+                sql: "INSERT INTO focus_session_task (session_id, task_id, share) VALUES ('s2', ?, 1)",
+                arguments: [task.id])
+        }
+
+        XCTAssertEqual(try store.creditTotal(taskID: task.id, today: "2026-10-22"), 0.5, accuracy: 0.001)
+    }
+}

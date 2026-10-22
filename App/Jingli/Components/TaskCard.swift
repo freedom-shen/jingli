@@ -9,6 +9,7 @@ struct TaskCard: View {
     var onToggleSelection: (() -> Void)?
     var onDone: (() -> Void)?
     var onPlay: (() -> Void)?
+    var onDetail: (() -> Void)?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -59,13 +60,14 @@ struct TaskCard: View {
                         .buttonStyle(TaskIconButtonStyle(active: task.done))
                         .help(task.done ? "恢复任务" : "完成任务")
 
-                        Button(action: {}) {
+                        Button(action: { onDetail?() }) {
                             Image(systemName: "ellipsis")
                                 .font(.system(size: 12))
                                 .frame(width: 28, height: 28)
                         }
                         .buttonStyle(TaskIconButtonStyle())
                         .help("任务详情")
+                        .accessibilityLabel("任务详情")
                     }
                 }
             }

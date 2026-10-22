@@ -16,6 +16,7 @@ final class AppModel: ObservableObject {
     @Published private(set) var isOnBreak = false
     @Published private(set) var breakText = "05:00"
     @Published var completion: FocusCompletion?
+    @Published var detailTask: Task?
 
     private let store: WorkspaceStore
     private let timerStore: FocusTimerStore
@@ -142,6 +143,41 @@ final class AppModel: ObservableObject {
         } catch {
             errorMessage = error.localizedDescription
         }
+    }
+
+    func openTaskDetail(_ task: Task) {
+        detailTask = task
+    }
+
+    func closeTaskDetail() {
+        detailTask = nil
+    }
+
+    @discardableResult
+    func updateTask(id: String, title: String, note: String) -> Bool {
+        do {
+            try store.updateTask(id: id, title: title, note: note)
+            reload()
+            return true
+        } catch {
+            errorMessage = error.localizedDescription
+            return false
+        }
+    }
+
+    func toggleDetailDone() {
+        guard let task = detailTask else { return }
+        detailTask = nil
+        toggleDone(task)
+    }
+
+    func creditedPomodoros(for task: Task) -> Double {
+        (try? store.creditTotal(taskID: task.id)) ?? 0
+    }
+
+    func projectName(for task: Task) -> String {
+        guard let id = task.projectID else { return "无项目" }
+        return projects.first { $0.id == id }?.name ?? "无项目"
     }
 
     @discardableResult

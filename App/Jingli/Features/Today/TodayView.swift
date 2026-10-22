@@ -74,7 +74,8 @@ struct TodayView: View {
                             task: task,
                             focusState: model.focusState(for: task),
                             onDone: { model.toggleDone(task) },
-                            onPlay: { model.toggleFocus(for: task) }
+                            onPlay: { model.toggleFocus(for: task) },
+                            onDetail: { model.openTaskDetail(task) }
                         )
                     }
                 }
