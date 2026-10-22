@@ -1,8 +1,8 @@
 # 精力管理 · Mac 应用规划
 
-> 版本：v3.0（Phase 0 收尾）  
+> 版本：v3.1（Phase 0 收尾）  
 > 日期：2026-10-22  
-> 状态：P0-3 / P0-4 / P0-5 / P0-6 / P0-7 完成；P0-2 代码完成；剩余 P0-1 + P0-2 手工验证  
+> 状态：P0-3 / P0-4 / P0-5 / P0-6 / P0-7 完成；P0-1 / P0-2 代码完成，真实快捷指令与全屏 / Space 手工待验  
 > 输入材料：`精力管理 · Mac 应用设计稿 (1).pdf`、`精力管理 · Mac 应用设计稿.pdf`（v1，含项目页）、`精力管理 · App 图标.pdf`、`项目与任务管理器.html`、`项目与任务管理器-文字稿.txt`
 >
 > **2026-10-22 范围调整：应用只管理「今天」。不保留历史、不做 7 天 / 30 天图表、不迁移旧番茄历史。PDF 的「近 7 天柱状图」移出 v1。**
@@ -1342,18 +1342,19 @@ Phase 0 的五件事（不写业务代码）：
 - **P0-3 已完成**：`--snapshot` 抓主窗口 1440×900 + 浮窗 260×360；连续两次截图 0 像素差异；`jingli-snapshot-diff` 可用。
 - **P0-7 已完成**：`scripts/self-test.sh --fast/--full` 跑通；基线 `phase0-main.png` / `phase0-panel.png`。
 - **P0-4 已完成**：App 内 Unix socket + CLI；`socket=0600`、`ping=pong`、20 个并发 `task add` 最终 `count=20`。
-- 剩余 P0：P0-1（Shortcuts 勿扰）与 P0-2 的全屏 / Space 手工验证。
+- **P0-1 代码完成**：`FocusController` + `ProcessShortcutRunner` + 设置指南 + 2 条测试；真实 On/Off 需要先创建 `Jingli Focus On/Off` 两个快捷指令。
+- 剩余：P0-1 真实快捷指令验证、P0-2 全屏 / Space 手工验证。
 
 ### 15.2 开工门槛（P0，2–3 天）
 
 | # | 事项 | 完成标志 |
 |---|---|---|
-| P0-1 | Shortcuts 勿扰 spike | 真实 Focus On/Off；已有 Focus / 权限拒绝 / 重命名都有结论 |
+| P0-1 | 🟡 Shortcuts 勿扰 spike（代码完成） | `FocusController` / `focus-spike.sh` / 指南就绪；真实 On/Off 待创建两个快捷指令 |
 | P0-2 | 🟡 全局 NSPanel spike（代码完成） | `level=1000`、`collectionBehavior=321`、first-mouse 通过；全屏 / Space / Stage Manager 手工待做 |
 | P0-3 | ✅ 截图 spike（2026-10-22） | 主窗口 + 浮窗可抓图；连续两次 0 差异；diff 工具可用 |
 | P0-4 | ✅ 数据 / socket / CLI spike（2026-10-22） | socket 0600；20 并发写入后 count=20；`self-test --fast` 已包含 |
 | P0-5 | ✅ Xcode 工程 + JingliCore（2026-10-22） | 空页面能跑；build/test 通过；app 可启动 |
-| P0-6 | ✅ 数据模型 / 迁移 / fixtures（2026-10-22） | schema、rollover、purge、项目删除保任务；14 tests |
+| P0-6 | ✅ 数据模型 / 迁移 / fixtures（2026-10-22） | schema、rollover、purge、项目删除保任务；16 tests |
 | P0-7 | ✅ snapshot + self-test（2026-10-22） | `self-test --fast/--full` 通过；2 张基线；0 差异 |
 
 P0 完成：merge `main` + push + tag `v0.0.1-phase0`（可选）。

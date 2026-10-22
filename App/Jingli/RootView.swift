@@ -2,6 +2,8 @@ import SwiftUI
 import JingliCore
 
 struct RootView: View {
+    @State private var focusMessage = ""
+
     var body: some View {
         ZStack {
             Theme.background.ignoresSafeArea()
@@ -17,6 +19,30 @@ struct RootView: View {
                     Text("主线已选 0 / 4")
                         .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(Theme.textSecondary)
+
+                    Button("勿扰开") {
+                        do {
+                            try FocusController.shared.enable()
+                            focusMessage = "勿扰已开启"
+                        } catch {
+                            focusMessage = "勿扰失败：\(error.localizedDescription)"
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                    .accessibilityIdentifier("focus-on")
+
+                    Button("勿扰关") {
+                        do {
+                            try FocusController.shared.disable()
+                            focusMessage = "勿扰已关闭"
+                        } catch {
+                            focusMessage = "勿扰失败：\(error.localizedDescription)"
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                    .accessibilityIdentifier("focus-off")
 
                     Button("显示浮窗") {
                         FloatingPanelController.shared.show()
@@ -36,6 +62,12 @@ struct RootView: View {
                 Text("Phase 0 骨架已就绪。下一步接入任务、计时与截图模式。")
                     .font(.system(size: 14))
                     .foregroundStyle(Theme.textSecondary)
+
+                if !focusMessage.isEmpty {
+                    Text(focusMessage)
+                        .font(.system(size: 12))
+                        .foregroundStyle(Theme.accent)
+                }
 
                 Spacer()
             }
