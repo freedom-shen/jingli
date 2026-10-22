@@ -28,6 +28,9 @@ struct RootView: View {
         .sheet(item: $model.detailTask) { task in
             TaskDetailView(model: model, task: task)
         }
+        .sheet(isPresented: $model.isCommandBarPresented) {
+            CommandBarView(model: model)
+        }
         .alert(
             "出错了",
             isPresented: Binding(

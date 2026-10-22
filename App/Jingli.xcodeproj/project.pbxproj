@@ -10,6 +10,7 @@
 		0B73EB33180FF0CAEC713BC8 /* TaskEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D9911A61D3379CC6094732C /* TaskEditorView.swift */; };
 		0B7B8F7EA2AE9DC695147F99 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDE6A7E06DB79DA4FE43E59 /* AppDelegate.swift */; };
 		115F92C67CB33A4D41CA3C3D /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69C109D6B349355695ABB984 /* Theme.swift */; };
+		1D842E61FDA704D314CD69EA /* CommandBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED82CCB8A5F44619F8E92801 /* CommandBarView.swift */; };
 		272F9FAE80A662AF8FC4CD1C /* JingliCore in Frameworks */ = {isa = PBXBuildFile; productRef = 00854301257684596A8AE39D /* JingliCore */; };
 		28C0E6164778C1B4CF4792E4 /* FloatingPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4E251DE0C315724C6D9C37 /* FloatingPanel.swift */; };
 		2E29B1746F39E1025D19C0F8 /* DayStartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7212BA70871C2AD4EA5768C /* DayStartView.swift */; };
@@ -76,6 +77,7 @@
 		D4986D70767EE189D31D4A82 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		E7212BA70871C2AD4EA5768C /* DayStartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayStartView.swift; sourceTree = "<group>"; };
 		E8FB027571F00346C816CA6B /* ProjectEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectEditorView.swift; sourceTree = "<group>"; };
+		ED82CCB8A5F44619F8E92801 /* CommandBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandBarView.swift; sourceTree = "<group>"; };
 		FB557493D0233C0F0F8F7769 /* SnapshotRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotRunner.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -194,6 +196,7 @@
 		AA9EBC72E5E798EAABE99D97 /* TaskEditor */ = {
 			isa = PBXGroup;
 			children = (
+				ED82CCB8A5F44619F8E92801 /* CommandBarView.swift */,
 				A74B80342124F664E60A8A17 /* TaskDetailView.swift */,
 				1D9911A61D3379CC6094732C /* TaskEditorView.swift */,
 			);
@@ -382,6 +385,7 @@
 				0B7B8F7EA2AE9DC695147F99 /* AppDelegate.swift in Sources */,
 				40E19708FE03FABCE68B9048 /* AppModel.swift in Sources */,
 				345ABEDB01DE372C11B27639 /* AppServices.swift in Sources */,
+				1D842E61FDA704D314CD69EA /* CommandBarView.swift in Sources */,
 				90303DFEFF8EC8C5ED6C6A96 /* CompletionNotifier.swift in Sources */,
 				5861A4B37B65732741CF75C8 /* CompletionOverlay.swift in Sources */,
 				50DF0432443503B1D224B4E2 /* CompletionPanel.swift in Sources */,

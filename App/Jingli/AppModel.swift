@@ -18,6 +18,9 @@ final class AppModel: ObservableObject {
     @Published var completion: FocusCompletion?
     @Published var detailTask: Task?
     @Published private(set) var stats: TodayStats?
+    @Published var isCommandBarPresented = false
+    @Published var commandText = ""
+    @Published var commandMessage: String?
 
     private let store: WorkspaceStore
     private let timerStore: FocusTimerStore
@@ -486,6 +489,50 @@ final class AppModel: ObservableObject {
 
     func openSettings() {
         page = .settings
+    }
+
+    func openCommandBar() {
+        commandText = ""
+        commandMessage = nil
+        isCommandBarPresented = true
+    }
+
+    func executeCommand() {
+        let text = commandText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else { return }
+
+        if text == "统计" || text == "今天怎么样" {
+            isCommandBarPresented = false
+            openStats()
+            return
+        }
+
+        if text.hasPrefix("开始 ") {
+            let title = String(text.dropFirst(3)).trimmingCharacters(in: .whitespaces)
+            guard let task = (snapshot?.todayTasks ?? []).first(where: {
+                !$0.done && $0.title.localizedCaseInsensitiveContains(title)
+            }) else {
+                commandMessage = "今天的任务里找不到「\(title)」"
+                return
+            }
+            startFocus(task)
+            isCommandBarPresented = false
+            return
+        }
+
+        if text.hasPrefix("新任务 ") {
+            let title = String(text.dropFirst(4)).trimmingCharacters(in: .whitespaces)
+            guard !title.isEmpty else {
+                commandMessage = "新任务后面要跟标题"
+                return
+            }
+            if createTask(title: title, lane: "main", projectID: nil) {
+                isCommandBarPresented = false
+            }
+            return
+        }
+
+        commandMessage = "支持：开始 <任务> / 新任务 <标题> / 统计"
     }
 
     func runBackupNow() -> URL? {
