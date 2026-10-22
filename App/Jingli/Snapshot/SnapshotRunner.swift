@@ -1,5 +1,6 @@
 import AppKit
 import SwiftUI
+import JingliCore
 
 @MainActor
 enum SnapshotRunner {
@@ -9,11 +10,44 @@ enum SnapshotRunner {
 
         let mainPath = value(for: "--snapshot-out", in: arguments) ?? "/tmp/jingli-snapshot.png"
         let panelPath = value(for: "--snapshot-panel-out", in: arguments)
+        let fixture = value(for: "--snapshot-fixture", in: arguments) ?? "day-start"
 
-        let window = snapshotWindow()
+        do {
+            switch fixture {
+            case "today-running":
+                let task = try seedToday()
+                AppServices.shared.model.reload()
+                AppServices.shared.model.startSnapshotTimer(
+                    taskID: task.id,
+                    elapsedMs: 12 * 60 * 1000 + 19 * 1000
+                )
+                captureMainAndPanel(mainPath: mainPath, panelPath: panelPath)
+            case "stats":
+                try seedStats()
+                AppServices.shared.model.reload()
+                AppServices.shared.model.openStats()
+                captureMainAndPanel(mainPath: mainPath, panelPath: nil)
+            case "completion":
+                let tasks = try seedCompletionTasks()
+                captureCompletion(tasks: tasks, to: mainPath)
+            default:
+                captureMainAndPanel(mainPath: mainPath, panelPath: panelPath)
+            }
+        } catch {
+            fputs("snapshot failed: \(error)\n", stderr)
+            exit(1)
+        }
+    }
+
+    private static func captureMainAndPanel(mainPath: String, panelPath: String?) {
+        let window = makeWindow(rootView: AnyView(
+            RootView()
+                .environment(\.controlActiveState, .key)
+                .frame(width: 1440, height: 900)
+                .preferredColorScheme(.dark)
+        ))
         NSApp.activate(ignoringOtherApps: true)
         window.makeKeyAndOrderFront(nil)
-        AppServices.shared.model.reload()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             guard let contentView = window.contentView else {
@@ -43,20 +77,118 @@ enum SnapshotRunner {
         }
     }
 
-    private static func snapshotWindow() -> NSWindow {
-        let size = NSSize(width: 1440, height: 900)
+    private static func captureCompletion(tasks: [Task], to path: String) {
+        guard tasks.count == 2 else {
+            fputs("snapshot failed: completion fixture needs two tasks\n", stderr)
+            exit(1)
+        }
+        let completion = FocusCompletion(
+            sessionID: "snapshot",
+            taskIDs: tasks.map(\.id),
+            shares: [tasks[0].id: 0.5, tasks[1].id: 0.5]
+        )
+        let view = CompletionOverlay(
+            completion: completion,
+            tasks: tasks,
+            dimmed: false,
+            onBreak: {},
+            onNextRound: {},
+            onClose: {}
+        )
+        .environment(\.controlActiveState, .key)
+        .preferredColorScheme(.dark)
+
+        let window = makeWindow(
+            rootView: AnyView(view),
+            size: NSSize(width: 460, height: 560)
+        )
+        NSApp.activate(ignoringOtherApps: true)
+        window.makeKeyAndOrderFront(nil)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            guard let contentView = window.contentView else {
+                fputs("snapshot failed: no content view\n", stderr)
+                exit(1)
+            }
+            contentView.layoutSubtreeIfNeeded()
+            do {
+                try capture(contentView, to: URL(fileURLWithPath: path))
+            } catch {
+                fputs("snapshot failed: \(error)\n", stderr)
+                exit(1)
+            }
+            exit(0)
+        }
+    }
+
+    private static func seedToday() throws -> Task {
+        let store = AppServices.shared.store
+        let today = DayKey.make()
+        let project = try store.createProject(name: "工作", description: "本周重点")
+        let main = try store.createTask(
+            title: "整理产品需求",
+            projectID: project.id,
+            lane: "main",
+            plannedDate: today
+        )
+        let temporary = try store.createTask(
+            title: "回复客户邮件",
+            projectID: project.id,
+            lane: "temporary",
+            plannedDate: today
+        )
+        try store.startDay(taskIDs: [main.id, temporary.id], today: today)
+        return main
+    }
+
+    private static func seedStats() throws {
+        let store = AppServices.shared.store
+        let today = DayKey.make()
+        let project = try store.createProject(name: "工作")
+        let first = try store.createTask(
+            title: "整理产品需求",
+            projectID: project.id,
+            lane: "main",
+            plannedDate: today
+        )
+        let second = try store.createTask(
+            title: "回复客户邮件",
+            projectID: project.id,
+            lane: "temporary",
+            plannedDate: today
+        )
+        try store.startDay(taskIDs: [first.id, second.id], today: today)
+        _ = try store.toggleTask(id: second.id)
+
+        let startedAt = ISO8601DateFormatter().date(from: "2026-10-22T01:30:00Z") ?? Date()
+        let startedMs = Int64(startedAt.timeIntervalSince1970 * 1000)
+        guard var timer = FocusTimer(
+            taskIDs: [first.id, second.id],
+            sessionDate: today,
+            durationMs: 25 * 60 * 1000
+        ) else { return }
+        timer.start(now: startedMs, sessionID: "stats-snapshot")
+        timer.tick(now: startedMs + Int64(timer.durationMs))
+        _ = try FocusTimerStore(database: store.database).complete(timer, now: startedAt)
+    }
+
+    private static func seedCompletionTasks() throws -> [Task] {
+        let store = AppServices.shared.store
+        let project = try store.createProject(name: "工作")
+        return [
+            try store.createTask(title: "整理产品需求", projectID: project.id, lane: "main"),
+            try store.createTask(title: "回复客户邮件", projectID: project.id, lane: "temporary")
+        ]
+    }
+
+    private static func makeWindow(rootView: AnyView, size: NSSize = NSSize(width: 1440, height: 900)) -> NSWindow {
         let window = SnapshotWindow(
             contentRect: NSRect(origin: .zero, size: size),
             styleMask: [.borderless],
             backing: .buffered,
             defer: false
         )
-        window.contentView = NSHostingView(
-            rootView: RootView()
-                .environment(\.controlActiveState, .key)
-                .frame(width: size.width, height: size.height)
-                .preferredColorScheme(.dark)
-        )
+        window.contentView = NSHostingView(rootView: rootView)
         window.setContentSize(size)
         return window
     }

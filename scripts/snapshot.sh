@@ -8,6 +8,9 @@ OUT="$ROOT/artifacts/snapshot"
 BASELINE_DIR="$ROOT/Tests/Snapshots"
 MODE="${1:-compare}"
 
+SCENARIOS=(day-start today-running stats completion)
+PANEL_SCENARIOS=(day-start today-running)
+
 if [ ! -d "$APP" ]; then
   echo "missing app at $APP; run xcodebuild first" >&2
   exit 2
@@ -25,67 +28,110 @@ fi
 )
 DIFF="$ROOT/Packages/JingliCore/.build/debug/jingli-snapshot-diff"
 
-run_once() {
+has_panel() {
+  local fixture="$1"
+  local item
+  for item in "${PANEL_SCENARIOS[@]}"; do
+    [ "$item" = "$fixture" ] && return 0
+  done
+  return 1
+}
+
+run_scenario() {
   local dir="$1"
+  local fixture="$2"
   mkdir -p "$dir/support"
-  JINGLI_SUPPORT_DIR="$dir/support" "$APP/Contents/MacOS/Jingli" \
-    --snapshot \
-    --snapshot-out "$dir/main.png" \
-    --snapshot-panel-out "$dir/panel.png" \
-    > "$dir/run.log" 2>&1 &
+  local args=(
+    --snapshot
+    --snapshot-fixture "$fixture"
+    --snapshot-out "$dir/$fixture-main.png"
+  )
+  if has_panel "$fixture"; then
+    args+=(--snapshot-panel-out "$dir/$fixture-panel.png")
+  fi
+
+  JINGLI_SUPPORT_DIR="$dir/support" "$APP/Contents/MacOS/Jingli" "${args[@]}" \
+    > "$dir/$fixture-run.log" 2>&1 &
   local pid=$!
-  for _ in $(seq 1 40); do
-    if [ -f "$dir/main.png" ] && [ -f "$dir/panel.png" ]; then
-      break
+  for _ in $(seq 1 60); do
+    if [ -f "$dir/$fixture-main.png" ]; then
+      if ! has_panel "$fixture" || [ -f "$dir/$fixture-panel.png" ]; then
+        break
+      fi
     fi
     sleep 0.25
   done
   wait "$pid" || true
-  if [ ! -f "$dir/main.png" ] || [ ! -f "$dir/panel.png" ]; then
-    echo "snapshot missing in $dir" >&2
-    cat "$dir/run.log" >&2 || true
+
+  if [ ! -f "$dir/$fixture-main.png" ]; then
+    echo "snapshot missing: $dir/$fixture-main.png" >&2
+    cat "$dir/$fixture-run.log" >&2 || true
+    exit 1
+  fi
+  if has_panel "$fixture" && [ ! -f "$dir/$fixture-panel.png" ]; then
+    echo "panel snapshot missing: $dir/$fixture-panel.png" >&2
+    cat "$dir/$fixture-run.log" >&2 || true
     exit 1
   fi
 }
 
+run_all() {
+  local dir="$1"
+  local fixture
+  for fixture in "${SCENARIOS[@]}"; do
+    run_scenario "$dir" "$fixture"
+  done
+}
+
 compare_images() {
-  local baselineMain="$1"
-  local baselinePanel="$2"
-  local currentDir="$3"
-  local tag="$4"
-  "$DIFF" \
-    --baseline "$baselineMain" \
-    --current "$currentDir/main.png" \
-    --diff "$OUT/$tag-main.diff.png" \
-    --max-mismatch 0 | tee "$OUT/$tag-main.json"
-  "$DIFF" \
-    --baseline "$baselinePanel" \
-    --current "$currentDir/panel.png" \
-    --diff "$OUT/$tag-panel.diff.png" \
-    --max-mismatch 0 | tee "$OUT/$tag-panel.json"
+  local baselineDir="$1"
+  local currentDir="$2"
+  local tag="$3"
+  local fixture
+  for fixture in "${SCENARIOS[@]}"; do
+    "$DIFF" \
+      --baseline "$baselineDir/$fixture-main.png" \
+      --current "$currentDir/$fixture-main.png" \
+      --diff "$OUT/$tag-$fixture-main.diff.png" \
+      --max-mismatch 0 | tee "$OUT/$tag-$fixture-main.json"
+    if has_panel "$fixture"; then
+      "$DIFF" \
+        --baseline "$baselineDir/$fixture-panel.png" \
+        --current "$currentDir/$fixture-panel.png" \
+        --diff "$OUT/$tag-$fixture-panel.diff.png" \
+        --max-mismatch 0 | tee "$OUT/$tag-$fixture-panel.json"
+    fi
+  done
 }
 
 case "$MODE" in
   --update)
-    run_once "$OUT/current"
+    run_all "$OUT/current"
     mkdir -p "$BASELINE_DIR"
-    cp "$OUT/current/main.png" "$BASELINE_DIR/phase0-main.png"
-    cp "$OUT/current/panel.png" "$BASELINE_DIR/phase0-panel.png"
-    echo "updated baselines: $BASELINE_DIR/phase0-main.png, phase0-panel.png"
+    rm -f "$BASELINE_DIR"/phase0-*.png
+    for fixture in "${SCENARIOS[@]}"; do
+      cp "$OUT/current/$fixture-main.png" "$BASELINE_DIR/$fixture-main.png"
+      if has_panel "$fixture"; then
+        cp "$OUT/current/$fixture-panel.png" "$BASELINE_DIR/$fixture-panel.png"
+      fi
+    done
+    echo "updated baselines in $BASELINE_DIR"
     ;;
   --determinism)
-    run_once "$OUT/current"
-    run_once "$OUT/second"
-    compare_images "$OUT/current/main.png" "$OUT/current/panel.png" "$OUT/second" "determinism"
+    run_all "$OUT/current"
+    run_all "$OUT/second"
+    compare_images "$OUT/current" "$OUT/second" "determinism"
     echo "determinism passed (0 mismatch)"
     ;;
   compare|--compare)
-    if [ ! -f "$BASELINE_DIR/phase0-main.png" ] || [ ! -f "$BASELINE_DIR/phase0-panel.png" ]; then
-      echo "missing baselines; run scripts/snapshot.sh --update" >&2
-      exit 2
-    fi
-    run_once "$OUT/current"
-    compare_images "$BASELINE_DIR/phase0-main.png" "$BASELINE_DIR/phase0-panel.png" "$OUT/current" "baseline"
+    for fixture in "${SCENARIOS[@]}"; do
+      if [ ! -f "$BASELINE_DIR/$fixture-main.png" ]; then
+        echo "missing baseline $fixture-main.png; run scripts/snapshot.sh --update" >&2
+        exit 2
+      fi
+    done
+    run_all "$OUT/current"
+    compare_images "$BASELINE_DIR" "$OUT/current" "baseline"
     echo "snapshot passed"
     ;;
   *)

@@ -7,6 +7,12 @@ public struct FocusCompletion: Sendable, Identifiable {
     public let shares: [String: Double]
 
     public var id: String { sessionID }
+
+    public init(sessionID: String, taskIDs: [String], shares: [String: Double]) {
+        self.sessionID = sessionID
+        self.taskIDs = taskIDs
+        self.shares = shares
+    }
 }
 
 public final class FocusTimerStore: @unchecked Sendable {

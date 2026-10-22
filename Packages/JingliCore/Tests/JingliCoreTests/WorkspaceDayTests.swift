@@ -231,3 +231,49 @@ extension WorkspaceDayTests {
         XCTAssertEqual(try store.creditTotal(taskID: task.id, today: "2026-10-22"), 0.5, accuracy: 0.001)
     }
 }
+
+extension WorkspaceDayTests {
+    func testTodayStatsCountsOnlyCompletedSessions() throws {
+        let database = try JingliDatabase.inMemory()
+        let store = WorkspaceStore(database: database)
+        let today = "2026-10-22"
+        let first = try store.createTask(title: "写方案", lane: "main", plannedDate: today)
+        let second = try store.createTask(title: "回邮件", lane: "temporary", plannedDate: today)
+        _ = try store.toggleTask(id: second.id)
+
+        try database.queue.write { db in
+            try db.execute(
+                sql: """
+                INSERT INTO focus_session
+                    (id, session_date, started_at, duration_sec, status)
+                VALUES ('done', ?, '2026-10-22T09:00:00Z', 1500, 'completed')
+                """,
+                arguments: [today]
+            )
+            try db.execute(
+                sql: "INSERT INTO focus_session_task (session_id, task_id, share) VALUES ('done', ?, 0.5)",
+                arguments: [first.id]
+            )
+            try db.execute(
+                sql: "INSERT INTO focus_session_task (session_id, task_id, share) VALUES ('done', ?, 0.5)",
+                arguments: [second.id]
+            )
+            try db.execute(
+                sql: """
+                INSERT INTO focus_session
+                    (id, session_date, started_at, duration_sec, status)
+                VALUES ('gone', ?, '2026-10-22T10:00:00Z', 900, 'abandoned')
+                """,
+                arguments: [today]
+            )
+        }
+
+        let stats = try store.todayStats(today: today)
+        XCTAssertEqual(stats.pomodoros, 1)
+        XCTAssertEqual(stats.focusSeconds, 1500)
+        XCTAssertEqual(stats.completedTasks, 1)
+        XCTAssertEqual(stats.records.count, 1)
+        XCTAssertEqual(stats.records.first?.tasks.count, 2)
+        XCTAssertEqual(stats.records.first?.tasks.first?.share, 0.5)
+    }
+}

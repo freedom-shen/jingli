@@ -17,6 +17,7 @@ final class AppModel: ObservableObject {
     @Published private(set) var breakText = "05:00"
     @Published var completion: FocusCompletion?
     @Published var detailTask: Task?
+    @Published private(set) var stats: TodayStats?
 
     private let store: WorkspaceStore
     private let timerStore: FocusTimerStore
@@ -77,6 +78,9 @@ final class AppModel: ObservableObject {
             if case let .project(id) = page,
                !next.projects.contains(where: { $0.id == id }) {
                 page = .projects
+            }
+            if page == .stats {
+                refreshStats()
             }
             errorMessage = nil
         } catch {
@@ -431,7 +435,11 @@ final class AppModel: ObservableObject {
     }
 
     private func nowMilliseconds() -> Int64 {
-        Int64(Date().timeIntervalSince1970 * 1000)
+        if let raw = ProcessInfo.processInfo.environment["JINGLI_FAKE_NOW_MS"],
+           let fixed = Int64(raw) {
+            return fixed
+        }
+        return Int64(Date().timeIntervalSince1970 * 1000)
     }
 
     private var timerDurationMs: Int {
@@ -455,8 +463,29 @@ final class AppModel: ObservableObject {
         isTaskEditorPresented = true
     }
 
+    /// 截图测试专用：不触发勿扰、不做持久化的进行中计时。
+    func startSnapshotTimer(taskID: String, elapsedMs: Int64) {
+        guard var next = FocusTimer(
+            taskIDs: [taskID],
+            sessionDate: DayKey.make(),
+            durationMs: FocusTimer.defaultDurationMs
+        ) else { return }
+        next.start(now: nowMilliseconds() - elapsedMs, sessionID: "snapshot")
+        timer = next
+        updateTimerText()
+    }
+
     func openProjects() {
         page = .projects
+    }
+
+    func openStats() {
+        page = .stats
+        refreshStats()
+    }
+
+    func refreshStats() {
+        stats = try? store.todayStats()
     }
 
     func openProject(_ id: String) {
@@ -537,6 +566,7 @@ enum AppPage: Equatable {
     case day
     case projects
     case project(String)
+    case stats
 }
 
 enum TaskFocusState {

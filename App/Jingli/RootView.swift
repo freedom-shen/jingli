@@ -52,6 +52,8 @@ struct RootView: View {
             ProjectListView(model: model)
         case .project:
             ProjectDetailView(model: model)
+        case .stats:
+            StatsView(model: model)
         case .day:
             if let snapshot = model.snapshot {
                 if snapshot.dayStarted {
@@ -107,24 +109,30 @@ struct RootView: View {
                     .accessibilityIdentifier("reset-day-button")
                 }
 
-                iconButton("plus", identifier: "new-task-button") {
+                iconButton("chart.bar", label: "统计", identifier: "stats-button") {
+                    model.openStats()
+                }
+
+                iconButton("plus", label: "新建任务", identifier: "new-task-button") {
                     model.openTaskEditor()
                 }
 
-                iconButton("folder", identifier: "projects-button") {
+                iconButton("folder", label: "项目", identifier: "projects-button") {
                     model.openProjects()
                 }
             case .projects:
-                iconButton("plus", identifier: "new-project-button") {
+                iconButton("plus", label: "新建项目", identifier: "new-project-button") {
                     model.openProjectEditor(nil)
                 }
             case .project:
-                iconButton("plus", identifier: "new-project-task-button") {
+                iconButton("plus", label: "新建任务", identifier: "new-project-task-button") {
                     model.openTaskEditor(projectID: model.currentProject()?.id)
                 }
-                iconButton("pencil", identifier: "edit-project-button") {
+                iconButton("pencil", label: "编辑项目", identifier: "edit-project-button") {
                     model.openProjectEditor(model.currentProject())
                 }
+            case .stats:
+                EmptyView()
             }
 
             Button("浮窗") {
@@ -174,6 +182,7 @@ struct RootView: View {
 
     private func iconButton(
         _ systemName: String,
+        label: String,
         identifier: String,
         action: @escaping () -> Void
     ) -> some View {
@@ -184,6 +193,7 @@ struct RootView: View {
         }
         .buttonStyle(.bordered)
         .controlSize(.small)
+        .accessibilityLabel(label)
         .accessibilityIdentifier(identifier)
     }
 
@@ -193,6 +203,8 @@ struct RootView: View {
             return "项目"
         case .project:
             return model.currentProject()?.name ?? "项目"
+        case .stats:
+            return "统计"
         case .day:
             return model.dayStarted ? "今日任务" : "开启一天"
         }
