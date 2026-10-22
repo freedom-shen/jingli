@@ -1,8 +1,8 @@
 # 精力管理 · Mac 应用规划
 
-> 版本：v2.0（实现基线）  
+> 版本：v2.1（实现基线）  
 > 日期：2026-10-22  
-> 状态：技术栈与默认值已锁定；MCP 可选；待 Phase 0 实物与 4 个 spike  
+> 状态：技术栈与默认值已锁定；MCP 可选；每阶段 commit + push；待 Phase 0 实物与 4 个 spike  
 > 输入材料：`精力管理 · Mac 应用设计稿 (1).pdf`、`精力管理 · Mac 应用设计稿.pdf`（v1，含项目页）、`项目与任务管理器.html`、`项目与任务管理器-文字稿.txt`
 
 ---
@@ -1010,6 +1010,7 @@ scripts/design-compare.sh today-running-2    # App 截图 vs PDF 设计稿并排
 | 并发 | 单写 actor / 单队列；CLI 走 Unix socket，不直写 DB | 避免 UI 与 Agent 冲突 |
 | 备份 | 每日 JSON，保留 14 天；手动导出随时可用 | 恢复走导入向导 |
 | 错误恢复 | DB 损坏从最近备份恢复；磁盘满只读提示；Shortcut 缺失降级 | 不阻塞核心计时 |
+| Git 节奏 | **每个阶段结束 `commit` + `push`** | 不积压本地提交；每 Phase 打 tag |
 | 测试基线 | 15 个截图 case + CLI contract + 4 个 spike | 见 8.3 / 8.5 |
 
 ---
@@ -1088,6 +1089,7 @@ git push -u origin main
 - `main`：始终可构建、可运行。
 - 功能分支：`feat/timer-engine`、`feat/agent-bridge`、`fix/day-plan-reset`、`docs/git-workflow`。
 - 分支生命周期尽量短，完成后 **rebase merge** 回 `main`，保留功能分支上的分阶段提交；只有提交历史很乱时才 squash。
+- **每个阶段结束都要 `commit` + `push` 当前分支**，不要等整个功能做完才推；功能分支先 push，合并后再 push `main`。
 - 版本用 annotated tag：`v0.1.0`（Phase 1）、`v0.2.0`（Phase 2）、`v0.3.0`（Phase 3）、`v1.0.0`。
 - 预发布用 `v1.0.0-beta.1`；不单独开 release 分支。
 
@@ -1142,6 +1144,26 @@ test(timer): cover 1/2/3/4-way split and relaunch
 test(ui): add completion panel and break flow
 docs(timer): document state machine and test cases
 ```
+
+**阶段提交与推送（硬规则）：**
+
+每个阶段结束 = **commit + push**，不是只 commit。
+
+- 功能分支每完成一个子阶段（模型 / 逻辑 / UI / 测试 / 文档）就 commit + push 到 origin；开 draft PR 让进度可见。
+- `main` 合并后立即 `git push origin main`，保持远端与本地一致。
+- 每个 Phase 结束打 tag 并 push tag；tag 打在合并后的 `main` 上。
+- 推送失败 / 离线：把待推 commit 记在任务里，恢复网络后立刻补推；不允许连续积压多个阶段。
+- 每次 push 后，在 PR / 任务记录里写远程 commit hash（`git rev-parse --short HEAD`）。
+
+| 阶段 | 完成标志 | Git 动作 |
+|---|---|---|
+| 子阶段 | 一个逻辑切片可构建 | commit + push 功能分支 |
+| Phase 0 | 骨架 + 4 个 spike 通过 | merge `main` + push + tag `v0.0.1-phase0`（可选） |
+| Phase 1 | 核心闭环可日用 | merge `main` + push + tag `v0.1.0` |
+| Phase 2 | 功能对齐 + 迁移 | merge `main` + push + tag `v0.2.0` |
+| Phase 3 | Agent CLI 端到端 | merge `main` + push + tag `v0.3.0` |
+| Phase 4 | 7 天 dogfood 通过 | merge `main` + push + tag `v1.0.0` |
+| v1.1 | 精力层 / MCP 可选 | merge `main` + push + tag `v1.1.0` |
 
 ### 12.5 提交什么、忽略什么
 
@@ -1251,7 +1273,8 @@ Release job 在 tag 时触发：archive → 导出 `.app` → zip / dmg → 可�
 - 并行任务用 `git worktree`，一个任务一个工作区，避免互相踩文件。
 - 提交前必须跑 `scripts/check.sh`；提交信息用 Conventional Commits。
 - **必须分阶段提交**：一个功能拆成多个逻辑 commit，禁止一个 commit 塞完整个功能；每个 commit 都要能构建。
-- Agent 可以开 PR，但合并由人确认；PR 描述里列出 commit 顺序和每一步的验证结果。
+- **每个阶段结束必须 push**：commit 后立即 `git push origin <branch>`；禁止只在本地积压多个阶段。push 后在任务/PR 里写远程 commit hash。
+- Agent 可以开 PR，但合并由人确认；PR 描述里列出 commit 顺序、每一步的验证结果和已 push 的 hash。
 - 禁止 `git push --force` 到 `main`；禁止提交 token、数据库、备份、真实任务数据。
 
 ### 12.10 备份
@@ -1277,6 +1300,8 @@ git clone --mirror <private-repo-url> /Volumes/ssd/backups/jingli.git
 3. 数据模型 + 迁移 JSON schema + `Tests/Fixtures/` 样例。
 4. SwiftUI 工程骨架 + 设计 token + 空页面导航 + `--snapshot` 模式。
 5. 测试骨架：`scripts/self-test.sh` + `scripts/snapshot.sh` + 临时测试库 + 1 个截图基线。
+
+**每一步结束都 `commit` + `push`；不要攒到最后。** Phase 0 每完成一个 spike，也单独 commit + push。
 
 开工前建议先做 4 个 spike（每个 0.5–1 天），验证最危险的假设：
 
