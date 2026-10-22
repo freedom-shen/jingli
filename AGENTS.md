@@ -33,6 +33,7 @@ cd Packages/JingliCore && swift test
 
 scripts/self-test.sh --fast
 scripts/self-test.sh --full
+scripts/package.sh            # Release 构建 + zip + 安装到 /Applications
 scripts/snapshot.sh compare
 scripts/snapshot.sh --update
 scripts/agent-spike.sh

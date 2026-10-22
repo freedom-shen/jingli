@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.5.0 — 2026-10-22
+
+- 新增 `scripts/package.sh`：Release 构建 → 可选 Developer ID 签名 → zip → 退出旧进程 → 替换 `/Applications/Jingli.app` → 重新注册 LaunchServices；`--run` 安装后启动，`--install-dir` 可改安装目录。
+- `scripts/release-build.sh` 收敛为 `package.sh --no-install` 的兼容入口。
+- 版本号 `0.5.0`；已验证首次安装、运行中替换、`--run` 启动、签名校验。
+- 真实勿扰快捷指令创建并验证（见 v0.4.x 记录）。
+
 ## v0.4.0 — 2026-10-22
 
 发布候选：功能主体完成，自动化闭环通过，等待真实一天人工验收。

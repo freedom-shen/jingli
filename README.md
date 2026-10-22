@@ -25,12 +25,39 @@
 
 ## 构建与运行
 
+开发调试：
+
 ```bash
 cd App && xcodegen generate && cd ..
 xcodebuild -project App/Jingli.xcodeproj -scheme Jingli \
   -configuration Debug -destination 'platform=macOS' \
   -derivedDataPath /tmp/jingli-dd build
 open /tmp/jingli-dd/Build/Products/Debug/Jingli.app
+```
+
+## 打包与安装
+
+```bash
+scripts/package.sh            # Release 构建 + zip + 安装/替换到 /Applications
+scripts/package.sh --run      # 安装后启动
+scripts/package.sh --no-install   # 只构建 + zip
+scripts/package.sh --no-zip       # 只构建 + 安装
+scripts/package.sh --install-dir ~/Applications
+SIGN_IDENTITY=<证书 SHA-1 或名称> scripts/package.sh
+NOTARY_PROFILE=<keychain profile> scripts/package.sh   # 可选公证
+```
+
+产物：
+
+- `/Applications/Jingli.app`（替换旧版本前会先退出正在运行的 App，并重新注册 LaunchServices）
+- `artifacts/release/Jingli-<version>.zip`
+
+安装后验证：
+
+```bash
+plutil -p /Applications/Jingli.app/Contents/Info.plist | grep -E 'CFBundleShortVersionString|CFBundleIdentifier'
+codesign --verify --deep --strict /Applications/Jingli.app
+jingli ping
 ```
 
 独立数据目录运行（不污染正式数据）：
