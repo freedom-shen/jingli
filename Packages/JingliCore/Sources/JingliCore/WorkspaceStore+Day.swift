@@ -215,6 +215,39 @@ public extension WorkspaceStore {
         }
     }
 
+    @discardableResult
+    func toggleTask(id: String) throws -> Task? {
+        try database.queue.write { db in
+            guard let current = try Row.fetchOne(
+                db,
+                sql: "SELECT * FROM task WHERE id = ?",
+                arguments: [id]
+            ) else {
+                return nil
+            }
+
+            let done = current["done"] as Bool
+            let nextDone = !done
+            let completedAt = nextDone
+                ? ISO8601DateFormatter().string(from: Date())
+                : nil
+
+            try db.execute(
+                sql: "UPDATE task SET done = ?, completed_at = ? WHERE id = ?",
+                arguments: [nextDone, completedAt, id]
+            )
+
+            guard let updated = try Row.fetchOne(
+                db,
+                sql: "SELECT * FROM task WHERE id = ?",
+                arguments: [id]
+            ) else {
+                return nil
+            }
+            return Task(row: updated)
+        }
+    }
+
     private func validateSelection(
         _ taskIDs: [String],
         today: String,

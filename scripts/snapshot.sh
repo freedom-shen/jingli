@@ -27,7 +27,8 @@ DIFF="$ROOT/Packages/JingliCore/.build/debug/jingli-snapshot-diff"
 
 run_once() {
   local dir="$1"
-  "$APP/Contents/MacOS/Jingli" \
+  mkdir -p "$dir/support"
+  JINGLI_SUPPORT_DIR="$dir/support" "$APP/Contents/MacOS/Jingli" \
     --snapshot \
     --snapshot-out "$dir/main.png" \
     --snapshot-panel-out "$dir/panel.png" \

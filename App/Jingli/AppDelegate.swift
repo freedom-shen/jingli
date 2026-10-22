@@ -34,12 +34,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func startAgentServer() {
         do {
-            try FileManager.default.createDirectory(
-                at: AppPaths.supportDirectory,
-                withIntermediateDirectories: true
-            )
-            let database = try JingliDatabase.onDisk(at: AppPaths.databaseURL)
-            let server = AgentServer(database: database)
+            let server = AgentServer(database: AppServices.shared.database)
             try server.start(socketURL: AppPaths.socketURL)
             agentServer = server
         } catch {

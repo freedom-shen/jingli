@@ -2,78 +2,96 @@ import SwiftUI
 import JingliCore
 
 struct RootView: View {
-    @State private var focusMessage = ""
+    @StateObject private var model = AppModel()
 
     var body: some View {
         ZStack {
             Theme.background.ignoresSafeArea()
 
-            VStack(alignment: .leading, spacing: 24) {
-                HStack(alignment: .firstTextBaseline) {
-                    Text("开启一天")
-                        .font(.system(size: 28, weight: .semibold))
-                        .foregroundStyle(Theme.textPrimary)
+            VStack(alignment: .leading, spacing: 0) {
+                topBar
 
-                    Spacer()
-
-                    Text("主线已选 0 / 4")
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(Theme.textSecondary)
-
-                    Button("勿扰开") {
-                        do {
-                            try FocusController.shared.enable()
-                            focusMessage = "勿扰已开启"
-                        } catch {
-                            focusMessage = "勿扰失败：\(error.localizedDescription)"
-                        }
+                if let snapshot = model.snapshot {
+                    if snapshot.dayStarted {
+                        TodayView(model: model, snapshot: snapshot)
+                    } else {
+                        DayStartView(model: model, snapshot: snapshot)
                     }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
-                    .accessibilityIdentifier("focus-on")
-
-                    Button("勿扰关") {
-                        do {
-                            try FocusController.shared.disable()
-                            focusMessage = "勿扰已关闭"
-                        } catch {
-                            focusMessage = "勿扰失败：\(error.localizedDescription)"
-                        }
-                    }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
-                    .accessibilityIdentifier("focus-off")
-
-                    Button("显示浮窗") {
-                        FloatingPanelController.shared.show()
-                    }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
-                    .accessibilityIdentifier("show-floating-panel")
-
-                    Button("隐藏浮窗") {
-                        FloatingPanelController.shared.hide()
-                    }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
-                    .accessibilityIdentifier("hide-floating-panel")
+                } else {
+                    ProgressView()
+                        .controlSize(.small)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
-
-                Text("Phase 0 骨架已就绪。下一步接入任务、计时与截图模式。")
-                    .font(.system(size: 14))
-                    .foregroundStyle(Theme.textSecondary)
-
-                if !focusMessage.isEmpty {
-                    Text(focusMessage)
-                        .font(.system(size: 12))
-                        .foregroundStyle(Theme.accent)
-                }
-
-                Spacer()
             }
-            .padding(40)
         }
         .frame(minWidth: 1100, minHeight: 700)
         .preferredColorScheme(.dark)
+        .sheet(isPresented: $model.isTaskEditorPresented) {
+            TaskEditorView(model: model)
+        }
+        .alert(
+            "出错了",
+            isPresented: Binding(
+                get: { model.errorMessage != nil },
+                set: { if !$0 { model.errorMessage = nil } }
+            )
+        ) {
+            Button("好", role: .cancel) {}
+        } message: {
+            Text(model.errorMessage ?? "")
+        }
+        .onAppear { model.reload() }
+    }
+
+    private var topBar: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 12) {
+            Text(model.dayStarted ? "今日任务" : "开启一天")
+                .font(.system(size: 28, weight: .semibold))
+                .foregroundStyle(Theme.textPrimary)
+
+            Spacer()
+
+            Text(countText)
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(Theme.textSecondary)
+
+            if model.dayStarted {
+                Button("重置") {
+                    model.resetDay()
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+                .accessibilityIdentifier("reset-day-button")
+            }
+
+            Button {
+                model.openTaskEditor()
+            } label: {
+                Image(systemName: "plus")
+                    .font(.system(size: 13, weight: .semibold))
+                    .frame(width: 24, height: 24)
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+            .accessibilityIdentifier("new-task-button")
+
+            Button("浮窗") {
+                FloatingPanelController.shared.show()
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+            .accessibilityIdentifier("show-floating-panel")
+        }
+        .padding(.horizontal, 40)
+        .padding(.top, 28)
+        .padding(.bottom, 18)
+    }
+
+    private var countText: String {
+        if model.dayStarted {
+            let mainCount = model.snapshot?.todayTasks.filter { $0.lane == "main" }.count ?? 0
+            return "主线 \(mainCount) / 4"
+        }
+        return "主线已选 \(model.selectedMainCount) / 4"
     }
 }

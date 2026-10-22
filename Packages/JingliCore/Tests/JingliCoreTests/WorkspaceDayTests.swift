@@ -90,6 +90,18 @@ final class WorkspaceDayTests: XCTestCase {
         XCTAssertEqual(try store.taskCount(), 3)
     }
 
+    func testToggleTaskCompletion() throws {
+        let (store, _, t1, _) = try makeStore()
+
+        let done = try store.toggleTask(id: t1.id)
+        XCTAssertEqual(done?.done, true)
+        XCTAssertNotNil(done?.completedAt)
+
+        let reopened = try store.toggleTask(id: t1.id)
+        XCTAssertEqual(reopened?.done, false)
+        XCTAssertNil(reopened?.completedAt)
+    }
+
     private func makeStore() throws -> (WorkspaceStore, Project, Task, Task) {
         let database = try JingliDatabase.inMemory()
         let store = WorkspaceStore(database: database)

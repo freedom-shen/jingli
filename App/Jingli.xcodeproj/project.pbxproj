@@ -7,15 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0B73EB33180FF0CAEC713BC8 /* TaskEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D9911A61D3379CC6094732C /* TaskEditorView.swift */; };
 		0B7B8F7EA2AE9DC695147F99 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDE6A7E06DB79DA4FE43E59 /* AppDelegate.swift */; };
 		115F92C67CB33A4D41CA3C3D /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69C109D6B349355695ABB984 /* Theme.swift */; };
 		272F9FAE80A662AF8FC4CD1C /* JingliCore in Frameworks */ = {isa = PBXBuildFile; productRef = 00854301257684596A8AE39D /* JingliCore */; };
 		28C0E6164778C1B4CF4792E4 /* FloatingPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4E251DE0C315724C6D9C37 /* FloatingPanel.swift */; };
+		2E29B1746F39E1025D19C0F8 /* DayStartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7212BA70871C2AD4EA5768C /* DayStartView.swift */; };
+		345ABEDB01DE372C11B27639 /* AppServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E7406F01D0BA6A7FF9D04FA /* AppServices.swift */; };
+		40E19708FE03FABCE68B9048 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4986D70767EE189D31D4A82 /* AppModel.swift */; };
 		52A23BD3CE1C7F2F7DC6CC11 /* FloatingPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0ABF6A9D1C7AB24D1BDC9F2 /* FloatingPanelView.swift */; };
 		6640A7A6D24035C87D88E994 /* SnapshotRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB557493D0233C0F0F8F7769 /* SnapshotRunner.swift */; };
 		8BD20B4455E057AB5D7E093D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 71C1D692A0AB7C393EE3CCE0 /* Assets.xcassets */; };
 		A5465BE37DBAA78A1FB3C1A9 /* JingliApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC9618A2DBBE55DDF8631873 /* JingliApp.swift */; };
+		AE5E95FED3D3F8CFB42AA741 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E13E357DCCBD85D8BA129B9 /* TodayView.swift */; };
 		CE4F61388333ED626B1C2209 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94DA84C0289342098B879CF7 /* RootView.swift */; };
+		E28996E8F472B638EE36B8A5 /* TaskCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB8767B7A713D102C631EF4 /* TaskCard.swift */; };
 		F09691D382E6B33E87DDDAA4 /* JingliTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDD74A624DACE35D5575E551 /* JingliTests.swift */; };
 		FF00BF88A88ED10537CD2B0A /* JingliCore in Frameworks */ = {isa = PBXBuildFile; productRef = 8B43A917917AD4BD75DF5D28 /* JingliCore */; };
 /* End PBXBuildFile section */
@@ -32,9 +38,13 @@
 
 /* Begin PBXFileReference section */
 		1BF08515B42BC266448DC3CF /* JingliTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JingliTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1D9911A61D3379CC6094732C /* TaskEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskEditorView.swift; sourceTree = "<group>"; };
 		4B4E251DE0C315724C6D9C37 /* FloatingPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingPanel.swift; sourceTree = "<group>"; };
+		4BB8767B7A713D102C631EF4 /* TaskCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskCard.swift; sourceTree = "<group>"; };
+		5E7406F01D0BA6A7FF9D04FA /* AppServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppServices.swift; sourceTree = "<group>"; };
 		69C109D6B349355695ABB984 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		71C1D692A0AB7C393EE3CCE0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		7E13E357DCCBD85D8BA129B9 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
 		83D70C90B6CB19BF9F0720D9 /* Jingli.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Jingli.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8ECA132F9266F52FDF28D189 /* JingliCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = JingliCore; path = ../Packages/JingliCore; sourceTree = SOURCE_ROOT; };
 		8EDE6A7E06DB79DA4FE43E59 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -42,6 +52,8 @@
 		BDD74A624DACE35D5575E551 /* JingliTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JingliTests.swift; sourceTree = "<group>"; };
 		C0ABF6A9D1C7AB24D1BDC9F2 /* FloatingPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingPanelView.swift; sourceTree = "<group>"; };
 		CC9618A2DBBE55DDF8631873 /* JingliApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JingliApp.swift; sourceTree = "<group>"; };
+		D4986D70767EE189D31D4A82 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		E7212BA70871C2AD4EA5768C /* DayStartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayStartView.swift; sourceTree = "<group>"; };
 		FB557493D0233C0F0F8F7769 /* SnapshotRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotRunner.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -82,6 +94,14 @@
 			path = Snapshot;
 			sourceTree = "<group>";
 		};
+		4EE39AAC59CA7F57C896EC46 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				4BB8767B7A713D102C631EF4 /* TaskCard.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
 		55E4ADA9813DD50298B67C62 /* Design */ = {
 			isa = PBXGroup;
 			children = (
@@ -90,12 +110,36 @@
 			path = Design;
 			sourceTree = "<group>";
 		};
+		5D96B945E1E3D71F036CB901 /* Today */ = {
+			isa = PBXGroup;
+			children = (
+				7E13E357DCCBD85D8BA129B9 /* TodayView.swift */,
+			);
+			path = Today;
+			sourceTree = "<group>";
+		};
 		76DEF368BF4925F0C26E5ABC /* JingliTests */ = {
 			isa = PBXGroup;
 			children = (
 				BDD74A624DACE35D5575E551 /* JingliTests.swift */,
 			);
 			path = JingliTests;
+			sourceTree = "<group>";
+		};
+		862195377975CB8FA2846EB2 /* DayStart */ = {
+			isa = PBXGroup;
+			children = (
+				E7212BA70871C2AD4EA5768C /* DayStartView.swift */,
+			);
+			path = DayStart;
+			sourceTree = "<group>";
+		};
+		AA9EBC72E5E798EAABE99D97 /* TaskEditor */ = {
+			isa = PBXGroup;
+			children = (
+				1D9911A61D3379CC6094732C /* TaskEditorView.swift */,
+			);
+			path = TaskEditor;
 			sourceTree = "<group>";
 		};
 		B3959EEEB3BA261B32889EE5 /* Packages */ = {
@@ -110,14 +154,28 @@
 			isa = PBXGroup;
 			children = (
 				8EDE6A7E06DB79DA4FE43E59 /* AppDelegate.swift */,
+				D4986D70767EE189D31D4A82 /* AppModel.swift */,
+				5E7406F01D0BA6A7FF9D04FA /* AppServices.swift */,
 				71C1D692A0AB7C393EE3CCE0 /* Assets.xcassets */,
 				CC9618A2DBBE55DDF8631873 /* JingliApp.swift */,
 				94DA84C0289342098B879CF7 /* RootView.swift */,
+				4EE39AAC59CA7F57C896EC46 /* Components */,
 				55E4ADA9813DD50298B67C62 /* Design */,
+				E0E0FE5946D5209CDB131C46 /* Features */,
 				13D23E6610CDDB365D4D03CE /* Floating */,
 				2EDB01A4DA4E16EC3E5EB95F /* Snapshot */,
 			);
 			path = Jingli;
+			sourceTree = "<group>";
+		};
+		E0E0FE5946D5209CDB131C46 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				862195377975CB8FA2846EB2 /* DayStart */,
+				AA9EBC72E5E798EAABE99D97 /* TaskEditor */,
+				5D96B945E1E3D71F036CB901 /* Today */,
+			);
+			path = Features;
 			sourceTree = "<group>";
 		};
 		E57D9291E9C9FC423B254D6A /* Products */ = {
@@ -241,12 +299,18 @@
 			buildActionMask = 2147483647;
 			files = (
 				0B7B8F7EA2AE9DC695147F99 /* AppDelegate.swift in Sources */,
+				40E19708FE03FABCE68B9048 /* AppModel.swift in Sources */,
+				345ABEDB01DE372C11B27639 /* AppServices.swift in Sources */,
+				2E29B1746F39E1025D19C0F8 /* DayStartView.swift in Sources */,
 				28C0E6164778C1B4CF4792E4 /* FloatingPanel.swift in Sources */,
 				52A23BD3CE1C7F2F7DC6CC11 /* FloatingPanelView.swift in Sources */,
 				A5465BE37DBAA78A1FB3C1A9 /* JingliApp.swift in Sources */,
 				CE4F61388333ED626B1C2209 /* RootView.swift in Sources */,
 				6640A7A6D24035C87D88E994 /* SnapshotRunner.swift in Sources */,
+				E28996E8F472B638EE36B8A5 /* TaskCard.swift in Sources */,
+				0B73EB33180FF0CAEC713BC8 /* TaskEditorView.swift in Sources */,
 				115F92C67CB33A4D41CA3C3D /* Theme.swift in Sources */,
+				AE5E95FED3D3F8CFB42AA741 /* TodayView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
