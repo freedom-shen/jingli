@@ -4,12 +4,15 @@ import JingliCore
 struct CompletionOverlay: View {
     let completion: FocusCompletion
     let tasks: [Task]
+    var dimmed = true
     let onClose: () -> Void
 
     var body: some View {
         ZStack {
-            Color.black.opacity(0.62)
-                .ignoresSafeArea()
+            if dimmed {
+                Color.black.opacity(0.62)
+                    .ignoresSafeArea()
+            }
 
             VStack(spacing: 16) {
                 VStack(spacing: 6) {

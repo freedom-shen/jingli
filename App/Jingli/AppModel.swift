@@ -166,13 +166,15 @@ final class AppModel: ObservableObject {
 
         guard var next = FocusTimer(
             taskIDs: [task.id],
-            sessionDate: DayKey.make()
+            sessionDate: DayKey.make(),
+            durationMs: timerDurationMs
         ) else { return }
         next.start(now: nowMilliseconds(), sessionID: UUID().uuidString)
         next.setFocusMode(on: true, owned: true)
         timer = next
         persistTimer()
         updateTimerText()
+        CompletionNotifier.shared.requestAuthorization()
         try? FocusController.shared.enable()
     }
 
@@ -221,13 +223,28 @@ final class AppModel: ObservableObject {
     }
 
     func dismissCompletion() {
+        CompletionPanelController.shared.hide()
         completion = nil
         reload()
     }
 
     private func finish(_ finished: FocusTimer) {
+        let tasks = snapshot?.todayTasks ?? []
         do {
             completion = try timerStore.complete(finished)
+            if let completion {
+                CompletionPanelController.shared.show(
+                    completion: completion,
+                    tasks: tasks,
+                    onClose: { [weak self] in
+                        self?.dismissCompletion()
+                    }
+                )
+                CompletionNotifier.shared.notify(
+                    taskCount: finished.taskIDs.count,
+                    durationSeconds: finished.durationMs / 1000
+                )
+            }
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -255,6 +272,14 @@ final class AppModel: ObservableObject {
 
     private func nowMilliseconds() -> Int64 {
         Int64(Date().timeIntervalSince1970 * 1000)
+    }
+
+    private var timerDurationMs: Int {
+        if let raw = ProcessInfo.processInfo.environment["JINGLI_TIMER_SECONDS"],
+           let seconds = Int(raw), seconds > 0 {
+            return seconds * 1000
+        }
+        return FocusTimer.defaultDurationMs
     }
 
     func openTaskEditor() {

@@ -30,15 +30,6 @@ struct RootView: View {
         .sheet(isPresented: $model.isTaskEditorPresented) {
             TaskEditorView(model: model)
         }
-        .overlay {
-            if let completion = model.completion {
-                CompletionOverlay(
-                    completion: completion,
-                    tasks: model.snapshot?.todayTasks ?? [],
-                    onClose: { model.dismissCompletion() }
-                )
-            }
-        }
         .alert(
             "出错了",
             isPresented: Binding(

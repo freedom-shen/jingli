@@ -15,11 +15,13 @@
 		2E29B1746F39E1025D19C0F8 /* DayStartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7212BA70871C2AD4EA5768C /* DayStartView.swift */; };
 		345ABEDB01DE372C11B27639 /* AppServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E7406F01D0BA6A7FF9D04FA /* AppServices.swift */; };
 		40E19708FE03FABCE68B9048 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4986D70767EE189D31D4A82 /* AppModel.swift */; };
+		50DF0432443503B1D224B4E2 /* CompletionPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DE13761BE6BEB3CD41EFA0F /* CompletionPanel.swift */; };
 		52A23BD3CE1C7F2F7DC6CC11 /* FloatingPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0ABF6A9D1C7AB24D1BDC9F2 /* FloatingPanelView.swift */; };
 		5861A4B37B65732741CF75C8 /* CompletionOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01AAF237ABC51D878145362B /* CompletionOverlay.swift */; };
 		6640A7A6D24035C87D88E994 /* SnapshotRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB557493D0233C0F0F8F7769 /* SnapshotRunner.swift */; };
 		7BCF357191B3DEB13320C106 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81B1C4AAD464F2EE7768EFD7 /* MenuBarView.swift */; };
 		8BD20B4455E057AB5D7E093D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 71C1D692A0AB7C393EE3CCE0 /* Assets.xcassets */; };
+		90303DFEFF8EC8C5ED6C6A96 /* CompletionNotifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54C77D9C2834106F90D19635 /* CompletionNotifier.swift */; };
 		A5465BE37DBAA78A1FB3C1A9 /* JingliApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC9618A2DBBE55DDF8631873 /* JingliApp.swift */; };
 		AE5E95FED3D3F8CFB42AA741 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E13E357DCCBD85D8BA129B9 /* TodayView.swift */; };
 		CE4F61388333ED626B1C2209 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94DA84C0289342098B879CF7 /* RootView.swift */; };
@@ -44,9 +46,11 @@
 		1D9911A61D3379CC6094732C /* TaskEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskEditorView.swift; sourceTree = "<group>"; };
 		4B4E251DE0C315724C6D9C37 /* FloatingPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingPanel.swift; sourceTree = "<group>"; };
 		4BB8767B7A713D102C631EF4 /* TaskCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskCard.swift; sourceTree = "<group>"; };
+		54C77D9C2834106F90D19635 /* CompletionNotifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionNotifier.swift; sourceTree = "<group>"; };
 		5E7406F01D0BA6A7FF9D04FA /* AppServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppServices.swift; sourceTree = "<group>"; };
 		69C109D6B349355695ABB984 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		71C1D692A0AB7C393EE3CCE0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		7DE13761BE6BEB3CD41EFA0F /* CompletionPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionPanel.swift; sourceTree = "<group>"; };
 		7E13E357DCCBD85D8BA129B9 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
 		81B1C4AAD464F2EE7768EFD7 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
 		83D70C90B6CB19BF9F0720D9 /* Jingli.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Jingli.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -81,6 +85,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		06EFC76773112BFFF4D4E668 /* Completion */ = {
+			isa = PBXGroup;
+			children = (
+				7DE13761BE6BEB3CD41EFA0F /* CompletionPanel.swift */,
+			);
+			path = Completion;
+			sourceTree = "<group>";
+		};
 		13D23E6610CDDB365D4D03CE /* Floating */ = {
 			isa = PBXGroup;
 			children = (
@@ -172,11 +184,13 @@
 				71C1D692A0AB7C393EE3CCE0 /* Assets.xcassets */,
 				CC9618A2DBBE55DDF8631873 /* JingliApp.swift */,
 				94DA84C0289342098B879CF7 /* RootView.swift */,
+				06EFC76773112BFFF4D4E668 /* Completion */,
 				4EE39AAC59CA7F57C896EC46 /* Components */,
 				55E4ADA9813DD50298B67C62 /* Design */,
 				E0E0FE5946D5209CDB131C46 /* Features */,
 				13D23E6610CDDB365D4D03CE /* Floating */,
 				787B9E458E18C3D77DEBF2DA /* MenuBar */,
+				F9E18456D49FF1E54C45343E /* Notifications */,
 				2EDB01A4DA4E16EC3E5EB95F /* Snapshot */,
 			);
 			path = Jingli;
@@ -209,6 +223,14 @@
 				B3959EEEB3BA261B32889EE5 /* Packages */,
 				E57D9291E9C9FC423B254D6A /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		F9E18456D49FF1E54C45343E /* Notifications */ = {
+			isa = PBXGroup;
+			children = (
+				54C77D9C2834106F90D19635 /* CompletionNotifier.swift */,
+			);
+			path = Notifications;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -315,7 +337,9 @@
 				0B7B8F7EA2AE9DC695147F99 /* AppDelegate.swift in Sources */,
 				40E19708FE03FABCE68B9048 /* AppModel.swift in Sources */,
 				345ABEDB01DE372C11B27639 /* AppServices.swift in Sources */,
+				90303DFEFF8EC8C5ED6C6A96 /* CompletionNotifier.swift in Sources */,
 				5861A4B37B65732741CF75C8 /* CompletionOverlay.swift in Sources */,
+				50DF0432443503B1D224B4E2 /* CompletionPanel.swift in Sources */,
 				2E29B1746F39E1025D19C0F8 /* DayStartView.swift in Sources */,
 				28C0E6164778C1B4CF4792E4 /* FloatingPanel.swift in Sources */,
 				52A23BD3CE1C7F2F7DC6CC11 /* FloatingPanelView.swift in Sources */,
