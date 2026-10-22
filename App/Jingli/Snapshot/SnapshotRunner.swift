@@ -1,4 +1,5 @@
 import AppKit
+import SwiftUI
 
 @MainActor
 enum SnapshotRunner {
@@ -9,36 +10,54 @@ enum SnapshotRunner {
         let mainPath = value(for: "--snapshot-out", in: arguments) ?? "/tmp/jingli-snapshot.png"
         let panelPath = value(for: "--snapshot-panel-out", in: arguments)
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            do {
-                guard let window = NSApp.windows.first(where: {
-                    $0.contentView != nil && !($0 is FloatingPanel)
-                }), let contentView = window.contentView else {
-                    throw SnapshotError.noWindow
-                }
+        let window = snapshotWindow()
+        NSApp.activate(ignoringOtherApps: true)
+        window.makeKeyAndOrderFront(nil)
+        AppServices.shared.model.reload()
 
-                window.setContentSize(NSSize(width: 1440, height: 900))
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            guard let contentView = window.contentView else {
+                fputs("snapshot failed: no content view\n", stderr)
+                exit(1)
+            }
+
+            do {
                 contentView.layoutSubtreeIfNeeded()
                 try capture(contentView, to: URL(fileURLWithPath: mainPath))
-
-                guard let panelPath else {
-                    exit(0)
-                }
-
-                FloatingPanelController.shared.show()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    if let panel = NSApp.windows.first(where: { $0 is FloatingPanel }),
-                       let panelView = panel.contentView {
-                        panelView.layoutSubtreeIfNeeded()
-                        try? capture(panelView, to: URL(fileURLWithPath: panelPath))
-                    }
-                    exit(0)
-                }
             } catch {
                 fputs("snapshot failed: \(error)\n", stderr)
                 exit(1)
             }
+
+            guard let panelPath else { exit(0) }
+
+            FloatingPanelController.shared.show()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                if let panel = NSApp.windows.first(where: { $0 is FloatingPanel }),
+                   let panelView = panel.contentView {
+                    panelView.layoutSubtreeIfNeeded()
+                    try? capture(panelView, to: URL(fileURLWithPath: panelPath))
+                }
+                exit(0)
+            }
         }
+    }
+
+    private static func snapshotWindow() -> NSWindow {
+        let size = NSSize(width: 1440, height: 900)
+        let window = SnapshotWindow(
+            contentRect: NSRect(origin: .zero, size: size),
+            styleMask: [.borderless],
+            backing: .buffered,
+            defer: false
+        )
+        window.contentView = NSHostingView(
+            rootView: RootView()
+                .frame(width: size.width, height: size.height)
+                .preferredColorScheme(.dark)
+        )
+        window.setContentSize(size)
+        return window
     }
 
     private static func value(for flag: String, in arguments: [String]) -> String? {
@@ -81,8 +100,11 @@ enum SnapshotRunner {
     }
 }
 
+private final class SnapshotWindow: NSWindow {
+    override var canBecomeKey: Bool { true }
+}
+
 enum SnapshotError: Error {
-    case noWindow
     case emptyView
     case bitmapCreationFailed
     case pngEncodingFailed
