@@ -16,6 +16,7 @@
 		345ABEDB01DE372C11B27639 /* AppServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E7406F01D0BA6A7FF9D04FA /* AppServices.swift */; };
 		40E19708FE03FABCE68B9048 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4986D70767EE189D31D4A82 /* AppModel.swift */; };
 		52A23BD3CE1C7F2F7DC6CC11 /* FloatingPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0ABF6A9D1C7AB24D1BDC9F2 /* FloatingPanelView.swift */; };
+		5861A4B37B65732741CF75C8 /* CompletionOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01AAF237ABC51D878145362B /* CompletionOverlay.swift */; };
 		6640A7A6D24035C87D88E994 /* SnapshotRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB557493D0233C0F0F8F7769 /* SnapshotRunner.swift */; };
 		8BD20B4455E057AB5D7E093D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 71C1D692A0AB7C393EE3CCE0 /* Assets.xcassets */; };
 		A5465BE37DBAA78A1FB3C1A9 /* JingliApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC9618A2DBBE55DDF8631873 /* JingliApp.swift */; };
@@ -37,6 +38,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		01AAF237ABC51D878145362B /* CompletionOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionOverlay.swift; sourceTree = "<group>"; };
 		1BF08515B42BC266448DC3CF /* JingliTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JingliTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1D9911A61D3379CC6094732C /* TaskEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskEditorView.swift; sourceTree = "<group>"; };
 		4B4E251DE0C315724C6D9C37 /* FloatingPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingPanel.swift; sourceTree = "<group>"; };
@@ -97,6 +99,7 @@
 		4EE39AAC59CA7F57C896EC46 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				01AAF237ABC51D878145362B /* CompletionOverlay.swift */,
 				4BB8767B7A713D102C631EF4 /* TaskCard.swift */,
 			);
 			path = Components;
@@ -301,6 +304,7 @@
 				0B7B8F7EA2AE9DC695147F99 /* AppDelegate.swift in Sources */,
 				40E19708FE03FABCE68B9048 /* AppModel.swift in Sources */,
 				345ABEDB01DE372C11B27639 /* AppServices.swift in Sources */,
+				5861A4B37B65732741CF75C8 /* CompletionOverlay.swift in Sources */,
 				2E29B1746F39E1025D19C0F8 /* DayStartView.swift in Sources */,
 				28C0E6164778C1B4CF4792E4 /* FloatingPanel.swift in Sources */,
 				52A23BD3CE1C7F2F7DC6CC11 /* FloatingPanelView.swift in Sources */,

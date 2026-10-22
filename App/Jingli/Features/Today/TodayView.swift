@@ -72,8 +72,9 @@ struct TodayView: View {
                     ForEach(tasks) { task in
                         TaskCard(
                             task: task,
+                            focusState: model.focusState(for: task),
                             onDone: { model.toggleDone(task) },
-                            onPlay: {}
+                            onPlay: { model.toggleFocus(for: task) }
                         )
                     }
                 }

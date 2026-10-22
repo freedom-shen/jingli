@@ -14,6 +14,7 @@ public struct FocusTimer: Codable, Equatable, Sendable {
     public private(set) var phase: TimerPhase
     public private(set) var remainingMs: Int
     public private(set) var endsAt: Int64?
+    public private(set) var startedAt: Int64?
     public let durationMs: Int
     public private(set) var sessionID: String?
     public let sessionDate: String
@@ -31,6 +32,7 @@ public struct FocusTimer: Codable, Equatable, Sendable {
         self.phase = .ready
         self.remainingMs = durationMs
         self.endsAt = nil
+        self.startedAt = nil
         self.durationMs = durationMs
         self.sessionID = nil
         self.sessionDate = sessionDate
@@ -49,6 +51,7 @@ public struct FocusTimer: Codable, Equatable, Sendable {
     public mutating func start(now: Int64, sessionID: String) {
         guard phase == .ready else { return }
         self.sessionID = sessionID
+        self.startedAt = now
         phase = .running
         remainingMs = durationMs
         endsAt = now + Int64(durationMs)

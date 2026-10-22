@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 import JingliCore
 
 struct RootView: View {
@@ -29,6 +30,15 @@ struct RootView: View {
         .sheet(isPresented: $model.isTaskEditorPresented) {
             TaskEditorView(model: model)
         }
+        .overlay {
+            if let completion = model.completion {
+                CompletionOverlay(
+                    completion: completion,
+                    tasks: model.snapshot?.todayTasks ?? [],
+                    onClose: { model.dismissCompletion() }
+                )
+            }
+        }
         .alert(
             "出错了",
             isPresented: Binding(
@@ -41,6 +51,9 @@ struct RootView: View {
             Text(model.errorMessage ?? "")
         }
         .onAppear { model.reload() }
+        .onReceive(Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()) { _ in
+            model.tickFocus()
+        }
     }
 
     private var topBar: some View {
@@ -50,6 +63,31 @@ struct RootView: View {
                 .foregroundStyle(Theme.textPrimary)
 
             Spacer()
+
+            if model.timerIsActive {
+                HStack(spacing: 8) {
+                    Text(model.timerText)
+                        .font(.system(size: 13, weight: .semibold, design: .rounded))
+                        .foregroundStyle(Theme.accent)
+                        .monospacedDigit()
+
+                    Button(model.timerIsPaused ? "继续" : "暂停") {
+                        if model.timerIsPaused {
+                            model.resumeFocus()
+                        } else {
+                            model.pauseFocus()
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+
+                    Button("废弃") {
+                        model.abandonFocus()
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                }
+            }
 
             Text(countText)
                 .font(.system(size: 12, weight: .medium))
