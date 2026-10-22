@@ -3,7 +3,7 @@ import Combine
 import JingliCore
 
 struct RootView: View {
-    @StateObject private var model = AppModel()
+    @ObservedObject private var model = AppServices.shared.model
 
     var body: some View {
         ZStack {

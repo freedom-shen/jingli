@@ -7,11 +7,13 @@ final class AppServices {
 
     let database: JingliDatabase
     let store: WorkspaceStore
+    let model: AppModel
 
     private init() {
         if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil {
             database = try! JingliDatabase.inMemory()
             store = WorkspaceStore(database: database)
+            model = AppModel(store: store)
             return
         }
 
@@ -25,5 +27,6 @@ final class AppServices {
             database = try! JingliDatabase.inMemory()
         }
         store = WorkspaceStore(database: database)
+        model = AppModel(store: store)
     }
 }

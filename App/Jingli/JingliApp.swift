@@ -10,5 +10,12 @@ struct JingliApp: App {
         }
         .windowStyle(.hiddenTitleBar)
         .defaultSize(width: 1440, height: 900)
+
+        MenuBarExtra {
+            MenuBarPanel(model: AppServices.shared.model)
+        } label: {
+            MenuBarLabel(model: AppServices.shared.model)
+        }
+        .menuBarExtraStyle(.window)
     }
 }

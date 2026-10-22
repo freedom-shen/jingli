@@ -77,9 +77,12 @@ final class FloatingPanelController {
         let frame = NSRect(origin: origin, size: FloatingPanelConfiguration.size)
 
         let panel = FloatingPanel(contentRect: frame)
-        let content = FloatingPanelView(onClose: { [weak panel] in
-            panel?.orderOut(nil)
-        })
+        let content = FloatingPanelView(
+            model: AppServices.shared.model,
+            onClose: { [weak panel] in
+                panel?.orderOut(nil)
+            }
+        )
         panel.contentView = FirstMouseHostingView(rootView: content)
         panel.setFrame(frame, display: true)
         panel.orderFrontRegardless()
