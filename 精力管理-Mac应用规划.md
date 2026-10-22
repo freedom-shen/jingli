@@ -1,9 +1,11 @@
 # 精力管理 · Mac 应用规划
 
-> 版本：v2.1（实现基线）  
+> 版本：v2.2（实现基线）  
 > 日期：2026-10-22  
-> 状态：技术栈与默认值已锁定；MCP 可选；每阶段 commit + push；待 Phase 0 实物与 4 个 spike  
+> 状态：技术栈与默认值已锁定；MCP 可选；每阶段 commit + push；**范围收敛为「只管今天」**  
 > 输入材料：`精力管理 · Mac 应用设计稿 (1).pdf`、`精力管理 · Mac 应用设计稿.pdf`（v1，含项目页）、`项目与任务管理器.html`、`项目与任务管理器-文字稿.txt`
+>
+> **2026-10-22 范围调整：应用只管理「今天」。不保留历史、不做 7 天 / 30 天图表、不迁移旧番茄历史。PDF 的「近 7 天柱状图」移出 v1。**
 
 ---
 
@@ -15,7 +17,7 @@
 
 - 这个产品的价值不是「又一个待办」，而是「每天限制你只做少量重要的事」。
 - Mac 应用的差异化是「常驻但不打扰」：菜单栏、浮动番茄钟、通知、全局快捷键；开始专注时自动进入勿扰，结束自动恢复。
-- 先把闭环做扎实，再加精力 check-in / 周复盘，否则会变成记录负担。
+- 先把闭环做扎实；**只管理今天**，不做历史趋势，也不做周复盘。
 - Agent 不应该直接操作数据库，应该走统一的 Core API，才能保证 4 个主线、计时分摊等规则不被绕过。
 
 ---
@@ -32,7 +34,7 @@ v2 共 4 页，均为 1440×900 的深色界面。与 v1 相比，v2 用「本�
 | 今日清单 | 主线任务 / 临时任务两区；卡片底部左侧番茄数，右侧播放、完成、详情；右下角浮动番茄钟 |
 | 本轮番茄钟完成 | 全局置顶弹窗（独立 `NSPanel`，覆盖所有 App、全屏和 Space）：番茄图标、标题「本轮番茄钟完成」、副标题「25 分钟 · 2 件任务共同计时，各记 0.5 个」；参与任务逐行显示 +0.5；主按钮「开始休息 5 分钟」，次按钮「再来一轮」「回到清单」；背景浮窗显示 00:00「本轮结束」 |
 | 项目（v1） | 项目卡片网格，显示名称、说明、任务数；支持新建项目、进入项目 |
-| 精力统计 | 今日番茄钟、专注时长、完成任务三张 KPI；近 7 天柱状图；今日专注记录列表 |
+| 精力统计 | 今日番茄钟、专注时长、完成任务三张 KPI；今日专注记录列表。**v1 不做近 7 天柱状图**（范围收敛为「只管今天」） |
 
 视觉特征：纯黑背景、深色圆角卡片、克制的蓝色选中态、白色主按钮、SF 字体、细边框、低饱和度项目色。
 
@@ -65,14 +67,13 @@ localStorage 键：
 
 行为规格，覆盖：产品定位、视觉与布局、开启一天、今日任务、项目管理、浮动番茄钟、多任务共同计时、番茄钟统计、重置一天、文件使用与数据保存。
 
-### 1.4 需要确认的六个口径
+### 1.4 已定口径（范围收敛）
 
-1. **统计页只在 PDF 里有，HTML 没有。** 现有历史记录只有 `sessionId + taskIds`，没有时间戳；要做「今日 / 近 7 天」统计，必须补 `startedAt / endedAt`，否则迁移后的老数据无法按天归类。
-2. **PDF 的 7 天柱状图出现 2.5、3.5。** 按文字稿「一轮 = 1 个番茄，由到时仍参与的任务均分」，每天的总番茄数应该是整数；2.5/3.5 要么是设计稿示意，要么意味着支持半轮 / 部分计时。这个口径要定。
-3. **信息架构不一致。** PDF 的「开启一天」按项目分组；文字稿说首页按「主线 / 临时」平铺。建议以 PDF 为准（按项目分组更利于挑选），今日页仍按主线 / 临时分。
-4. **HTML 没有导出 / 备份入口。** 迁到 Mac 应用前，需要先加一个「导出 JSON」按钮，或者写一次性迁移脚本；否则只能重新录入。
-5. **时钟结束页引入了文字稿没有定义的行为。** ①「开始休息 5 分钟」是不是独立的 5 分钟倒计时？能否暂停 / 跳过？是否计入统计？②「再来一轮」是否复用本轮任务集合、是否排除已完成任务？③ 完成后浮窗仍显示「废弃本轮」，语义不对，应该改成「关闭」或「结束本轮」。这三件事需要补规格。
-6. **跨午夜轮次的统计归属未定义。** 23:50 开始、00:15 结束的一轮，算开始日还是结束日？建议按结束时间归属，和「完成」语义一致；需要在统计查询里固定，并写进测试用例。
+1. **只管理今天。** 不保留历史、不做近 7 天 / 30 天图表；统计页只显示「今日番茄钟 / 今日专注时长 / 今日完成任务 + 今日专注记录」。
+2. **不迁移旧番茄历史。** HTML 的 `liubai.pomodoro.v1.*` 不导入；只导入当前项目 / 任务 / 今日计划。进行中的计时如果跨天，忽略。
+3. **跨天规则。** 未完成任务回到未安排；今日番茄记录清空；已完成任务保留完成状态，可在项目中查看，但不进历史统计。
+4. **统计口径。** 日总番茄按整数；单任务按 `1/n` 份额；不做半轮。
+5. **时钟结束页。** 休息 5 分钟独立倒计时、可跳过、不计入统计；再来一轮复用未完成任务；完成后浮窗按钮改「关闭」。
 
 ---
 
@@ -87,7 +88,7 @@ localStorage 键：
 - **选**：每天最多 4 件主线，跨项目共用名额；临时任务不限。
 - **做**：25 分钟一轮，多任务共享倒计时，按参与人数均分。
 - **结算**：完成后弹窗展示每个任务的 `+1/n`，可开始 5 分钟休息、再来一轮或回到清单。
-- **看**：今天投入多少轮、多少分钟、完成了什么；近 7 天趋势。
+- **看**：今天投入多少轮、多少分钟、完成了什么；**不做历史趋势**。
 
 ### 2.3 Mac 差异化
 
@@ -175,7 +176,7 @@ localStorage 键：
 - **勿扰联动走 Shortcuts**：macOS 没有公开 API 直接设置 Focus；用「设置专注模式」快捷指令 + `shortcuts run`，不碰私有 API、不做 Control Center UI 脚本。
 - **本地优先**：SQLite WAL + 每日 JSON 备份；v1 不做云同步。
 - **Agent 走 Unix socket + JSON-RPC**：不监听公网端口，不需要防火墙权限；socket 目录 0600。
-- **原生组件**：`MenuBarExtra`、`NSPanel`、`UNUserNotificationCenter`、`SMAppService`、Swift Charts、GRDB。
+- **原生组件**：`MenuBarExtra`、`NSPanel`、`UNUserNotificationCenter`、`SMAppService`、GRDB。
 
 ### 4.2 技术栈
 
@@ -184,7 +185,6 @@ localStorage 键：
 | UI | SwiftUI + AppKit | MenuBarExtra、NSPanel、自定义暗色主题 |
 | 状态 | `@Observable` + Combine | 单一 Core，UI 只订阅 |
 | 数据库 | SQLite + GRDB | WAL、显式迁移、易被 CLI 读取 |
-| 图表 | Swift Charts | 7 天 / 30 天 |
 | 通知 | UNUserNotificationCenter | 轮次结束、操作按钮 |
 | 开机自启 | SMAppService | macOS 13+ |
 | 全局快捷键 | KeyboardShortcuts / Carbon | `⌃⌥Space`、`⌘⇧N` |
@@ -203,39 +203,36 @@ localStorage 键：
 | `task` | id, title, project_id, lane(main/temporary), planned_date, note, done, created_at, completed_at, sort_order | 主线每天最多 4 |
 | `day_plan` | date, started, started_at | 当天是否已开启 |
 | `day_plan_task` | date, task_id, lane, selected_at | 草稿选择；开启后固化 |
-| `focus_session` | id, started_at, ended_at, duration_sec, status, credited, focus_mode_on, focus_mode_owned | 一轮一条；记录本轮是否由应用开启 / 负责关闭勿扰 |
+| `focus_session` | id, session_date, started_at, ended_at, duration_sec, status, credited, focus_mode_on, focus_mode_owned | 一轮一条；**只保留今天**，跨天清空 |
 | `focus_session_task` | session_id, task_id, share | 完成时按人数均分，`1/n` |
-| `daily_checkin` | date, energy, mood, sleep_hours, note | v1.1 |
-| `agent_event` | id, at, actor, action, payload, undo | Agent 审计 |
+| `agent_event` | id, at, actor, action, payload, undo | Agent 审计（最近 50 条） |
 | `setting` | key, value | 偏好 |
 
 ### 5.1 必须保真的行为
 
 - 主线名额是**跨项目全局**的；完成后仍占当天的名额。
-- 开启一天：选中的任务安排到今天；未选中的原今日任务回到未安排状态；完成状态、项目归属、番茄历史保留。
-- 重置一天：不删除项目 / 任务，不恢复已完成任务，不清空累计番茄钟。
+- 开启一天：选中的任务安排到今天；未选中的原今日任务回到未安排状态；完成状态、项目归属、**今日番茄记录**保留。
+- 重置一天：不删除项目 / 任务，不恢复已完成任务，不清空**今日**累计番茄钟。
 - 共享计时：中途加入的任务参与均分；提前完成或移出的任务不记这一轮；暂停 / 废弃不增加统计；同一轮不能因刷新 / 重启重复累计。
 - 累计保留计算精度，只在显示时保留最多两位小数（三次 `1/3` 显示 1，不是 0.99）。
 - 新任务在「开启一天」和项目内创建时默认不安排日期；今日页创建默认今天。
+- **跨天清空**：未完成任务回到未安排；`focus_session` 删除；已完成任务保留完成状态，可在项目里查看，但不进历史统计。
 
-### 5.2 统计口径
+### 5.2 统计口径（只算今天）
 
-建议：
+- **今日总番茄** = 今天完成的轮数（每轮 1 个，shared round 也只算 1）。
+- **单任务番茄** = 今天 `sum(share)`，可能为 0.5 / 0.33 / 0.25。
+- **今日专注分钟** = 今天完成轮数 × 25。
+- **单任务参与时长** = 今天参与轮数 × 25；shared round 会在多个任务上重复计算，UI 上要和「今日总时长」分开标注。
+- **今日完成任务** = `completed_at` 是今天的任务。
+- **不做** 7 天 / 30 天窗口、legacy 历史、跨天累计；页面只展示今天。
 
-- **总番茄** = 完成轮数（每轮 1 个，shared round 也只算 1）。
-- **单任务番茄** = `sum(share)`，可能为 0.5 / 0.33 / 0.25。
-- **总专注分钟** = 完成轮数 × 25。
-- **单任务参与时长** = 参与轮数 × 25；shared round 会在多个任务上重复计算，UI 上要和「总时长」分开标注。
-- **完成任务** = `completed_at` 落在统计区间内的任务，不管创建于哪天。
-
-> 待确认：PDF 的 2.5 / 3.5 是否意味着支持半轮 / 部分计时，还是只是设计示意。
-
-### 5.3 迁移方案
+### 5.3 迁移方案（只导当前状态）
 
 - `workspace.v1` → `project` / `task` / `day_plan`。
-- `liubai.pomodoro.v1.*` → `focus_session`，标记 `legacy=1`、`ended_at=null`；保留累计次数，但不进时间序列图表。
-- `liubai.focus.v1` 进行中的计时 → 恢复；已结束未记账 → 补记一次。
-- 建议先在 HTML 里加「导出 JSON」，再在 Mac 应用里做导入向导。
+- `liubai.pomodoro.v1.*` **不导入**；旧番茄历史直接忽略。
+- `liubai.focus.v1` 进行中的计时：只有日期是今天才恢复，否则忽略。
+- 建议先在 HTML 里加「导出 JSON」，再在 Mac 应用里做导入向导；导入后不保留历史。
 
 迁移 JSON 建议结构：
 
@@ -244,8 +241,7 @@ localStorage 键：
   "schema": "jingli.export.v1",
   "exportedAt": "2026-10-22T09:00:00Z",
   "workspace": { "version": 1, "projects": [], "tasks": [], "dayPlan": null },
-  "focus": { "phase": "running", "taskIds": [], "remainingMs": 0, "endsAt": 0 },
-  "history": [{ "sessionId": "uuid", "taskIds": ["task-1", "task-2"] }]
+  "focus": { "phase": "running", "taskIds": [], "remainingMs": 0, "endsAt": 0 }
 }
 ```
 
@@ -359,7 +355,7 @@ Tool 返回结构化 JSON + 一句人类可读摘要，方便 Agent 转述。
 | **今日** | 主线 / 临时两区、卡片播放 / 完成 / 详情、完成态置灰划线 | 菜单栏快捷操作、通知 |
 | **时钟结束** | 全局置顶弹窗：本轮分摊 `+1/n`、开始休息 5 分钟、再来一轮、回到清单；背景浮窗 `00:00`「本轮结束」 | 独立 `NSPanel`，覆盖全屏 / 所有 Space；系统通知同款操作；休息倒计时可在浮窗 / 菜单栏显示 |
 | **项目** | 项目网格、项目详情、未分类任务 | 拖拽排序（可选） |
-| **统计** | 3 张 KPI、近 7 天柱状图、今日专注记录 | Swift Charts、导出 |
+| **统计** | 3 张今日 KPI、今日专注记录；**不做 7 天图表** | 导出（可选）；无 Swift Charts |
 | **浮窗** | 番茄钟、参与任务堆叠、添加 / 移出、废弃本轮；完成后显示 `00:00`「本轮结束」 | NSPanel 置顶、跨 Space、位置记忆 |
 | **菜单栏** | 倒计时、暂停 / 继续、快速添加、打开主窗口 | MenuBarExtra |
 | **设置** | 计时长度、通知、开机自启、数据备份、Agent、勿扰联动 | SMAppService、token 管理、快捷指令检查 |
@@ -448,12 +444,12 @@ Tool 返回结构化 JSON + 一句人类可读摘要，方便 Agent 转述。
 |---|---|---|---|
 | **Phase 0** | 2–3 天 | 定口径、设计 token、HTML 导出、工程骨架、测试骨架（`self-test.sh` / 测试库 / fake clock / `--snapshot` 模式） | 一页 PRD + 迁移 JSON 样例 + 空页面导航能跑 + `self-test --fast` 跑通空测试 + 1 个 snapshot case |
 | **Phase 1** | 5–7 天 | 原生壳 + SQLite + 任务 / 项目 CRUD + 今日页 + 计时器 + 菜单栏 + 浮窗 + 完成弹窗 + 勿扰联动 + 通知 | 能完整过一天：建任务 → 排期 → 开始 / 暂停 / 继续 → 完成 → 查看分摊 → 休息 / 再来一轮；开始 / 结束正确切换勿扰；重启 / 睡眠后计时准确；浮窗跨 Space 置顶 |
-| **Phase 2** | 5–7 天 | 开启一天（按项目分组）+ 重置 + 项目页 + 统计页 + 设置 + 迁移 | 功能对齐 HTML + PDF；7 天图表；老数据导入 |
+| **Phase 2** | 4–6 天 | 开启一天（按项目分组）+ 重置 + 项目页 + 今日统计页 + 设置 + 导入（只导任务/项目） | 功能对齐 HTML + PDF（不含 7 天图表）；今日统计；任务/项目导入 |
 | **Phase 3** | 4–5 天 | Agent socket + CLI + SKILL.md + 审计 / 撤销 + ⌘K | 新开一个 Agent 会话，说「帮我排今天的主线」能端到端完成；删除类操作无确认会被拒绝 |
-| **Phase 4** | 3–5 天 | 连续日用 7 天、性能 / 可访问性 / 图标 / 打包 / 备份 | 7 天无数据丢失；内存 < 150MB；计时误差 < 1s；无崩溃 |
-| **v1.1** | 1–2 周 | 精力 check-in、周复盘、日历、iCloud（可选）、MCP（可选） | 能回答「这周精力花在哪、主线完成率多少」 |
+| **Phase 4** | 2–3 天 | 完整一天 + 跨天重置、性能 / 可访问性 / 图标 / 打包 / 备份 | 完整一天无数据丢失；跨天清空正确；内存 < 150MB；计时误差 < 1s |
+| **v1.1（可选）** | 1 周 | 今日精力 check-in、MCP（可选）、英文（可选） | 能记录今天的精力状态；不做历史复盘 |
 
-按每天投入 2–3 小时算，v1.0 大约 3–4 周。
+按每天投入 2–3 小时算，v1.0 大约 **2–3 周**。
 
 ### 8.1 验收标准
 
@@ -481,8 +477,8 @@ Tool 返回结构化 JSON + 一句人类可读摘要，方便 Agent 转述。
 
 - [ ] 开启一天按项目分组，主线全局最多 4
 - [ ] 重置一天符合规格
-- [ ] 统计页 KPI / 7 天图表 / 今日记录
-- [ ] 老数据导入（含 legacy 历史）
+- [ ] 今日统计 KPI + 今日记录（无 7 天图表）
+- [ ] 任务 / 项目导入（不导旧番茄历史）
 - [ ] 设置项生效
 
 **Phase 3**
@@ -495,7 +491,8 @@ Tool 返回结构化 JSON + 一句人类可读摘要，方便 Agent 转述。
 
 **Phase 4**
 
-- [ ] 连续 7 天真实使用
+- [ ] 完整一天真实使用
+- [ ] 跨天重置：未完成任务回未安排、今日番茄清空、已完成保留
 - [ ] 无数据丢失
 - [ ] 内存 < 150MB，空闲 CPU ≈ 0
 - [ ] 计时误差 < 1s
@@ -518,10 +515,10 @@ Tool 返回结构化 JSON + 一句人类可读摘要，方便 Agent 转述。
 
 #### 8.2.2 测试夹具
 
-- HTML 导出：空工作区、Demo 数据、legacy 历史、进行中、暂停、已完成未记账。
+- HTML 导出：空工作区、Demo 数据、进行中、暂停、已完成未记账（不导旧番茄历史）。
 - 任务边界：160 字标题、2000 字备注、emoji、中英混排、特殊字符。
 - 计划边界：0 / 1 / 4 / 5 个主线、跨项目、已完成仍占名额、未排日期、过期临时任务。
-- 数据量：100 项目 / 10,000 任务 / 1,000 条番茄记录 / 30 天统计。
+- 数据量：100 项目 / 10,000 任务 / 今日 50 条番茄记录。
 - 异常：损坏 JSON、重复 ID、缺失项目、非法日期、负时长。
 - 数据库：空库、旧 schema、WAL 锁、只读、导入中断。
 - 快照：4 个主页面 + 完成弹窗的基准图。
@@ -531,15 +528,15 @@ Tool 返回结构化 JSON + 一句人类可读摘要，方便 Agent 转述。
 | 模块 | 必须覆盖 |
 |---|---|
 | 计时器 | 1/2/3/4 人均分；中途加入 / 移出；提前完成；暂停 / 继续；废弃；到时；重启；睡眠唤醒；时区 / DST / 手动改时钟；跨午夜；重复记账 |
-| 开启一天 | 主线全局 4 个上限；取消 / 重选；草稿保存；开始后未选任务回未安排；重置；完成仍占名额；跨日期 |
-| 统计 | 总番茄整数；单任务份额；总时长 vs 参与时长；7 天窗口；legacy 不计入时间序列；四舍五入；跨午夜归属 |
+| 开启一天 | 主线全局 4 个上限；取消 / 重选；草稿保存；开始后未选任务回未安排；重置；完成仍占名额；跨天重置 |
+| 统计 | 今日总番茄整数；单任务份额；今日总时长 vs 参与时长；四舍五入；跨午夜归属（只影响今天） |
 | 勿扰 | 快捷指令缺失 / 重命名；自动化拒绝；已有 Focus；手动关闭；休息 / 再来一轮；崩溃 / 重启；串行队列；调用延迟 |
 | 全局弹窗 | 主窗口关闭；App 后台；全屏；所有 Space；Stage Manager；多显示器；第一次点击；键盘焦点；Esc；屏幕共享 / 录制 |
 | 通知 | 允许 / 拒绝；前台 / 后台；通知动作；勿扰开启时系统通知被静音，但完成弹窗仍出现；声音 |
 | Agent | CLI JSON schema；dry-run；4 主线绕过；删除确认；审计 / 撤销；并发 UI + Agent；App 未运行；socket 失效；token 轮换；恶意输入；MCP（可选）不影响 v1 |
-| 迁移 | HTML 导出各变体；重复导入；中断导入；旧 schema 升级；备份 / 恢复 |
+| 迁移 | 任务 / 项目导入；重复导入；中断导入；旧 schema 升级；备份 / 恢复 |
 | UI | 1440×900 基准截图；1280 / 2560 宽度；4 列 / 窄屏；长文本截断；空状态；键盘导航；VoiceOver；Reduce Motion；高对比度；刘海菜单栏 |
-| 性能 | 空闲 CPU；计时中 CPU；内存；10k 任务；30 天图表；启动时间；8 小时连续计时；7 天 soak |
+| 性能 | 空闲 CPU；计时中 CPU；内存；10k 任务；启动时间；8 小时连续计时；跨天重置 |
 | 发布 | clean build；签名；notarize；首次启动；v1.0 → v1.1 升级；卸载残留；数据清理 |
 
 #### 8.2.4 环境矩阵
@@ -567,8 +564,8 @@ Tool 返回结构化 JSON + 一句人类可读摘要，方便 Agent 转述。
 
 #### 8.2.6 发布门槛
 
-- 连续 7 天真实使用（Phase 4 已有）。
-- 每天至少 4 轮番茄；至少 2 次共享轮次；至少 1 次中途加入 / 移出。
+- 完整一天真实使用（Phase 4 已有）+ 一次跨天重置。
+- 当天至少 4 轮番茄；至少 2 次共享轮次；至少 1 次中途加入 / 移出。
 - 至少 1 次睡眠唤醒、1 次强制退出、1 次勿扰手动关闭。
 - P0（数据丢失 / 崩溃 / 计时错误 / 勿扰残留）为零；P1 有明确 workaround。
 - 备份 / 恢复演练：导出 → 删除库 → 导入 → 数据一致。
@@ -647,7 +644,7 @@ doctor:      scripts/doctor.sh
 
 - `-ui-testing`：启用测试模式，隐藏 onboarding、禁用真实通知。
 - `-test-db /tmp/jingli-ui-<uuid>.sqlite`：独立测试库。
-- `-fixture empty|day-start|today|stats|legacy`：预置数据。
+- `-fixture empty|day-start|today|stats|finished`：预置数据（不预置历史）。
 - `-fake-clock 2026-10-22T09:00:00+08:00`：可控时间。
 - `-disable-animations`：关闭动效，减少 flaky。
 - `-window-size 1440x900`：固定窗口尺寸，便于截图。
@@ -657,7 +654,7 @@ doctor:      scripts/doctor.sh
 
 **Accessibility Identifier（所有可交互元素必须有）：**
 
-`main-window`、`day-start-button`、`task-card-<id>`、`task-play-<id>`、`task-done-<id>`、`task-detail-<id>`、`focus-dock`、`focus-clock`、`completion-panel`、`completion-row-<id>`、`break-button`、`next-round-button`、`back-to-list-button`、`menu-bar-extra`、`project-card-<id>`、`stats-kpi`、`stats-chart`。
+`main-window`、`day-start-button`、`task-card-<id>`、`task-play-<id>`、`task-done-<id>`、`task-detail-<id>`、`focus-dock`、`focus-clock`、`completion-panel`、`completion-row-<id>`、`break-button`、`next-round-button`、`back-to-list-button`、`menu-bar-extra`、`project-card-<id>`、`stats-kpi`。
 
 **核心 UI 用例：**
 
@@ -675,10 +672,11 @@ doctor:      scripts/doctor.sh
 | UI-10 | 完成任务 | 卡片置灰划线，仍占主线名额 |
 | UI-11 | 重置一天 | 回到开启一天，任务保留 |
 | UI-12 | 项目删除 | 任务进未分类 |
-| UI-13 | 统计页（种子数据） | KPI、7 天图、今日记录 |
+| UI-13 | 统计页（种子数据） | 今日 KPI、今日记录；无 7 天图 |
 | UI-14 | 菜单栏 | 显示倒计时，暂停 / 继续 |
 | UI-15 | 完成弹窗全局（测试模式） | 独立窗口存在；真实置顶手工测 |
 | UI-16 | 勿扰 Mock | start 调用 On，finish 调用 Off |
+| UI-17 | 跨天重置 | 未完成任务回未安排；今日番茄清空；已完成保留 |
 
 **UI 自动化的边界：**
 
@@ -729,7 +727,7 @@ doctor:      scripts/doctor.sh
 #### 8.3.6 CI
 
 - PR：`scripts/self-test.sh --fast` + UI smoke。
-- Nightly：`--full` + 性能 + 快照 + 假时钟 7 天模拟。
+- Nightly：`--full` + 性能 + 快照 + 假时钟跨天重置模拟。
 - Tag：release build + notarize + clean-user smoke。
 - macOS runner：`macos-26`；缓存 SPM；上传 `artifacts/`。
 - 测试报告：xcresult + JUnit；PR 里自动贴摘要。
@@ -763,7 +761,7 @@ doctor:      scripts/doctor.sh
 | **L3** | Agent 读报告 → 自动修 → 重跑 | 单元、集成、CLI、大部分 UI |
 | **L2** | 自动跑 + 机器可读报告，但修复靠人 | 快照、性能、迁移、崩溃恢复 |
 | **L1** | 脚本辅助，关键动作仍需人 | 签名 / 公证、升级、磁盘满、DB 损坏 |
-| **L0** | 只能手工，留证据 | 全局窗口、真实 Focus、通知中心、多显示器、真机 7 天 |
+| **L0** | 只能手工，留证据 | 全局窗口、真实 Focus、通知中心、多显示器、真机完整一天 |
 
 #### 8.4.2 不可自动化的边界（必须手工）
 
@@ -778,7 +776,7 @@ doctor:      scripts/doctor.sh
 | 签名 / 公证 / 首次启动 | Gatekeeper、quarantine、干净机器 | 需要干净 macOS 用户 / VM | `codesign` / `notarytool` / `spctl` 自动 + 干净 VM 手工 | 每个 release |
 | 升级 / 卸载 | 旧版本 → 新版本、残留文件 | 依赖真实用户目录 | 安装旧版 → 新版脚本 + 手工检查 | 每个 minor release |
 | macOS 升级 | 新系统行为变化 | 无法预测 | 环境矩阵手工跑 | 每次大版本 |
-| 真实 7 天使用 | 真实节奏、疲劳、注意力 | 无法模拟 | dogfood + 每天一句话记录 | 每个 v1.0 |
+| 真实完整一天 | 真实节奏、疲劳、注意力；跨天重置 | 无法模拟 | dogfood 一天 + 跨天重置检查 | 每个 v1.0 |
 | Agent / LLM 行为 | 模型选择、工具调用不确定性 | 不能断言唯一输出 | 合同测试 + 假 Agent + golden prompt eval（N 次阈值）+ 手工验收 | 每个 Phase 3 |
 | 视觉 / 手感 | 动画、拖拽、字体渲染、毛玻璃 | 截图抓不到手感 | 快照 + 录屏 + 设计 review | 每个 UI 变更 |
 | 辅助功能 / 输入法 | VoiceOver 体验、中文 IME 组合 | 自动 AX audit 只能查标签 | Accessibility Inspector + 手工 | 每个 release |
@@ -811,7 +809,7 @@ doctor:      scripts/doctor.sh
 - Mock 只能证明「我们调用正确」，不能证明「系统真的这么表现」；每个 mock 边界至少保留一条真实 smoke。
 - 不能自动化的项不要假装自动；写进 gate，留下证据。
 - 每次 macOS 升级重跑手工矩阵；系统行为变化是最大风险。
-- Dogfood 是最终测试：7 天真实使用 > 100 条 UI 用例。
+- Dogfood 是最终测试：**完整一天 + 跨天重置** > 100 条 UI 用例。
 
 #### 8.4.6 还缺的文档 / 脚本
 
@@ -861,7 +859,7 @@ Agent 读 report.json → 修 → 重跑
 | `today-many` | 4 主线 + 8 临时 | 4 列 / 换行 / 滚动 |
 | `projects` | 5 个项目 + 未分类 | 网格、颜色、任务数 |
 | `project-detail` | 项目详情 | 任务列表、空状态 |
-| `stats-data` | 7 天数据 | KPI、柱状图、今日记录 |
+| `stats-data` | 今日数据 | 今日 KPI、今日记录 |
 | `stats-empty` | 无数据 | 空状态 |
 | `settings` | 设置页 | 勿扰、Agent、数据 |
 | `dialog-task` | 新建 / 编辑任务 | 表单、日期快捷键 |
@@ -968,7 +966,7 @@ scripts/design-compare.sh today-running-2    # App 截图 vs PDF 设计稿并排
 |---|---|---|
 | 范围蔓延 | 精力层变成记录负担，v1 迟迟不能日用 | 冻结 v1 范围；精力层放 v1.1 |
 | 计时器 bug | 睡眠 / 时钟跳变 / 重复记账导致统计错误 | Core 单点计时；`credited` 幂等；先写单元测试 |
-| 迁移丢失 | localStorage 老数据无法按天统计 | 先加导出；legacy 记录只保留累计次数 |
+| 迁移丢失 | 只导任务/项目，旧番茄历史不导；用户误以为历史还在 | 导入向导明确写「只导入当前任务/项目，不导入历史」；旧历史不展示 |
 | 沙盒 / 签名 | 本地 socket + CLI 受 entitlement 限制 | 个人使用不做沙盒；Developer ID 签名 |
 | 设计还原 | 一边写逻辑一边调像素，效率低 | 先做 design tokens，再做页面 |
 | Agent 安全 | Agent 误删 / 误改 | 本地 socket + token；破坏性操作 confirm；审计 + undo |
@@ -988,10 +986,11 @@ scripts/design-compare.sh today-running-2    # App 截图 vs PDF 设计稿并排
 | 项目 | 决定 | 说明 |
 |---|---|---|
 | 技术栈 | **SwiftUI + AppKit** | 2026-10-22 已定 |
-| 精力层 | **v1 不含，放 v1.1** | 先做任务 + 番茄 + 统计闭环 |
-| 统计口径 | 日总番茄按整数；单任务按 `1/n` 份额；**不做半轮** | 2.5 / 3.5 视为设计示意 |
-| 跨午夜 | 按**结束时间**归属 | 23:50–00:15 算结束日 |
-| HTML 数据 | 提供导出 / 导入；无数据则空库开始 | legacy 只保留累计次数，不进时间序列 |
+| 精力层 | **v1 不含；v1.1 只做今日 check-in** | 不做历史复盘 |
+| 统计口径 | **只算今天**；日总番茄按整数；单任务按 `1/n`；不做 7 天 / 30 天 | 2.5 / 3.5 视为设计示意 |
+| 跨午夜 | 按**结束时间**归属，只影响今天 | 23:50–00:15 算结束日；跨天清空 |
+| 数据保留 | **只保留今天**；跨天删除 `focus_session` | 任务 / 项目保留，已完成任务保留完成状态 |
+| HTML 数据 | 只导任务 / 项目 / 今日计划；旧番茄历史不导 | 导入向导明确提示 |
 | 产品名 | 显示名「精力管理」，内部代号 `jingli` | bundle id `com.freedom-shen.jingli` |
 | 同步 | v1 只本地 + 每日 JSON 备份（保留 14 天）+ 手动导出 | iCloud 放 v1.1 |
 | Agent | **CLI + `SKILL.md`；MCP 可选，v1 不做** | 不做内嵌聊天；外部 Agent 通过 CLI 操作 |
@@ -1162,7 +1161,7 @@ docs(timer): document state machine and test cases
 | Phase 1 | 核心闭环可日用 | merge `main` + push + tag `v0.1.0` |
 | Phase 2 | 功能对齐 + 迁移 | merge `main` + push + tag `v0.2.0` |
 | Phase 3 | Agent CLI 端到端 | merge `main` + push + tag `v0.3.0` |
-| Phase 4 | 7 天 dogfood 通过 | merge `main` + push + tag `v1.0.0` |
+| Phase 4 | 完整一天 + 跨天重置通过 | merge `main` + push + tag `v1.0.0` |
 | v1.1 | 精力层 / MCP 可选 | merge `main` + push + tag `v1.1.0` |
 
 ### 12.5 提交什么、忽略什么
@@ -1257,7 +1256,7 @@ PR 模板：
 GitHub Actions 或 GitLab CI，macOS runner：
 
 - PR：`scripts/self-test.sh --fast`（build + unit + integration + UI smoke + snapshots + lint）。
-- Nightly：`scripts/self-test.sh --full`（全量 UI + 性能 + 假时钟 7 天模拟）。
+- Nightly：`scripts/self-test.sh --full`（全量 UI + 性能 + 假时钟跨天重置模拟）。
 - `swift test`（JingliCore / CLI）；`xcodebuild test -only-testing:JingliUITests`（UI）。
 - `swiftformat --lint`、`swiftlint`、`shellcheck scripts/*.sh`。
 - 缓存 SPM 依赖；上传 `artifacts/`、xcresult、失败截图。
@@ -1296,7 +1295,7 @@ git clone --mirror <private-repo-url> /Volumes/ssd/backups/jingli.git
 如果方向认可，直接做 Phase 0 的五件事（不写业务代码）：
 
 1. 第 10 节默认值已定，不再需要拍板；按该表执行。
-2. 一页 PRD：把 6 个口径问题写死。
+2. 一页 PRD：把「只管今天」、跨天规则、迁移边界写死。
 3. 数据模型 + 迁移 JSON schema + `Tests/Fixtures/` 样例。
 4. SwiftUI 工程骨架 + 设计 token + 空页面导航 + `--snapshot` 模式。
 5. 测试骨架：`scripts/self-test.sh` + `scripts/snapshot.sh` + 临时测试库 + 1 个截图基线。
@@ -1308,7 +1307,7 @@ git clone --mirror <private-repo-url> /Volumes/ssd/backups/jingli.git
 - [ ] **Shortcuts 勿扰**：创建 `Jingli Focus On/Off`，用 `shortcuts run` 开关勿扰；验证已有 Focus、自动化权限被拒、重命名。
 - [ ] **全局 NSPanel**：覆盖全屏应用 / 所有 Space / Stage Manager；第一次点击可点；不抢键盘焦点。
 - [ ] **截图模式**：`cacheDisplay` 能稳定抓 SwiftUI 页面 + NSPanel + 菜单栏；连续两次截图无差异。
-- [ ] **数据与并发**：SQLite + Unix socket + CLI 同时写（MCP 可选）；localStorage 导出 → 导入 → 统计一致。
+- [ ] **数据与并发**：SQLite + Unix socket + CLI 同时写（MCP 可选）；任务/项目导入；旧番茄历史不导；今日统计一致。
 
 这 4 个 spike 过了，才算真正「不缺」；没过就先调整方案（例如勿扰降级为手动开关、或调整截图方案）。**SwiftUI 已定，不再改栈。**
 
@@ -1322,5 +1321,6 @@ git clone --mirror <private-repo-url> /Volumes/ssd/backups/jingli.git
 |---|---|---|---|
 | 2026-10-22 | 采用 **SwiftUI + AppKit** | 核心体验是系统级 ambient UI（菜单栏、浮窗、通知、全局快捷键）；只有 4 个页面，原生工作量可控；后续接 EventKit / SMAppService / Swift Charts 更顺 | 不做 Tauri / WKWebView；工程用 Xcode + SwiftUI；浮窗与完成弹窗直接走 `NSPanel` |
 | 2026-10-22 | **默认值锁定；MCP 降为可选** | 先跑起来；CLI + SKILL.md 已足够覆盖 Agent 输入 | v1 不实现 MCP、不含精力层、固定 25 分钟；详见第 10 节 |
+| 2026-10-22 | **范围收敛为「只管今天」** | 产品本来就是一天的工具；历史不是需求 | 不做 7 天 / 30 天图表；不迁移旧番茄历史；跨天清空；Phase 4 改为完整一天 + 跨天重置 |
 
 对应 ADR：`docs/adr/0001-native-swiftui.md`（已创建）。
