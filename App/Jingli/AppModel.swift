@@ -676,6 +676,12 @@ extension AppModel: FocusAgentHandling {
             payload["phase"] = "idle"
             payload["remainingMs"] = 0
         }
+        if let completion {
+            payload["completion"] = [
+                "taskIds": completion.taskIDs,
+                "shares": completion.shares
+            ]
+        }
         return payload
     }
 
@@ -745,6 +751,33 @@ extension AppModel: FocusAgentHandling {
         timer = current
         persistTimer()
         updateTimerText()
+        return try agentFocusStatus()
+    }
+
+    func agentStartBreak() throws -> [String: Any] {
+        guard completion != nil else {
+            throw AgentError.invalidParams("本轮尚未结束")
+        }
+        startBreak()
+        return try agentFocusStatus()
+    }
+
+    func agentSkipBreak() throws -> [String: Any] {
+        guard isOnBreak else {
+            throw AgentError.invalidParams("当前不在休息")
+        }
+        skipBreak()
+        return try agentFocusStatus()
+    }
+
+    func agentNextRound() throws -> [String: Any] {
+        guard completion != nil else {
+            throw AgentError.invalidParams("本轮尚未结束")
+        }
+        startNextRound()
+        guard timerIsActive else {
+            throw AgentError.invalidParams("没有可复用的未完成任务")
+        }
         return try agentFocusStatus()
     }
 

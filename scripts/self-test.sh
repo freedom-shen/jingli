@@ -33,6 +33,9 @@ echo "== snapshot baseline =="
 if [ "$MODE" = "--full" ]; then
   echo "== snapshot determinism =="
   "$ROOT/scripts/snapshot.sh" --determinism | tee "$LOG_DIR/determinism.json"
+
+  echo "== simulated day =="
+  "$ROOT/scripts/dogfood.sh" | tee "$LOG_DIR/dogfood.log"
 fi
 
 echo "== agent spike =="

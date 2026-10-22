@@ -11,6 +11,9 @@ public protocol FocusAgentHandling: AnyObject, Sendable {
     func agentStopFocus() throws -> [String: Any]
     func agentAddFocusTask(taskID: String) throws -> [String: Any]
     func agentRemoveFocusTask(taskID: String) throws -> [String: Any]
+    func agentStartBreak() throws -> [String: Any]
+    func agentSkipBreak() throws -> [String: Any]
+    func agentNextRound() throws -> [String: Any]
 }
 
 public enum AgentError: Error, LocalizedError {
@@ -429,6 +432,12 @@ public final class AgentServer: @unchecked Sendable {
         case "focus.remove":
             let id = try string(params, "taskId")
             return try withFocus { try $0.agentRemoveFocusTask(taskID: id) }
+        case "focus.break":
+            return try withFocus { try $0.agentStartBreak() }
+        case "focus.skipBreak":
+            return try withFocus { try $0.agentSkipBreak() }
+        case "focus.next":
+            return try withFocus { try $0.agentNextRound() }
 
         case "agent.events":
             let limit = params["limit"] as? Int ?? 50

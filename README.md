@@ -44,9 +44,10 @@ JINGLI_SUPPORT_DIR=/tmp/jingli-dev \
 
 ```bash
 scripts/self-test.sh --fast    # unit + app tests + 4 场景截图 + agent spike
-scripts/self-test.sh --full    # 额外跑 --determinism 和全量截图
+scripts/self-test.sh --full    # 额外跑截图 determinism + 模拟一天 dogfood
 scripts/snapshot.sh compare
 scripts/snapshot.sh --determinism
+scripts/dogfood.sh             # 3 轮短计时、共享分摊、休息、再来一轮、统计、重置、备份、跨天
 scripts/agent-spike.sh
 ```
 

@@ -36,6 +36,7 @@ scripts/self-test.sh --full
 scripts/snapshot.sh compare
 scripts/snapshot.sh --update
 scripts/agent-spike.sh
+scripts/dogfood.sh
 ```
 
 ## 测试钩子

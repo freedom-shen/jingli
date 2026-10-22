@@ -301,6 +301,12 @@ case "focus":
     case "add", "remove":
         guard let id = words.first else { fail("focus \(sub) <id>") }
         run(sub == "add" ? "focus.add" : "focus.remove", params: ["taskId": id])
+    case "break":
+        run("focus.break")
+    case "skip-break":
+        run("focus.skipBreak")
+    case "next":
+        run("focus.next")
     default:
         fail("unknown focus command: \(sub)")
     }
