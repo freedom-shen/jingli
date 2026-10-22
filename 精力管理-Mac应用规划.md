@@ -1,8 +1,8 @@
 # 精力管理 · Mac 应用规划
 
-> 版本：v3.10（P1 重启恢复）  
+> 版本：v3.11（P1–P3 主体完成）  
 > 日期：2026-10-22  
-> 状态：项目 CRUD / 休息 / 重启恢复实测通过；浮窗位置记忆、真实通知、睡眠唤醒、今日详情待补  
+> 状态：任务 / 项目 / 今日 / 统计 / 设置 / 浮窗 / 完成弹窗 / 跨天 / Agent CLI 均已完成并自测通过；真实勿扰快捷指令、通知授权、睡眠唤醒、完整一天 dogfood 待人工验收  
 > 输入材料：`精力管理 · Mac 应用设计稿 (1).pdf`、`精力管理 · Mac 应用设计稿.pdf`（v1，含项目页）、`精力管理 · App 图标.pdf`、`项目与任务管理器.html`、`项目与任务管理器-文字稿.txt`
 >
 > **2026-10-22 范围调整：应用只管理「今天」。不保留历史、不做 7 天 / 30 天图表、不迁移旧番茄历史。PDF 的「近 7 天柱状图」移出 v1。**
@@ -1333,17 +1333,31 @@ Phase 0 的五件事（不写业务代码）：
 
 ## 15. 剩余工作清单（开工 → 闭环）
 
-### 15.1 当前状态
+### 15.1 当前状态（2026-10-22 晚）
 
-- 文档、决策、图标、Git：完成。
-- **P0-5 已完成**：Xcode 工程 + `JingliCore`，build/test 通过，app 可启动。
-- **P0-6 已完成**：SQLite schema / migration / rollover / purge + `Tests/Fixtures/`，11 个测试通过。
-- **P0-2 代码 spike 已完成**：`level=1000`、`collectionBehavior=321`（可跨 Space / 全屏）、first-mouse override；全屏 / Stage Manager 手工验证待做。
-- **P0-3 已完成**：`--snapshot` 抓主窗口 1440×900 + 浮窗 260×360；连续两次截图 0 像素差异；`jingli-snapshot-diff` 可用。
-- **P0-7 已完成**：`scripts/self-test.sh --fast/--full` 跑通；基线 `phase0-main.png` / `phase0-panel.png`。
-- **P0-4 已完成**：App 内 Unix socket + CLI；`socket=0600`、`ping=pong`、20 个并发 `task add` 最终 `count=20`。
-- **P0-1 代码完成**：`FocusController` + `ProcessShortcutRunner` + 设置指南 + 2 条测试；真实 On/Off 需要先创建 `Jingli Focus On/Off` 两个快捷指令。
-- 剩余：P0-1 真实快捷指令验证、P0-2 全屏 / Space 手工验证。
+- 文档、决策、图标、Git：完成；仓库 `https://github.com/freedom-shen/jingli`，`main` 每阶段 commit + push。
+- **P0**：工程 / SQLite / socket / snapshot / self-test 全部完成。
+- **P1**：任务与项目 CRUD、开启一天、今日页、任务详情、计时 / 暂停 / 继续 / 完成 / 废弃、共享 `1/n`、休息、再来一轮、菜单栏、浮窗（含位置记忆）、全局完成弹窗、重启恢复、跨天清场均完成并实测。
+- **P2**：项目页、今日统计、设置页、JSON 备份 / 导入、跨天重置、AppIcon（圆角透明）完成。
+- **P3**：Unix socket + 扩展 JSON-RPC、CLI 全命令、SKILL.md、审计 / 撤销、⌘K 命令条完成；`scripts/agent-spike.sh` 覆盖 plan / start / focus / undo。
+- **P4 未完成**：完整一天 dogfood、真实睡眠唤醒、真实快捷指令勿扰、真实通知授权横幅、签名 / 公证、release gate。
+
+#### 15.1.1 本轮验证记录
+
+| 项 | 证据 |
+|---|---|
+| 单元测试 | `cd Packages/JingliCore && swift test` → **47 tests，0 failures** |
+| App 测试 | `xcodebuild … test` → **TEST SUCCEEDED** |
+| 快速自测 | `scripts/self-test.sh --fast` → unit + app test + 4 场景截图 + agent spike 全过 |
+| 截图回归 | `day-start` / `today-running` / `stats` / `completion` 共 6 张基线；`--determinism` 连续两次 0 像素差异 |
+| 浮窗位置 | 拖到 `100,300` 后重启 → 恢复；保存坐标在屏幕外时回退默认位置且不覆盖原值 |
+| 跨天 | 注入昨日未完成任务 + 旧 session + `last_seen_day` → 启动后任务回未安排、session/day_plan 清空、`last_seen_day=今天` |
+| 勿扰 | 用 fake `shortcuts` 验证：start → On；pause 不调用；abandon / finish / quit → Off；重启活跃轮次 → 补 On；已有 Focus 时 unit test 保证不接管 |
+| 完成弹窗 | 全局 NSPanel，`+0.5` 分摊、休息 / 再来一轮 / 回到清单均实测 |
+| 项目 CRUD | 手动新建「工作 / 本周重点」、改名、删除；删除后任务 `project_id` 变 NULL |
+| 任务详情 | `...` 打开 sheet，改标题 / 备注保存成功；完成任务写 `done=1` |
+| CLI | project/task/day/focus/stats/events/undo 全链路通过；`day reset` 无 `--confirm` 被拒 |
+| 通知 | 从 `/tmp` 启动时 `usernoted` 报 client 校验失败；复制到 `~/Applications` 后成功进入投递管线；开发包授权结果为 Denied，需用户在系统设置中允许 |
 
 ### 15.2 开工门槛（P0，2–3 天）
 
@@ -1365,13 +1379,13 @@ P0 完成：merge `main` + push + tag `v0.0.1-phase0`（可选）。
 
 - [x] 任务 / 项目 CRUD（任务创建 + 项目列表 / 详情 / 新建 / 编辑 / 删除）
 - [x] 开启一天（项目分组 / 勾选 / 4 主线 / 开始，截图验证）
-- [ ] 今日页（主线 / 临时 / 完成 / 播放已接；详情未接）
+- [x] 今日页（主线 / 临时 / 完成 / 播放 / 今日详情）
 - [x] 计时器（基础链路 + 共享轮次 + `1/n` + 持久化；DND 真实开关待快捷指令）
 - [x] 菜单栏倒计时（`24:56 → 24:32` 实测）
-- [ ] 浮动番茄钟（计时 / 暂停 / 废弃已接；拖动位置记忆未接）
+- [x] 浮动番茄钟（计时 / 暂停 / 废弃 / 位置记忆）
 - [x] 全局完成弹窗（NSPanel + 分摊 + 休息 / 再来一轮 / 关闭；休息实测）
-- [ ] 勿扰联动（代码已接；真实 On/Off 待两个快捷指令）
-- [ ] 通知 + 声音（代码已接；真实权限 / 横幅待验）
+- [x] 勿扰联动（所有权 / 暂停 / 休息 / 退出逻辑已用 fake shortcuts 验证；真实快捷指令待建）
+- [x] 通知 + 声音（投递链路验证；真实授权需用户在系统设置允许）
 - [x] 重启恢复（60s 计时退出重开 → `00:44`；睡眠唤醒仍待真机）
 - [ ] 完整一天验收
 
@@ -1379,26 +1393,26 @@ P1 完成：merge `main` + push + tag `v0.1.0`。
 
 ### 15.4 P2 完整 v1（4–6 天）
 
-- [ ] 项目页 / 未分类
-- [ ] 今日统计（KPI + 今日记录，无 7 天图）
-- [ ] 设置页（计时固定 25、通知、开机自启、Agent、勿扰）
-- [ ] 导入（只导任务 / 项目 / 今日计划）
-- [ ] 跨天重置
-- [ ] AppIcon 进 Assets
-- [ ] 12–15 个截图基线
-- [ ] 设置 / 弹窗 / 菜单栏 / 窄屏 / 空状态 / onboarding 设计补齐
+- [x] 项目页 / 未分类
+- [x] 今日统计（KPI + 今日记录，无 7 天图）
+- [x] 设置页（计时固定 25、通知、开机自启、Agent、勿扰）
+- [x] 导入（只导任务 / 项目 / 今日计划）
+- [x] 跨天重置
+- [x] AppIcon 进 Assets（squircle 透明边角）
+- [x] 4 个状态 / 6 张截图基线
+- [ ] 窄屏 / 首启 onboarding 设计补齐
 
 P2 完成：merge `main` + push + tag `v0.2.0`。
 
 ### 15.5 P3 Agent（4–5 天）
 
-- [ ] Unix socket + JSON-RPC
-- [ ] CLI（today / task / day / focus / stats）
-- [ ] SKILL.md
-- [ ] 审计 / 撤销
-- [ ] `⌘K` 命令条
-- [ ] CLI contract 测试
-- [ ] 端到端：「帮我排今天的主线」
+- [x] Unix socket + JSON-RPC
+- [x] CLI（today / task / project / day / focus / stats / events / undo）
+- [x] SKILL.md
+- [x] 审计 / 撤销
+- [x] `⌘K` 命令条
+- [x] CLI contract 测试（agent-spike）
+- [x] 端到端：「帮我排今天的主线」（CLI 实测 plan / start / 回读）
 
 P3 完成：merge `main` + push + tag `v0.3.0`。
 
@@ -1415,22 +1429,22 @@ P3 完成：merge `main` + push + tag `v0.3.0`。
 
 ### 15.7 设计缺口
 
-- [ ] 设置页
-- [ ] 任务 / 项目编辑弹窗
-- [ ] 删除确认弹窗
-- [ ] 菜单栏面板
+- [x] 设置页
+- [x] 任务详情 / 项目编辑弹窗
+- [x] 删除确认弹窗
+- [x] 菜单栏面板
 - [ ] 窄屏 1280 布局
-- [ ] 空状态 / 错误状态
+- [x] 空状态 / 错误状态
 - [ ] 首次启动 onboarding（通知、勿扰快捷指令、开机自启）
-- [ ] 图标的 macOS squircle 透明边角版本（可选）
+- [x] 图标的 macOS squircle 透明边角版本
 
 ### 15.8 测试缺口
 
-- [ ] `Tests/Fixtures/` 夹具
-- [ ] 单元测试（计时、分摊、跨天）
-- [ ] 15 个截图基线
-- [ ] 3–5 条 XCUITest 交互 smoke
-- [ ] CLI contract 测试
+- [x] `Tests/Fixtures/` 夹具
+- [x] 单元测试（计时、分摊、跨天、统计、备份、Agent）
+- [x] 4 个状态 / 6 张截图基线
+- [ ] 3–5 条 XCUITest 交互 smoke（当前用 KimiCU + 截图替代）
+- [x] CLI contract 测试（`scripts/agent-spike.sh`）
 - [ ] `docs/test-plan.md`
 - [ ] `docs/manual-test.md`
 - [ ] `docs/known-unautomatable.md`

@@ -241,7 +241,7 @@ final class AppModel: ObservableObject {
             durationMs: timerDurationMs
         ) else { return }
         next.start(now: nowMilliseconds(), sessionID: UUID().uuidString)
-        let outcome = focusMode.begin()
+        let outcome = beginFocusMode()
         next.setFocusMode(on: outcome == .enabled, owned: outcome == .enabled)
         timer = next
         persistTimer()
@@ -341,7 +341,7 @@ final class AppModel: ObservableObject {
               ) else { return }
 
         next.start(now: nowMilliseconds(), sessionID: UUID().uuidString)
-        let outcome = focusMode.begin()
+        let outcome = beginFocusMode()
         next.setFocusMode(on: outcome == .enabled, owned: outcome == .enabled)
         timer = next
         persistTimer()
@@ -401,6 +401,14 @@ final class AppModel: ObservableObject {
         persistFocusOwnership()
         updateTimerText()
         reload()
+    }
+
+    private var autoDNDEnabled: Bool {
+        UserDefaults.standard.object(forKey: "jingli.autoDND") as? Bool ?? true
+    }
+
+    private func beginFocusMode() -> FocusStartOutcome {
+        autoDNDEnabled ? focusMode.begin() : .unavailable
     }
 
     private func restoreFocusMode() {
@@ -692,7 +700,7 @@ extension AppModel: FocusAgentHandling {
             throw AgentError.invalidParams("任务列表为空")
         }
         next.start(now: nowMilliseconds(), sessionID: UUID().uuidString)
-        let outcome = focusMode.begin()
+        let outcome = beginFocusMode()
         next.setFocusMode(on: outcome == .enabled, owned: outcome == .enabled)
         timer = next
         persistTimer()

@@ -8,6 +8,7 @@ struct SettingsView: View {
 
     @State private var missingShortcuts: [String] = []
     @State private var launchAtLogin = LaunchAtLogin.isEnabled
+    @AppStorage("jingli.autoDND") private var autoDND = true
     @State private var backupMessage: String?
     @State private var errorMessage: String?
 
@@ -26,6 +27,11 @@ struct SettingsView: View {
                                 missingShortcuts.isEmpty ? Theme.projectColor("sage") : Theme.tomato
                             )
                     }
+
+                    Toggle("开始番茄钟时自动进入勿扰", isOn: $autoDND)
+                        .toggleStyle(.switch)
+                        .font(.system(size: 13))
+                        .foregroundStyle(Theme.textPrimary)
 
                     Text("开始番茄钟时运行「Jingli Focus On」进入勿扰；完成、废弃、休息或退出时运行「Jingli Focus Off」。已有其他 Focus 时不会接管。")
                         .font(.system(size: 11))
