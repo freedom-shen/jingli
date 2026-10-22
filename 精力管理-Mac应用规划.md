@@ -1465,12 +1465,23 @@ P3 完成：merge `main` + push + tag `v0.3.0`。
 - **个人 MVP**：Phase 0 + P1 + 今日统计，1–1.5 周；CLI 可后补。
 - **不阻塞**：MCP、精力层、英文、iCloud。
 
+### 15.12 人工验收（v1.0 前剩余）
+
+自动化能做的都已做完（`scripts/release-gate.sh` 通过、v0.4.x 已打 tag）。下面这些必须由人参与：
+
+1. 按 `docs/focus-shortcuts.md` 创建 `Jingli Focus On` / `Jingli Focus Off`，然后跑 `scripts/focus-spike.sh`。
+2. 首次开始番茄钟时允许系统通知；可先在设置页「发送测试通知」。
+3. 按 `docs/manual-test.md` 过一遍：全屏 / 多 Space / Stage Manager、真实睡眠唤醒、通知操作按钮。
+4. 用真实 25 分钟完整过一天（至少 4 轮、2 次共享、1 次中途加 / 移任务，跨零点更好）。
+5. 全部通过后：`scripts/release-gate.sh`，更新 `CHANGELOG.md`，打 tag `v1.0.0`。
+
 ### 15.11 开始条件
 
 - [x] 技术栈：SwiftUI + AppKit
 - [x] 默认值：第 10 节
 - [x] 图标：`Design/AppIcon/`
 - [x] Git：已绑定，每阶段 commit + push
-- [ ] P0-1 ~ P0-7
+- [x] P0-1 ~ P0-7
+- [ ] 人工验收（见 15.12）
 
 P0-1 ~ P0-7 完成即可进入 P1，不需要再拍板。
