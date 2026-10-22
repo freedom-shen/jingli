@@ -20,12 +20,19 @@ final class CompletionNotifier: @unchecked Sendable {
     }
 
     func notify(taskCount: Int, durationSeconds: Int) {
+        notify(
+            title: "本轮番茄钟完成",
+            body: "\(taskCount) 件任务 · \(durationSeconds / 60) 分钟"
+        )
+    }
+
+    func notify(title: String, body: String) {
         guard ProcessInfo.processInfo.environment["JINGLI_NO_NOTIFICATIONS"] != "1" else {
             return
         }
         let content = UNMutableNotificationContent()
-        content.title = "本轮番茄钟完成"
-        content.body = "\(taskCount) 件任务 · \(durationSeconds / 60) 分钟"
+        content.title = title
+        content.body = body
         content.sound = .default
 
         let request = UNNotificationRequest(

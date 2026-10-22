@@ -34,7 +34,7 @@ struct FloatingPanelView: View {
                     .shadow(color: Theme.tomato.opacity(0.35), radius: 24, y: 10)
 
                 VStack(spacing: 2) {
-                    Text(model.timerText)
+                    Text(model.displayText)
                         .font(.system(size: 28, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white)
                         .monospacedDigit()
@@ -51,23 +51,31 @@ struct FloatingPanelView: View {
 
             Spacer()
 
-            if model.timerIsActive {
+            if model.isBusy {
                 HStack(spacing: 8) {
-                    Button(model.timerIsPaused ? "继续" : "暂停") {
-                        if model.timerIsPaused {
-                            model.resumeFocus()
-                        } else {
-                            model.pauseFocus()
+                    if model.isOnBreak {
+                        Button("跳过休息") {
+                            model.skipBreak()
                         }
-                    }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                    } else {
+                        Button(model.timerIsPaused ? "继续" : "暂停") {
+                            if model.timerIsPaused {
+                                model.resumeFocus()
+                            } else {
+                                model.pauseFocus()
+                            }
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
 
-                    Button("废弃") {
-                        model.abandonFocus()
+                        Button("废弃") {
+                            model.abandonFocus()
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
                     }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
                 }
             } else {
                 Text("从今日页开始一件任务")
@@ -89,11 +97,13 @@ struct FloatingPanelView: View {
     }
 
     private var statusText: String {
+        if model.isOnBreak { return "休息中" }
         guard model.timerIsActive else { return "25 分钟专注" }
         return model.timerIsPaused ? "已暂停" : "专注中"
     }
 
     private var participantsText: String {
+        if model.isOnBreak { return "休息 5 分钟" }
         guard let timer = model.timer, model.timerIsActive else {
             return "本轮 0 件任务"
         }

@@ -7,7 +7,7 @@ struct MenuBarLabel: View {
     var body: some View {
         HStack(spacing: 4) {
             Image(systemName: "timer")
-            Text(model.timerIsActive ? model.timerText : "精力")
+            Text(model.isBusy ? model.displayText : "精力")
                 .monospacedDigit()
         }
     }
@@ -19,7 +19,7 @@ struct MenuBarPanel: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline) {
-                Text(model.timerText)
+                Text(model.displayText)
                     .font(.system(size: 24, weight: .semibold, design: .rounded))
                     .foregroundStyle(Theme.textPrimary)
                     .monospacedDigit()
@@ -35,23 +35,31 @@ struct MenuBarPanel: View {
                 .font(.system(size: 11))
                 .foregroundStyle(Theme.textSecondary)
 
-            if model.timerIsActive {
+            if model.isBusy {
                 HStack(spacing: 8) {
-                    Button(model.timerIsPaused ? "继续" : "暂停") {
-                        if model.timerIsPaused {
-                            model.resumeFocus()
-                        } else {
-                            model.pauseFocus()
+                    if model.isOnBreak {
+                        Button("跳过休息") {
+                            model.skipBreak()
                         }
-                    }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                    } else {
+                        Button(model.timerIsPaused ? "继续" : "暂停") {
+                            if model.timerIsPaused {
+                                model.resumeFocus()
+                            } else {
+                                model.pauseFocus()
+                            }
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
 
-                    Button("废弃") {
-                        model.abandonFocus()
+                        Button("废弃") {
+                            model.abandonFocus()
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
                     }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
                 }
             }
 
@@ -74,11 +82,13 @@ struct MenuBarPanel: View {
     }
 
     private var statusText: String {
+        if model.isOnBreak { return "休息中" }
         guard model.timerIsActive else { return "未开始" }
         return model.timerIsPaused ? "已暂停" : "专注中"
     }
 
     private var participantsText: String {
+        if model.isOnBreak { return "休息 5 分钟" }
         guard let timer = model.timer, model.timerIsActive else {
             return "从今日页开始一件任务"
         }

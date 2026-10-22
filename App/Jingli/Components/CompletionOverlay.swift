@@ -5,6 +5,8 @@ struct CompletionOverlay: View {
     let completion: FocusCompletion
     let tasks: [Task]
     var dimmed = true
+    let onBreak: () -> Void
+    let onNextRound: () -> Void
     let onClose: () -> Void
 
     var body: some View {
@@ -48,15 +50,31 @@ struct CompletionOverlay: View {
                     }
                 }
 
-                Button("关闭") {
-                    onClose()
+                VStack(spacing: 8) {
+                    Button("开始休息 5 分钟") {
+                        onBreak()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.large)
+                    .tint(Theme.textPrimary)
+                    .foregroundStyle(Theme.background)
+                    .frame(maxWidth: .infinity)
+                    .accessibilityIdentifier("completion-break-button")
+
+                    HStack(spacing: 8) {
+                        Button("再来一轮") {
+                            onNextRound()
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+
+                        Button("回到清单") {
+                            onClose()
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                    }
                 }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
-                .tint(Theme.textPrimary)
-                .foregroundStyle(Theme.background)
-                .frame(maxWidth: .infinity)
-                .accessibilityIdentifier("completion-close-button")
             }
             .padding(22)
             .frame(width: 380)

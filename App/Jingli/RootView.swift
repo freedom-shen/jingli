@@ -55,28 +55,36 @@ struct RootView: View {
 
             Spacer()
 
-            if model.timerIsActive {
+            if model.isBusy {
                 HStack(spacing: 8) {
-                    Text(model.timerText)
+                    Text(model.displayText)
                         .font(.system(size: 13, weight: .semibold, design: .rounded))
                         .foregroundStyle(Theme.accent)
                         .monospacedDigit()
 
-                    Button(model.timerIsPaused ? "继续" : "暂停") {
-                        if model.timerIsPaused {
-                            model.resumeFocus()
-                        } else {
-                            model.pauseFocus()
+                    if model.isOnBreak {
+                        Button("跳过休息") {
+                            model.skipBreak()
                         }
-                    }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                    } else {
+                        Button(model.timerIsPaused ? "继续" : "暂停") {
+                            if model.timerIsPaused {
+                                model.resumeFocus()
+                            } else {
+                                model.pauseFocus()
+                            }
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
 
-                    Button("废弃") {
-                        model.abandonFocus()
+                        Button("废弃") {
+                            model.abandonFocus()
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
                     }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
                 }
             }
 

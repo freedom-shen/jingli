@@ -9,10 +9,13 @@ final class AppModel: ObservableObject {
     @Published var isTaskEditorPresented = false
     @Published private(set) var timer: FocusTimer?
     @Published private(set) var timerText = "25:00"
+    @Published private(set) var isOnBreak = false
+    @Published private(set) var breakText = "05:00"
     @Published var completion: FocusCompletion?
 
     private let store: WorkspaceStore
     private let timerStore: FocusTimerStore
+    private var breakEndsAt: Int64 = 0
 
     init(store: WorkspaceStore = AppServices.shared.store) {
         self.store = store
@@ -24,6 +27,14 @@ final class AppModel: ObservableObject {
 
     var dayStarted: Bool {
         snapshot?.dayStarted ?? false
+    }
+
+    var isBusy: Bool {
+        timerIsActive || isOnBreak
+    }
+
+    var displayText: String {
+        isOnBreak ? breakText : timerText
     }
 
     var projects: [Project] {
@@ -92,6 +103,7 @@ final class AppModel: ObservableObject {
     }
 
     func resetDay() {
+        skipBreak()
         abandonFocus()
         do {
             try store.resetDay()
@@ -155,6 +167,10 @@ final class AppModel: ObservableObject {
     }
 
     func startFocus(_ task: Task) {
+        if isOnBreak {
+            skipBreak()
+        }
+
         if var current = timer, current.isActive {
             guard !current.taskIDs.contains(task.id) else { return }
             current = current.addingTask(task.id)
@@ -213,6 +229,10 @@ final class AppModel: ObservableObject {
     }
 
     func tickFocus() {
+        if isOnBreak {
+            tickBreak()
+            return
+        }
         guard var current = timer else { return }
         current.tick(now: nowMilliseconds())
         timer = current
@@ -220,6 +240,60 @@ final class AppModel: ObservableObject {
         if current.isFinished {
             finish(current)
         }
+    }
+
+    func startBreak() {
+        CompletionPanelController.shared.hide()
+        completion = nil
+        reload()
+        isOnBreak = true
+        breakEndsAt = nowMilliseconds() + Int64(breakDurationMs)
+        breakText = FocusTimer.format(breakDurationMs)
+    }
+
+    func skipBreak() {
+        isOnBreak = false
+        breakEndsAt = 0
+        breakText = "05:00"
+    }
+
+    func startNextRound() {
+        guard let completion else { return }
+        let candidates = (snapshot?.todayTasks ?? []).filter {
+            !$0.done && completion.taskIDs.contains($0.id)
+        }
+        CompletionPanelController.shared.hide()
+        self.completion = nil
+        reload()
+
+        guard let first = candidates.first,
+              var next = FocusTimer(
+                taskIDs: candidates.map(\.id),
+                sessionDate: DayKey.make(),
+                durationMs: timerDurationMs
+              ) else { return }
+
+        next.start(now: nowMilliseconds(), sessionID: UUID().uuidString)
+        next.setFocusMode(on: true, owned: true)
+        timer = next
+        persistTimer()
+        updateTimerText()
+        CompletionNotifier.shared.requestAuthorization()
+        try? FocusController.shared.enable()
+        _ = first
+    }
+
+    private func tickBreak() {
+        let remaining = max(0, Int(breakEndsAt - nowMilliseconds()))
+        breakText = FocusTimer.format(remaining)
+        guard remaining == 0 else { return }
+        isOnBreak = false
+        breakEndsAt = 0
+        breakText = "05:00"
+        CompletionNotifier.shared.notify(
+            title: "休息结束",
+            body: "可以开始下一轮了"
+        )
     }
 
     func dismissCompletion() {
@@ -236,6 +310,12 @@ final class AppModel: ObservableObject {
                 CompletionPanelController.shared.show(
                     completion: completion,
                     tasks: tasks,
+                    onBreak: { [weak self] in
+                        self?.startBreak()
+                    },
+                    onNextRound: { [weak self] in
+                        self?.startNextRound()
+                    },
                     onClose: { [weak self] in
                         self?.dismissCompletion()
                     }
@@ -280,6 +360,14 @@ final class AppModel: ObservableObject {
             return seconds * 1000
         }
         return FocusTimer.defaultDurationMs
+    }
+
+    private var breakDurationMs: Int {
+        if let raw = ProcessInfo.processInfo.environment["JINGLI_BREAK_SECONDS"],
+           let seconds = Int(raw), seconds > 0 {
+            return seconds * 1000
+        }
+        return 5 * 60 * 1000
     }
 
     func openTaskEditor() {

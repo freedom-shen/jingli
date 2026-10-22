@@ -35,6 +35,8 @@ final class CompletionPanelController {
     func show(
         completion: FocusCompletion,
         tasks: [Task],
+        onBreak: @escaping () -> Void,
+        onNextRound: @escaping () -> Void,
         onClose: @escaping () -> Void
     ) {
         hide()
@@ -55,6 +57,14 @@ final class CompletionPanelController {
             completion: completion,
             tasks: tasks,
             dimmed: false,
+            onBreak: { [weak self] in
+                self?.hide()
+                onBreak()
+            },
+            onNextRound: { [weak self] in
+                self?.hide()
+                onNextRound()
+            },
             onClose: { [weak self] in
                 self?.hide()
                 onClose()
