@@ -294,6 +294,31 @@ public extension WorkspaceStore {
         }
     }
 
+    /// 每天第一次使用（启动或跨零点）时清掉昨日痕迹，返回是否执行了跨天。
+    @discardableResult
+    func rolloverIfNeeded(today: String = DayKey.make()) throws -> Bool {
+        let lastSeen = try database.queue.read { db in
+            try String.fetchOne(
+                db,
+                sql: "SELECT value FROM setting WHERE key = ?",
+                arguments: ["last_seen_day"]
+            )
+        }
+        guard lastSeen != today else { return false }
+
+        try database.rollover(to: today)
+        try database.queue.write { db in
+            try db.execute(
+                sql: """
+                INSERT INTO setting (key, value) VALUES (?, ?)
+                ON CONFLICT(key) DO UPDATE SET value = excluded.value
+                """,
+                arguments: ["last_seen_day", today]
+            )
+        }
+        return true
+    }
+
     private func validateSelection(
         _ taskIDs: [String],
         today: String,

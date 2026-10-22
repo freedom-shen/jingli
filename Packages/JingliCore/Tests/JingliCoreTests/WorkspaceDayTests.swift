@@ -112,3 +112,71 @@ final class WorkspaceDayTests: XCTestCase {
         return (store, project, t1, t2)
     }
 }
+
+extension WorkspaceDayTests {
+    func testRolloverIfNeededClearsYesterdayOncePerDay() throws {
+        let database = try JingliDatabase.inMemory()
+        let store = WorkspaceStore(database: database)
+        let yesterday = "2026-10-21"
+        let today = "2026-10-22"
+
+        let open = try store.createTask(title: "未完成", lane: "main", plannedDate: yesterday)
+        let done = try store.createTask(title: "已完成", lane: "main", plannedDate: yesterday)
+        _ = try store.toggleTask(id: done.id)
+
+        try database.queue.write { db in
+            try db.execute(
+                sql: """
+                INSERT INTO focus_session
+                    (id, session_date, started_at, duration_sec, status)
+                VALUES ('s-old', ?, '2026-10-21T09:00:00Z', 1500, 'completed')
+                """,
+                arguments: [yesterday]
+            )
+            try db.execute(
+                sql: "INSERT INTO day_plan (date, started) VALUES (?, 1)",
+                arguments: [yesterday]
+            )
+            try db.execute(
+                sql: "INSERT INTO setting (key, value) VALUES ('last_seen_day', ?)",
+                arguments: [yesterday]
+            )
+        }
+
+        XCTAssertTrue(try store.rolloverIfNeeded(today: today))
+        XCTAssertFalse(try store.rolloverIfNeeded(today: today))
+
+        let tasks = try store.listTasks(includeDone: true)
+        XCTAssertNil(tasks.first { $0.id == open.id }?.plannedDate)
+        XCTAssertEqual(tasks.first { $0.id == done.id }?.plannedDate, yesterday)
+
+        try database.queue.read { db in
+            XCTAssertEqual(
+                try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM focus_session"),
+                0
+            )
+            XCTAssertEqual(
+                try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM day_plan WHERE date = ?", arguments: [yesterday]),
+                0
+            )
+            XCTAssertEqual(
+                try String.fetchOne(db, sql: "SELECT value FROM setting WHERE key = 'last_seen_day'"),
+                today
+            )
+        }
+    }
+
+    func testRolloverIfNeededFirstLaunchJustRecordsDay() throws {
+        let database = try JingliDatabase.inMemory()
+        let store = WorkspaceStore(database: database)
+        let task = try store.createTask(title: "今天保持计划", lane: "main", plannedDate: "2026-10-22")
+
+        XCTAssertTrue(try store.rolloverIfNeeded(today: "2026-10-22"))
+        XCTAssertFalse(try store.rolloverIfNeeded(today: "2026-10-22"))
+
+        XCTAssertEqual(
+            try store.listTasks().first { $0.id == task.id }?.plannedDate,
+            "2026-10-22"
+        )
+    }
+}

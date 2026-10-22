@@ -20,6 +20,7 @@ final class AppModel: ObservableObject {
     private let store: WorkspaceStore
     private let timerStore: FocusTimerStore
     private var breakEndsAt: Int64 = 0
+    private var currentDay = DayKey.make()
 
     init(store: WorkspaceStore = AppServices.shared.store) {
         self.store = store
@@ -62,6 +63,7 @@ final class AppModel: ObservableObject {
 
     func reload() {
         do {
+            try store.rolloverIfNeeded()
             let next = try store.snapshot()
             snapshot = next
             if next.dayStarted {
@@ -237,6 +239,7 @@ final class AppModel: ObservableObject {
     }
 
     func tickFocus() {
+        rolloverIfDayChanged()
         if isOnBreak {
             tickBreak()
             return
@@ -248,6 +251,13 @@ final class AppModel: ObservableObject {
         if current.isFinished {
             finish(current)
         }
+    }
+
+    private func rolloverIfDayChanged() {
+        let today = DayKey.make()
+        guard today != currentDay else { return }
+        currentDay = today
+        reload()
     }
 
     func startBreak() {
