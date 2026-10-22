@@ -1,15 +1,15 @@
 # 精力管理 · Mac 应用规划
 
-> 版本：v1.0（规划定稿）  
+> 版本：v2.0（实现基线）  
 > 日期：2026-10-22  
-> 状态：技术栈已定 SwiftUI；待 Phase 0（PRD / 工程骨架 / 4 个 spike）  
+> 状态：技术栈与默认值已锁定；MCP 可选；待 Phase 0 实物与 4 个 spike  
 > 输入材料：`精力管理 · Mac 应用设计稿 (1).pdf`、`精力管理 · Mac 应用设计稿.pdf`（v1，含项目页）、`项目与任务管理器.html`、`项目与任务管理器-文字稿.txt`
 
 ---
 
 ## 0. 结论摘要
 
-**做原生 SwiftUI 的 macOS 应用；现有 HTML 当功能基线，PDF 当视觉与信息架构基线；v1 只做「选 4 件主线 → 共同番茄钟 → 完成结算 → 统计」的闭环；开始一轮自动进入勿扰、结束 / 废弃自动退出；Agent 输入用 CLI + MCP + SKILL.md，应用内加一个 ⌘K 命令条和 Agent 活动面板。**
+**做原生 SwiftUI 的 macOS 应用；现有 HTML 当功能基线，PDF 当视觉与信息架构基线；v1 只做「选 4 件主线 → 共同番茄钟 → 完成结算 → 统计」的闭环；开始一轮自动进入勿扰、结束 / 废弃自动退出；Agent 输入用 CLI + SKILL.md（MCP 可选，不阻塞 v1），应用内加一个 ⌘K 命令条和 Agent 活动面板。**
 
 核心判断：
 
@@ -152,8 +152,8 @@ localStorage 键：
 ┌─────────────────────────────────────────────┐
 │  Kimi Code / Claude Code / Codex            │
 │   └─ SKILL.md  (何时调用、约束、示例)         │
-│        ├─ jingli CLI  (人/脚本/Shortcuts)    │
-│        └─ jingli-mcp  (stdio JSON-RPC)       │
+│        ├─ jingli CLI  (主路径，人/脚本)       │
+│        └─ jingli-mcp  (可选，v1.1)           │
 └──────────────────┬──────────────────────────┘
                    │ Unix socket + JSON-RPC (0600)
 ┌──────────────────▼──────────────────────────┐
@@ -169,7 +169,7 @@ localStorage 键：
 
 ### 4.1 关键设计
 
-- **单一真相**：所有写操作走 `Core`，UI / CLI / MCP 都调它；Agent 不直接写 SQLite。
+- **单一真相**：所有写操作走 `Core`，UI / CLI 都调它（MCP 可选）；Agent 不直接写 SQLite。
 - **计时器在 Core，不在 UI**：存 `endsAt` + `remainingMs` + `phase`；App 重启、睡眠唤醒、时钟跳变都以 Core 为准。
 - **完成弹窗独立于主窗口**：不挂在 `WindowGroup` 上，用单独的全局 `NSPanel`；主窗口关闭、App 在后台也能弹出。
 - **勿扰联动走 Shortcuts**：macOS 没有公开 API 直接设置 Focus；用「设置专注模式」快捷指令 + `shortcuts run`，不碰私有 API、不做 Control Center UI 脚本。
@@ -190,7 +190,7 @@ localStorage 键：
 | 全局快捷键 | KeyboardShortcuts / Carbon | `⌃⌥Space`、`⌘⇧N` |
 | 本地 API | Unix socket + JSON-RPC | 0600、无端口 |
 | CLI | Swift executable | 与 App 共享 `JingliCore` 库 |
-| MCP | Swift / stdio JSON-RPC | 薄翻译层 |
+| MCP | Swift / stdio JSON-RPC | **可选，v1.1**；CLI 已覆盖全部操作 |
 | 测试 | Swift Testing / XCTest | 计时器与统计优先 |
 
 ---
@@ -285,9 +285,9 @@ idle ──选任务──▶ ready ──开始 + Focus On──▶ running ⇄
 
 ### 6.1 三层结构
 
-1. **CLI `jingli`**：人、脚本、Shortcuts、Raycast 都能用。
-2. **MCP server `jingli-mcp`**：stdio JSON-RPC，给 Kimi Code / Claude Code / Codex 提供 tools。
-3. **SKILL.md**：教 Agent 何时调用、怎么确认、有哪些约束；放到 `~/.agents/skills/jingli/`。
+1. **CLI `jingli`**：主路径；人、脚本、Shortcuts、Raycast、Agent 都能用。
+2. **SKILL.md**：教 Agent 何时调用、怎么确认、有哪些约束；放到 `~/.agents/skills/jingli/`。
+3. **MCP server `jingli-mcp`（可选，v1.1）**：stdio JSON-RPC，给需要 MCP 的客户端提供 tools；v1 不实现，CLI 已覆盖全部操作。
 
 ### 6.2 CLI
 
@@ -306,12 +306,12 @@ jingli stats --days 7 --json
 
 - 所有命令支持 `--json`，便于 Agent 读取。
 - 写操作返回变更后的状态摘要。
-- App 未运行时，先 `open -b com.na.jingli` 并等待 socket；超时给明确错误，不直接改数据库。
+- App 未运行时，先 `open -b com.freedom-shen.jingli` 并等待 socket；超时给明确错误，不直接改数据库。
 - 破坏性命令必须带 `--confirm`，否则拒绝执行。
 
-### 6.3 MCP tools
+### 6.3 MCP tools（可选，v1.1）
 
-建议暴露：
+v1 不做 MCP；CLI 已覆盖以下全部操作。这里保留为 v1.1 的接口草案，需要时再加 `jingli-mcp` 薄翻译层。
 
 - 读取：`get_today`、`list_projects`、`get_stats`
 - 任务：`create_task`、`update_task`、`complete_task`、`reopen_task`
@@ -340,12 +340,12 @@ Tool 返回结构化 JSON + 一句人类可读摘要，方便 Agent 转述。
 
 - **⌘K 命令条**：支持确定性语法（`写周报 明天 主线`、`开始专注 写周报`、`今天怎么样`）；不认识的输入显示「交给 Agent」，复制带上下文的 prompt。
 - **Agent 活动面板**：最近 50 条操作，显示 actor / action / 时间，支持撤销（创建、修改、完成、排期；删除不提供撤销）。
-- **设置 → Agent**：开关、token、复制 skill 安装命令、复制 MCP 配置片段。
+- **设置 → Agent**：开关、token、复制 skill 安装命令；MCP 配置片段仅在启用可选 MCP 时显示。
 
 ### 6.6 安全与审计
 
 - 只走 Unix socket / `127.0.0.1`；token 文件 0600；拒绝非本地来源。
-- 破坏性操作需要 `confirm: true`；CLI / MCP 都做参数校验（4 个主线、任务已完成、项目不存在）。
+- 破坏性操作需要 `confirm: true`；CLI（以及未来的 MCP）都做参数校验（4 个主线、任务已完成、项目不存在）。
 - 所有 Agent 写操作进 `agent_event` 审计表；支持 `undo`。
 - 不把任务内容发到任何远端；Agent 的模型调用发生在用户自己的 Agent 客户端。
 
@@ -449,7 +449,7 @@ Tool 返回结构化 JSON + 一句人类可读摘要，方便 Agent 转述。
 | **Phase 0** | 2–3 天 | 定口径、设计 token、HTML 导出、工程骨架、测试骨架（`self-test.sh` / 测试库 / fake clock / `--snapshot` 模式） | 一页 PRD + 迁移 JSON 样例 + 空页面导航能跑 + `self-test --fast` 跑通空测试 + 1 个 snapshot case |
 | **Phase 1** | 5–7 天 | 原生壳 + SQLite + 任务 / 项目 CRUD + 今日页 + 计时器 + 菜单栏 + 浮窗 + 完成弹窗 + 勿扰联动 + 通知 | 能完整过一天：建任务 → 排期 → 开始 / 暂停 / 继续 → 完成 → 查看分摊 → 休息 / 再来一轮；开始 / 结束正确切换勿扰；重启 / 睡眠后计时准确；浮窗跨 Space 置顶 |
 | **Phase 2** | 5–7 天 | 开启一天（按项目分组）+ 重置 + 项目页 + 统计页 + 设置 + 迁移 | 功能对齐 HTML + PDF；7 天图表；老数据导入 |
-| **Phase 3** | 5–7 天 | Agent socket + CLI + MCP + SKILL.md + 审计 / 撤销 + ⌘K | 新开一个 Agent 会话，说「帮我排今天的主线」能端到端完成；删除类操作无确认会被拒绝 |
+| **Phase 3** | 5–7 天 | Agent socket + CLI + SKILL.md + 审计 / 撤销 + ⌘K | 新开一个 Agent 会话，说「帮我排今天的主线」能端到端完成；删除类操作无确认会被拒绝 |
 | **Phase 4** | 3–5 天 | 连续日用 7 天、性能 / 可访问性 / 图标 / 打包 / 备份 | 7 天无数据丢失；内存 < 150MB；计时误差 < 1s；无崩溃 |
 | **v1.1** | 1–2 周 | 精力 check-in、周复盘、日历、iCloud（可选） | 能回答「这周精力花在哪、主线完成率多少」 |
 
@@ -487,11 +487,11 @@ Tool 返回结构化 JSON + 一句人类可读摘要，方便 Agent 转述。
 
 **Phase 3**
 
-- [ ] CLI 全部命令可用
-- [ ] MCP 在 Kimi Code / Claude Code 中可发现 tools
+- [ ] CLI 全部命令可用；`--json` 输出稳定
 - [ ] Skill 能完成「读状态 → 提议 → dry-run → 执行 → 回读」
 - [ ] 删除 / 重置无确认被拒绝
 - [ ] Agent 操作可审计、可撤销
+- [ ] MCP（可选）：v1.1 再接，不影响 Phase 3 验收
 
 **Phase 4**
 
@@ -536,7 +536,7 @@ Tool 返回结构化 JSON + 一句人类可读摘要，方便 Agent 转述。
 | 勿扰 | 快捷指令缺失 / 重命名；自动化拒绝；已有 Focus；手动关闭；休息 / 再来一轮；崩溃 / 重启；串行队列；调用延迟 |
 | 全局弹窗 | 主窗口关闭；App 后台；全屏；所有 Space；Stage Manager；多显示器；第一次点击；键盘焦点；Esc；屏幕共享 / 录制 |
 | 通知 | 允许 / 拒绝；前台 / 后台；通知动作；勿扰开启时系统通知被静音，但完成弹窗仍出现；声音 |
-| Agent | CLI JSON schema；MCP tool 发现；dry-run；4 主线绕过；删除确认；审计 / 撤销；并发 UI + Agent；App 未运行；socket 失效；token 轮换；恶意输入 |
+| Agent | CLI JSON schema；dry-run；4 主线绕过；删除确认；审计 / 撤销；并发 UI + Agent；App 未运行；socket 失效；token 轮换；恶意输入；MCP（可选）不影响 v1 |
 | 迁移 | HTML 导出各变体；重复导入；中断导入；旧 schema 升级；备份 / 恢复 |
 | UI | 1440×900 基准截图；1280 / 2560 宽度；4 列 / 窄屏；长文本截断；空状态；键盘导航；VoiceOver；Reduce Motion；高对比度；刘海菜单栏 |
 | 性能 | 空闲 CPU；计时中 CPU；内存；10k 任务；30 天图表；启动时间；8 小时连续计时；7 天 soak |
@@ -558,8 +558,8 @@ Tool 返回结构化 JSON + 一句人类可读摘要，方便 Agent 转述。
 
 #### 8.2.5 自动化与 CI
 
-- `scripts/self-test.sh --fast`：单元 + 集成 + CLI + MCP contract + UI smoke + lint（详见 8.3）。
-- `xcodebuild test`：JingliCore、CLI、MCP；UI 测试单独 job（较慢）。
+- `scripts/self-test.sh --fast`：单元 + 集成 + CLI contract + UI smoke + lint（详见 8.3）。
+- `xcodebuild test`：JingliCore、CLI；UI 测试单独 job（较慢）；MCP 可选，不进 PR 门禁。
 - 快照测试：4 个主页面 + 完成弹窗，基准图存 `Tests/Snapshots/`。
 - 覆盖率：建议 Core ≥ 80%、整体 ≥ 60%；计时 / 统计 / 迁移必须高覆盖。
 - CI：macOS runner；PR 跑 `--fast`；夜间跑 `--full` + 性能；tag 跑 release build。
@@ -595,7 +595,7 @@ Tool 返回结构化 JSON + 一句人类可读摘要，方便 Agent 转述。
   ↓
 scripts/self-test.sh --fast
   ├─ build
-  ├─ unit（JingliCore / CLI / MCP）
+  ├─ unit（JingliCore / CLI）
   ├─ integration（临时 DB / socket / 迁移）
   ├─ UI smoke（XCUITest）
   ├─ snapshots（4 页面 + 完成弹窗）
@@ -618,7 +618,7 @@ artifacts/<timestamp>/report.json + summary.md
 | `scripts/test-unit.sh` | `swift test` + `xcodebuild test` 单元 | xcresult |
 | `scripts/test-integration.sh` | 临时 DB、迁移、CLI、socket | xcresult / JSON |
 | `scripts/test-ui.sh` | XCUITest，按 `-only-testing:JingliUITests` | xcresult + 截图 |
-| `scripts/test-agent.sh` | CLI JSON schema、MCP tool 列表、dry-run、confirm | JSON |
+| `scripts/test-agent.sh` | CLI JSON schema、dry-run、confirm；MCP 可选 | JSON |
 | `scripts/test-snapshot.sh` | 截图对比；`--update` 更新基线 | diff 图 + 报告 |
 | `scripts/test-performance.sh` | XCTest metrics：启动、内存、CPU、计时漂移 | JSON |
 | `scripts/doctor.sh` | 环境检查：Xcode、Shortcuts、权限、屏幕 | 终端报告 |
@@ -760,7 +760,7 @@ doctor:      scripts/doctor.sh
 
 | 层级 | 含义 | 适用 |
 |---|---|---|
-| **L3** | Agent 读报告 → 自动修 → 重跑 | 单元、集成、CLI、MCP、大部分 UI |
+| **L3** | Agent 读报告 → 自动修 → 重跑 | 单元、集成、CLI、大部分 UI |
 | **L2** | 自动跑 + 机器可读报告，但修复靠人 | 快照、性能、迁移、崩溃恢复 |
 | **L1** | 脚本辅助，关键动作仍需人 | 签名 / 公证、升级、磁盘满、DB 损坏 |
 | **L0** | 只能手工，留证据 | 全局窗口、真实 Focus、通知中心、多显示器、真机 7 天 |
@@ -981,26 +981,36 @@ scripts/design-compare.sh today-running-2    # App 截图 vs PDF 设计稿并排
 
 ---
 
-## 10. 待确认清单
+## 10. 决策与默认值（v1 基线）
 
-- [x] 技术栈：**SwiftUI + AppKit**（已定，2026-10-22）
-- [ ] v1 是否包含精力层（推荐 v1.1）
-- [ ] 统计口径：每天总番茄是否只允许整数；2.5 / 3.5 是示意还是半轮
-- [ ] 是否已有 HTML 真实数据；是否需要迁移
-- [ ] 产品名：精力管理 / 留白；bundle id
-- [ ] 同步：v1 只本地 + 导出备份，是否可以
-- [ ] Agent 范围：CLI + MCP + Skill（推荐）/ 还要内嵌聊天框
-- [ ] 计时长度：固定 25 分钟，还是可配置 15 / 25 / 45 / 50
-- [ ] 休息 5 分钟：是否独立倒计时、能否暂停 / 跳过、是否计入统计
-- [ ] 再来一轮：是否复用本轮任务集合、是否排除已完成任务
-- [ ] 完成后浮窗按钮：「废弃本轮」改成「关闭」还是「结束本轮」
-- [ ] 全局完成弹窗：是否 30 秒无操作后自动降级 / 收起，避免长期挡在最前面
-- [ ] 全局完成弹窗：多显示器时固定出现在鼠标所在屏幕，还是主窗口所在屏幕
-- [ ] 勿扰联动：是否接受首次配置两个 Shortcuts 快捷指令（`Jingli Focus On` / `Jingli Focus Off`）
-- [ ] 勿扰联动：开始时已有其他 Focus，默认保留还是强制接管
-- [ ] 勿扰联动：休息 5 分钟期间是否保持勿扰（默认关闭）
-- [ ] 主窗口默认尺寸与是否记忆
-- [ ] 通知权限、声音、是否允许勿扰模式
+除技术栈外，以下按「个人使用、先跑起来、后续可改」的原则定默认值；不再阻塞 Phase 0。
+
+| 项目 | 决定 | 说明 |
+|---|---|---|
+| 技术栈 | **SwiftUI + AppKit** | 2026-10-22 已定 |
+| 精力层 | **v1 不含，放 v1.1** | 先做任务 + 番茄 + 统计闭环 |
+| 统计口径 | 日总番茄按整数；单任务按 `1/n` 份额；**不做半轮** | 2.5 / 3.5 视为设计示意 |
+| 跨午夜 | 按**结束时间**归属 | 23:50–00:15 算结束日 |
+| HTML 数据 | 提供导出 / 导入；无数据则空库开始 | legacy 只保留累计次数，不进时间序列 |
+| 产品名 | 显示名「精力管理」，内部代号 `jingli` | bundle id `com.freedom-shen.jingli` |
+| 同步 | v1 只本地 + 每日 JSON 备份（保留 14 天）+ 手动导出 | iCloud 放 v1.1 |
+| Agent | **CLI + `SKILL.md`；MCP 可选，v1 不做** | 不做内嵌聊天；外部 Agent 通过 CLI 操作 |
+| 计时长度 | v1 固定 25 分钟 | v1.1 再开放 15 / 25 / 45 / 50 |
+| 休息 | 独立 5 分钟，可跳过，不提供暂停，不计入统计 | 休息结束用通知提醒 |
+| 再来一轮 | 复用本轮未完成任务 | 已完成 / 已移出自动排除 |
+| 完成后按钮 | 浮窗「废弃本轮」改为「关闭」 | 完成后不再用「废弃」语义 |
+| 全局弹窗降级 | 默认不自动降级；设置里可选 30 秒后收起 | 默认满足「最前端」 |
+| 多显示器 | 出现在鼠标所在屏幕并居中 | 只出现一次 |
+| 勿扰 | 接受两个 Shortcuts；默认保留已有 Focus；休息关闭勿扰 | 首次启动引导创建 |
+| 主窗口 | 默认 1440×900，最小 1100×700，记忆位置 | 深色、隐藏标题栏 |
+| 通知 | 首次开始计时时请求权限；声音开；尊重系统勿扰 | 拒绝后不反复弹 |
+| 语言 | v1 简体中文；英文 v1.1 | 日期 / 时区按系统 |
+| 更新 | v1 手动构建安装，不做自动更新 | 个人使用足够 |
+| 生命周期 | 关窗留在菜单栏；`⌘Q` 退出；开机自启默认关 | 设置里可开 |
+| 并发 | 单写 actor / 单队列；CLI 走 Unix socket，不直写 DB | 避免 UI 与 Agent 冲突 |
+| 备份 | 每日 JSON，保留 14 天；手动导出随时可用 | 恢复走导入向导 |
+| 错误恢复 | DB 损坏从最近备份恢复；磁盘满只读提示；Shortcut 缺失降级 | 不阻塞核心计时 |
+| 测试基线 | 15 个截图 case + CLI contract + 4 个 spike | 见 8.3 / 8.5 |
 
 ---
 
@@ -1017,7 +1027,7 @@ scripts/design-compare.sh today-running-2    # App 截图 vs PDF 设计稿并排
 
 ## 12. Git 与项目管理
 
-项目从第一天起就用 Git 管理：代码、设计资产、文档、Skill、CLI、MCP 全部进同一个私有仓库。这样一次功能提交可以同时改 App、CLI、MCP 和 Skill，不会出现版本对不上。
+项目从第一天起就用 Git 管理：代码、设计资产、文档、Skill、CLI 全部进同一个私有仓库。这样一次功能提交可以同时改 App、CLI 和 Skill，不会出现版本对不上。
 
 ### 12.1 仓库形态：monorepo
 
@@ -1032,9 +1042,9 @@ jingli/
 │  ├─ Fixtures/            # 迁移 JSON、边界任务、测试库
 │  └─ Snapshots/           # 页面基准图
 ├─ Packages/
-│  └─ JingliCore/          # 模型、计时器、存储（App/CLI/MCP 共用）
+│  └─ JingliCore/          # 模型、计时器、存储（App/CLI 共用）
 ├─ CLI/                    # jingli 命令行
-├─ MCP/                    # jingli-mcp（stdio）
+├─ MCP/                    # jingli-mcp（v1.1 再建）
 ├─ Skill/                  # SKILL.md + scripts/install.sh
 ├─ Design/                 # PDF、截图、设计 token
 ├─ docs/                   # PRD、架构、ADR、数据模型
@@ -1047,8 +1057,9 @@ jingli/
 
 为什么不分仓：
 
-- App、CLI、MCP 共享 `JingliCore`，必须同版本发布。
-- Agent 相关的改动经常横跨 Core / CLI / MCP / Skill，一个 PR 能完整描述。
+- App、CLI 共享 `JingliCore`，必须同版本发布。
+- Agent 相关的改动经常横跨 Core / CLI / Skill，一个 PR 能完整描述。
+- MCP 是可选扩展，v1 不建目录也不影响主线。
 - 个人项目，分仓只会增加版本同步成本。
 
 Skill 不直接从仓库路径运行；`scripts/install.sh` 负责把 `Skill/jingli/` 复制到 `~/.agents/skills/jingli/`，仓库仍是唯一源。
@@ -1109,7 +1120,7 @@ git push -u origin main
 1. `feat(core): ...`：模型 / 数据层
 2. `feat(core): ...`：核心逻辑（计时、分摊、状态机）
 3. `feat(ui): ...`：界面 / 交互
-4. `feat(agent): ...`：CLI / MCP / Skill（如果涉及）
+4. `feat(agent): ...`：CLI / Skill（如果涉及；MCP 可选）
 5. `test(...): ...`：补边界测试
 6. `docs(...): ...`：更新文档 / CHANGELOG
 
@@ -1259,10 +1270,10 @@ git clone --mirror <private-repo-url> /Volumes/ssd/backups/jingli.git
 
 ## 13. 下一步
 
-如果方向认可，先做 Phase 0 的五件事（不写业务代码）：
+如果方向认可，直接做 Phase 0 的五件事（不写业务代码）：
 
-1. 技术栈已定 **SwiftUI + AppKit**；还需要拍板：**v1 是否含精力层**、**统计口径**、**勿扰 Shortcuts 是否接受**。
-2. 一页 PRD：把 6 个口径问题定下来。
+1. 第 10 节默认值已定，不再需要拍板；按该表执行。
+2. 一页 PRD：把 6 个口径问题写死。
 3. 数据模型 + 迁移 JSON schema + `Tests/Fixtures/` 样例。
 4. SwiftUI 工程骨架 + 设计 token + 空页面导航 + `--snapshot` 模式。
 5. 测试骨架：`scripts/self-test.sh` + `scripts/snapshot.sh` + 临时测试库 + 1 个截图基线。
@@ -1272,11 +1283,11 @@ git clone --mirror <private-repo-url> /Volumes/ssd/backups/jingli.git
 - [ ] **Shortcuts 勿扰**：创建 `Jingli Focus On/Off`，用 `shortcuts run` 开关勿扰；验证已有 Focus、自动化权限被拒、重命名。
 - [ ] **全局 NSPanel**：覆盖全屏应用 / 所有 Space / Stage Manager；第一次点击可点；不抢键盘焦点。
 - [ ] **截图模式**：`cacheDisplay` 能稳定抓 SwiftUI 页面 + NSPanel + 菜单栏；连续两次截图无差异。
-- [ ] **数据与并发**：SQLite + Unix socket + CLI/MCP 同时写；localStorage 导出 → 导入 → 统计一致。
+- [ ] **数据与并发**：SQLite + Unix socket + CLI 同时写（MCP 可选）；localStorage 导出 → 导入 → 统计一致。
 
 这 4 个 spike 过了，才算真正「不缺」；没过就先调整方案（例如勿扰降级为手动开关、或调整截图方案）。**SwiftUI 已定，不再改栈。**
 
-现在不缺的是**规划**；还缺的是**决策、Phase 0 的实物、以及这 4 个 spike 的验证**。
+现在不缺的是**规划**；还缺的是 **Phase 0 的实物和这 4 个 spike 的验证**。
 
 ---
 
@@ -1285,5 +1296,6 @@ git clone --mirror <private-repo-url> /Volumes/ssd/backups/jingli.git
 | 日期 | 决策 | 理由 | 影响 |
 |---|---|---|---|
 | 2026-10-22 | 采用 **SwiftUI + AppKit** | 核心体验是系统级 ambient UI（菜单栏、浮窗、通知、全局快捷键）；只有 4 个页面，原生工作量可控；后续接 EventKit / SMAppService / Swift Charts 更顺 | 不做 Tauri / WKWebView；工程用 Xcode + SwiftUI；浮窗与完成弹窗直接走 `NSPanel` |
+| 2026-10-22 | **默认值锁定；MCP 降为可选** | 先跑起来；CLI + SKILL.md 已足够覆盖 Agent 输入 | v1 不实现 MCP、不含精力层、固定 25 分钟；详见第 10 节 |
 
-对应 ADR：`docs/adr/0001-native-swiftui.md`（Phase 0 创建）。
+对应 ADR：`docs/adr/0001-native-swiftui.md`（已创建）。
