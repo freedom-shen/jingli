@@ -1,9 +1,9 @@
 # 精力管理 · Mac 应用规划
 
-> 版本：v2.2（实现基线）  
+> 版本：v2.3（实现基线）  
 > 日期：2026-10-22  
-> 状态：技术栈与默认值已锁定；MCP 可选；每阶段 commit + push；**范围收敛为「只管今天」**  
-> 输入材料：`精力管理 · Mac 应用设计稿 (1).pdf`、`精力管理 · Mac 应用设计稿.pdf`（v1，含项目页）、`项目与任务管理器.html`、`项目与任务管理器-文字稿.txt`
+> 状态：技术栈与默认值已锁定；MCP 可选；每阶段 commit + push；范围收敛为「只管今天」；图标已就绪  
+> 输入材料：`精力管理 · Mac 应用设计稿 (1).pdf`、`精力管理 · Mac 应用设计稿.pdf`（v1，含项目页）、`精力管理 · App 图标.pdf`、`项目与任务管理器.html`、`项目与任务管理器-文字稿.txt`
 >
 > **2026-10-22 范围调整：应用只管理「今天」。不保留历史、不做 7 天 / 30 天图表、不迁移旧番茄历史。PDF 的「近 7 天柱状图」移出 v1。**
 
@@ -37,6 +37,8 @@ v2 共 4 页，均为 1440×900 的深色界面。与 v1 相比，v2 用「本�
 | 精力统计 | 今日番茄钟、专注时长、完成任务三张 KPI；今日专注记录列表。**v1 不做近 7 天柱状图**（范围收敛为「只管今天」） |
 
 视觉特征：纯黑背景、深色圆角卡片、克制的蓝色选中态、白色主按钮、SF 字体、细边框、低饱和度项目色。
+
+**App 图标**：3D 番茄计时器，黑底；源文件在 `Design/AppIcon/AppIcon.pdf`，已生成 `AppIcon-1024.png`、`Jingli.iconset`、`Jingli.icns`。如果 Finder / Dock 需要 macOS squircle 透明边角，Phase 0 再生成 masked 版本。
 
 ### 1.2 HTML 原型
 
@@ -1046,7 +1048,7 @@ jingli/
 ├─ CLI/                    # jingli 命令行
 ├─ MCP/                    # jingli-mcp（v1.1 再建）
 ├─ Skill/                  # SKILL.md + scripts/install.sh
-├─ Design/                 # PDF、截图、设计 token
+├─ Design/                 # PDF、AppIcon、截图、设计 token
 ├─ docs/                   # PRD、架构、ADR、数据模型
 ├─ scripts/                # 构建、测试、迁移、备份
 ├─ .gitignore
