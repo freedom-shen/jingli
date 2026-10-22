@@ -1,17 +1,58 @@
+import AppKit
 import Foundation
 import UserNotifications
 
-final class CompletionNotifier: @unchecked Sendable {
+final class CompletionNotifier: NSObject, UNUserNotificationCenterDelegate, @unchecked Sendable {
     static let shared = CompletionNotifier()
 
-    private var requested = false
+    static let categoryID = "FOCUS_COMPLETE"
+    static let breakActionID = "JINGLI_BREAK"
+    static let nextRoundActionID = "JINGLI_NEXT_ROUND"
+    static let closeActionID = "JINGLI_CLOSE"
 
-    private init() {}
+    private var requested = false
+    private var configured = false
+
+    private override init() {
+        super.init()
+    }
+
+    func configure() {
+        guard !configured else { return }
+        configured = true
+
+        let center = UNUserNotificationCenter.current()
+        center.delegate = self
+
+        let breakAction = UNNotificationAction(
+            identifier: Self.breakActionID,
+            title: "开始休息 5 分钟",
+            options: [.foreground]
+        )
+        let nextAction = UNNotificationAction(
+            identifier: Self.nextRoundActionID,
+            title: "再来一轮",
+            options: [.foreground]
+        )
+        let closeAction = UNNotificationAction(
+            identifier: Self.closeActionID,
+            title: "回到清单",
+            options: []
+        )
+        let category = UNNotificationCategory(
+            identifier: Self.categoryID,
+            actions: [breakAction, nextAction, closeAction],
+            intentIdentifiers: [],
+            options: []
+        )
+        center.setNotificationCategories([category])
+    }
 
     func requestAuthorization() {
         guard ProcessInfo.processInfo.environment["JINGLI_NO_NOTIFICATIONS"] != "1" else {
             return
         }
+        configure()
         guard !requested else { return }
         requested = true
         UNUserNotificationCenter.current().requestAuthorization(
@@ -30,10 +71,12 @@ final class CompletionNotifier: @unchecked Sendable {
         guard ProcessInfo.processInfo.environment["JINGLI_NO_NOTIFICATIONS"] != "1" else {
             return
         }
+        configure()
         let content = UNMutableNotificationContent()
         content.title = title
         content.body = body
         content.sound = .default
+        content.categoryIdentifier = Self.categoryID
 
         let request = UNNotificationRequest(
             identifier: UUID().uuidString,
@@ -41,5 +84,42 @@ final class CompletionNotifier: @unchecked Sendable {
             trigger: nil
         )
         UNUserNotificationCenter.current().add(request)
+    }
+
+    // MARK: - UNUserNotificationCenterDelegate
+
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification,
+        withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
+    ) {
+        completionHandler([.banner, .sound])
+    }
+
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse,
+        withCompletionHandler completionHandler: @escaping () -> Void
+    ) {
+        let action = response.actionIdentifier
+        completionHandler()
+        DispatchQueue.main.async {
+            MainActor.assumeIsolated {
+                let model = AppServices.shared.model
+                switch action {
+                case Self.breakActionID:
+                    NSApp.activate(ignoringOtherApps: true)
+                    model.startBreak()
+                case Self.nextRoundActionID:
+                    NSApp.activate(ignoringOtherApps: true)
+                    model.startNextRound()
+                case Self.closeActionID:
+                    model.dismissCompletion()
+                default:
+                    NSApp.activate(ignoringOtherApps: true)
+                    model.dismissCompletion()
+                }
+            }
+        }
     }
 }

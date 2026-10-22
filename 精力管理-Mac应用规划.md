@@ -1357,7 +1357,7 @@ Phase 0 的五件事（不写业务代码）：
 | 项目 CRUD | 手动新建「工作 / 本周重点」、改名、删除；删除后任务 `project_id` 变 NULL |
 | 任务详情 | `...` 打开 sheet，改标题 / 备注保存成功；完成任务写 `done=1` |
 | CLI | project/task/day/focus/stats/events/undo 全链路通过；`day reset` 无 `--confirm` 被拒 |
-| 通知 | 从 `/tmp` 启动时 `usernoted` 报 client 校验失败；复制到 `~/Applications` 并接受系统授权后，完成通知以 banner 投递到 `.alert .lockScreen .notificationCenter`；正式 bundle 若被误拒，需在系统设置中重新允许 |
+| 通知 | 从 `/tmp` 启动时 `usernoted` 报 client 校验失败；复制到 `~/Applications` 并接受系统授权后，完成通知以 banner + sound 投递，`category:"FOCUS_COMPLETE"` 的三个操作已注册；正式 bundle 若被误拒，需在系统设置中重新允许 |
 | 模拟一天 | `scripts/dogfood.sh` → 3 轮、共享 `0.5/0.5`、暂停 / 继续、加 / 移任务、休息、再来一轮、统计 `3 个 / 6 秒`、重置、备份、跨天全部通过 |
 | 性能 | 空闲 RSS ≈ 102 MB / 0% CPU；计时 + 今日页 ≈ 102 MB / 1.3% CPU（目标 < 150 MB） |
 

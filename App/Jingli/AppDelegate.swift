@@ -15,6 +15,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
+        CompletionNotifier.shared.configure()
         startAgentServer()
         runDailyBackup()
 
