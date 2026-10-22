@@ -294,6 +294,35 @@ public extension WorkspaceStore {
         }
     }
 
+    func settingValue(_ key: String) throws -> String? {
+        try database.queue.read { db in
+            try String.fetchOne(
+                db,
+                sql: "SELECT value FROM setting WHERE key = ?",
+                arguments: [key]
+            )
+        }
+    }
+
+    func setSettingValue(_ key: String, _ value: String?) throws {
+        try database.queue.write { db in
+            if let value {
+                try db.execute(
+                    sql: """
+                    INSERT INTO setting (key, value) VALUES (?, ?)
+                    ON CONFLICT(key) DO UPDATE SET value = excluded.value
+                    """,
+                    arguments: [key, value]
+                )
+            } else {
+                try db.execute(
+                    sql: "DELETE FROM setting WHERE key = ?",
+                    arguments: [key]
+                )
+            }
+        }
+    }
+
     /// 每天第一次使用（启动或跨零点）时清掉昨日痕迹，返回是否执行了跨天。
     @discardableResult
     func rolloverIfNeeded(today: String = DayKey.make()) throws -> Bool {

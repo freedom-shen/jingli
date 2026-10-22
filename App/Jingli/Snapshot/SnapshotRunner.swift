@@ -53,6 +53,7 @@ enum SnapshotRunner {
         )
         window.contentView = NSHostingView(
             rootView: RootView()
+                .environment(\.controlActiveState, .key)
                 .frame(width: size.width, height: size.height)
                 .preferredColorScheme(.dark)
         )

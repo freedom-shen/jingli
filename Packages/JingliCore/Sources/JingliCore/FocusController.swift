@@ -28,7 +28,8 @@ public struct ProcessShortcutRunner: ShortcutRunning {
 
     private func execute(arguments: [String]) throws -> (status: Int32, output: String) {
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/shortcuts")
+        let override = ProcessInfo.processInfo.environment["JINGLI_SHORTCUTS_BIN"]
+        process.executableURL = URL(fileURLWithPath: override ?? "/usr/bin/shortcuts")
         process.arguments = arguments
 
         let pipe = Pipe()

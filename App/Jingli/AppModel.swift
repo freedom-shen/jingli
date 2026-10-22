@@ -19,6 +19,7 @@ final class AppModel: ObservableObject {
 
     private let store: WorkspaceStore
     private let timerStore: FocusTimerStore
+    private let focusMode = FocusModeCoordinator.shared
     private var breakEndsAt: Int64 = 0
     private var currentDay = DayKey.make()
 
@@ -26,6 +27,7 @@ final class AppModel: ObservableObject {
         self.store = store
         self.timerStore = FocusTimerStore(database: store.database)
         self.timer = try? timerStore.loadActive()
+        restoreFocusMode()
         updateTimerText()
         reload()
     }
@@ -196,12 +198,13 @@ final class AppModel: ObservableObject {
             durationMs: timerDurationMs
         ) else { return }
         next.start(now: nowMilliseconds(), sessionID: UUID().uuidString)
-        next.setFocusMode(on: true, owned: true)
+        let outcome = focusMode.begin()
+        next.setFocusMode(on: outcome == .enabled, owned: outcome == .enabled)
         timer = next
         persistTimer()
+        persistFocusOwnership()
         updateTimerText()
         CompletionNotifier.shared.requestAuthorization()
-        try? FocusController.shared.enable()
     }
 
     func toggleFocus(for task: Task) {
@@ -234,7 +237,8 @@ final class AppModel: ObservableObject {
     func abandonFocus() {
         timer = nil
         try? timerStore.clearActive()
-        try? FocusController.shared.disable()
+        focusMode.end()
+        persistFocusOwnership()
         updateTimerText()
     }
 
@@ -263,6 +267,8 @@ final class AppModel: ObservableObject {
     func startBreak() {
         CompletionPanelController.shared.hide()
         completion = nil
+        focusMode.end()
+        persistFocusOwnership()
         reload()
         isOnBreak = true
         breakEndsAt = nowMilliseconds() + Int64(breakDurationMs)
@@ -292,12 +298,13 @@ final class AppModel: ObservableObject {
               ) else { return }
 
         next.start(now: nowMilliseconds(), sessionID: UUID().uuidString)
-        next.setFocusMode(on: true, owned: true)
+        let outcome = focusMode.begin()
+        next.setFocusMode(on: outcome == .enabled, owned: outcome == .enabled)
         timer = next
         persistTimer()
+        persistFocusOwnership()
         updateTimerText()
         CompletionNotifier.shared.requestAuthorization()
-        try? FocusController.shared.enable()
         _ = first
     }
 
@@ -347,9 +354,28 @@ final class AppModel: ObservableObject {
             errorMessage = error.localizedDescription
         }
         timer = nil
-        try? FocusController.shared.disable()
+        focusMode.end()
+        persistFocusOwnership()
         updateTimerText()
         reload()
+    }
+
+    private func restoreFocusMode() {
+        let persisted = try? store.settingValue("focus_owned")
+        if let timer, timer.focusModeOwned {
+            focusMode.restore()
+            persistFocusOwnership()
+        } else if persisted == "1" {
+            focusMode.end()
+            persistFocusOwnership()
+        }
+    }
+
+    private func persistFocusOwnership() {
+        try? store.setSettingValue(
+            "focus_owned",
+            focusMode.isOwned ? "1" : nil
+        )
     }
 
     private func persistTimer() {

@@ -26,6 +26,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         agentServer?.stop()
+        FocusModeCoordinator.shared.endAndWait()
+        try? AppServices.shared.store.setSettingValue("focus_owned", nil)
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
