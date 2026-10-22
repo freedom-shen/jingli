@@ -7,8 +7,19 @@ let package = Package(
     products: [
         .library(name: "JingliCore", targets: ["JingliCore"])
     ],
+    dependencies: [
+        .package(url: "https://github.com/groue/GRDB.swift.git", from: "7.11.1")
+    ],
     targets: [
-        .target(name: "JingliCore"),
-        .testTarget(name: "JingliCoreTests", dependencies: ["JingliCore"])
+        .target(
+            name: "JingliCore",
+            dependencies: [
+                .product(name: "GRDB", package: "GRDB.swift")
+            ]
+        ),
+        .testTarget(
+            name: "JingliCoreTests",
+            dependencies: ["JingliCore"]
+        )
     ]
 )

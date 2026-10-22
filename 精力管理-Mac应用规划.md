@@ -1,8 +1,8 @@
 # 精力管理 · Mac 应用规划
 
-> 版本：v2.5（Phase 0 进行中）  
+> 版本：v2.6（Phase 0 进行中）  
 > 日期：2026-10-22  
-> 状态：P0-5 完成（Xcode 工程 + JingliCore 可构建 / 测试 / 启动）；剩余 P0-1 ~ P0-4、P0-6、P0-7  
+> 状态：P0-5 / P0-6 完成（工程 + 数据层 + 11 tests）；剩余 P0-1 ~ P0-4、P0-7  
 > 输入材料：`精力管理 · Mac 应用设计稿 (1).pdf`、`精力管理 · Mac 应用设计稿.pdf`（v1，含项目页）、`精力管理 · App 图标.pdf`、`项目与任务管理器.html`、`项目与任务管理器-文字稿.txt`
 >
 > **2026-10-22 范围调整：应用只管理「今天」。不保留历史、不做 7 天 / 30 天图表、不迁移旧番茄历史。PDF 的「近 7 天柱状图」移出 v1。**
@@ -1337,7 +1337,8 @@ Phase 0 的五件事（不写业务代码）：
 
 - 文档、决策、图标、Git：完成。
 - **P0-5 已完成**：Xcode 工程 + `JingliCore`，build/test 通过，app 可启动。
-- 其余 P0（4 个 spike、数据模型、snapshot）待做。
+- **P0-6 已完成**：SQLite schema / migration / rollover / purge + `Tests/Fixtures/`，11 个测试通过。
+- 其余 P0（4 个 spike、snapshot + self-test）待做。
 
 ### 15.2 开工门槛（P0，2–3 天）
 
@@ -1347,8 +1348,8 @@ Phase 0 的五件事（不写业务代码）：
 | P0-2 | 全局 NSPanel spike | 全屏 / 所有 Space / Stage Manager 可见；第一次点击可点；不抢焦点 |
 | P0-3 | 截图 spike | SwiftUI 页面 + NSPanel + 菜单栏可稳定抓图；连续两次无差异 |
 | P0-4 | 数据 spike | SQLite + socket + CLI 并发写；任务/项目导入；旧番茄历史不导 |
-| P0-5 | ✅ Xcode 工程 + JingliCore（2026-10-22） | 空页面能跑；`swift test` 7 个测试通过；app 可启动 |
-| P0-6 | 数据模型 / 迁移 / fixtures | 建库、迁移、种子数据可用 |
+| P0-5 | ✅ Xcode 工程 + JingliCore（2026-10-22） | 空页面能跑；build/test 通过；app 可启动 |
+| P0-6 | ✅ 数据模型 / 迁移 / fixtures（2026-10-22） | schema、rollover、purge、项目删除保任务；11 tests |
 | P0-7 | snapshot + self-test | `self-test --fast` 跑通；第一条截图基线 |
 
 P0 完成：merge `main` + push + tag `v0.0.1-phase0`（可选）。

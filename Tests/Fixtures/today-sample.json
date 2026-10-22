@@ -1,0 +1,88 @@
+{
+  "schema": "jingli.fixture.v1",
+  "projects": [
+    {
+      "id": "p-work",
+      "name": "工作",
+      "description": "本周重点",
+      "color": "blue",
+      "createdAt": "2026-10-20T09:00:00Z",
+      "sortOrder": 0
+    },
+    {
+      "id": "p-life",
+      "name": "生活",
+      "description": "",
+      "color": "sage",
+      "createdAt": "2026-10-20T09:01:00Z",
+      "sortOrder": 1
+    }
+  ],
+  "tasks": [
+    {
+      "id": "t-1",
+      "title": "完成季度复盘初稿",
+      "projectId": "p-work",
+      "lane": "main",
+      "plannedDate": "2026-10-22",
+      "note": "",
+      "done": false,
+      "createdAt": "2026-10-21T09:00:00Z",
+      "completedAt": null,
+      "sortOrder": 0
+    },
+    {
+      "id": "t-2",
+      "title": "梳理精力管理 App 信息架构",
+      "projectId": "p-work",
+      "lane": "main",
+      "plannedDate": "2026-10-22",
+      "note": "",
+      "done": false,
+      "createdAt": "2026-10-21T09:01:00Z",
+      "completedAt": null,
+      "sortOrder": 1
+    },
+    {
+      "id": "t-3",
+      "title": "阅读《深度工作》第 4 章",
+      "projectId": "p-life",
+      "lane": "main",
+      "plannedDate": "2026-10-22",
+      "note": "",
+      "done": true,
+      "createdAt": "2026-10-21T09:02:00Z",
+      "completedAt": "2026-10-22T08:30:00Z",
+      "sortOrder": 2
+    },
+    {
+      "id": "t-4",
+      "title": "回复设计群消息",
+      "projectId": "p-work",
+      "lane": "temporary",
+      "plannedDate": "2026-10-22",
+      "note": "",
+      "done": false,
+      "createdAt": "2026-10-22T08:00:00Z",
+      "completedAt": null,
+      "sortOrder": 3
+    },
+    {
+      "id": "t-5",
+      "title": "预约周六羽毛球场地",
+      "projectId": "p-life",
+      "lane": "temporary",
+      "plannedDate": "2026-10-22",
+      "note": "",
+      "done": false,
+      "createdAt": "2026-10-22T08:05:00Z",
+      "completedAt": null,
+      "sortOrder": 4
+    }
+  ],
+  "dayPlan": {
+    "date": "2026-10-22",
+    "started": false,
+    "taskIds": ["t-1", "t-2", "t-3", "t-4", "t-5"]
+  }
+}
