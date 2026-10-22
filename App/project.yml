@@ -1,0 +1,61 @@
+name: Jingli
+options:
+  bundleIdPrefix: com.freedom-shen
+  deploymentTarget:
+    macOS: "15.0"
+  createIntermediateGroups: true
+
+packages:
+  JingliCore:
+    path: ../Packages/JingliCore
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MACOSX_DEPLOYMENT_TARGET: "15.0"
+    CODE_SIGN_IDENTITY: "-"
+    CODE_SIGN_STYLE: Manual
+    DEVELOPMENT_TEAM: ""
+
+targets:
+  Jingli:
+    type: application
+    platform: macOS
+    sources:
+      - path: Jingli
+    dependencies:
+      - package: JingliCore
+    settings:
+      base:
+        PRODUCT_NAME: Jingli
+        PRODUCT_BUNDLE_IDENTIFIER: com.freedom-shen.jingli
+        MARKETING_VERSION: "0.0.1"
+        CURRENT_PROJECT_VERSION: "1"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: 精力管理
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
+        INFOPLIST_KEY_NSHumanReadableCopyright: ""
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ENABLE_HARDENED_RUNTIME: NO
+
+  JingliTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: JingliTests
+    dependencies:
+      - target: Jingli
+      - package: JingliCore
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+
+schemes:
+  Jingli:
+    build:
+      targets:
+        Jingli: all
+        JingliTests: [test]
+    test:
+      targets:
+        - JingliTests

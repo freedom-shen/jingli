@@ -1,0 +1,494 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		115F92C67CB33A4D41CA3C3D /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69C109D6B349355695ABB984 /* Theme.swift */; };
+		272F9FAE80A662AF8FC4CD1C /* JingliCore in Frameworks */ = {isa = PBXBuildFile; productRef = 00854301257684596A8AE39D /* JingliCore */; };
+		8BD20B4455E057AB5D7E093D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 71C1D692A0AB7C393EE3CCE0 /* Assets.xcassets */; };
+		A5465BE37DBAA78A1FB3C1A9 /* JingliApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC9618A2DBBE55DDF8631873 /* JingliApp.swift */; };
+		CE4F61388333ED626B1C2209 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94DA84C0289342098B879CF7 /* RootView.swift */; };
+		F09691D382E6B33E87DDDAA4 /* JingliTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDD74A624DACE35D5575E551 /* JingliTests.swift */; };
+		FF00BF88A88ED10537CD2B0A /* JingliCore in Frameworks */ = {isa = PBXBuildFile; productRef = 8B43A917917AD4BD75DF5D28 /* JingliCore */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		FC75366C3281C5C37BEC2261 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 48B4D54387B94D9F745F9A7B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CBE485763CEDEAA4377D83BB;
+			remoteInfo = Jingli;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		1BF08515B42BC266448DC3CF /* JingliTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JingliTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		69C109D6B349355695ABB984 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		71C1D692A0AB7C393EE3CCE0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		83D70C90B6CB19BF9F0720D9 /* Jingli.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Jingli.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8ECA132F9266F52FDF28D189 /* JingliCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = JingliCore; path = ../Packages/JingliCore; sourceTree = SOURCE_ROOT; };
+		94DA84C0289342098B879CF7 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		BDD74A624DACE35D5575E551 /* JingliTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JingliTests.swift; sourceTree = "<group>"; };
+		CC9618A2DBBE55DDF8631873 /* JingliApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JingliApp.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		10DFCF0156D6470749E2B0F8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FF00BF88A88ED10537CD2B0A /* JingliCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		59095B66D694BD2F9EF1AA71 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				272F9FAE80A662AF8FC4CD1C /* JingliCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		55E4ADA9813DD50298B67C62 /* Design */ = {
+			isa = PBXGroup;
+			children = (
+				69C109D6B349355695ABB984 /* Theme.swift */,
+			);
+			path = Design;
+			sourceTree = "<group>";
+		};
+		76DEF368BF4925F0C26E5ABC /* JingliTests */ = {
+			isa = PBXGroup;
+			children = (
+				BDD74A624DACE35D5575E551 /* JingliTests.swift */,
+			);
+			path = JingliTests;
+			sourceTree = "<group>";
+		};
+		B3959EEEB3BA261B32889EE5 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				8ECA132F9266F52FDF28D189 /* JingliCore */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		DBB32DD9EEC13BD511B4A2F0 /* Jingli */ = {
+			isa = PBXGroup;
+			children = (
+				71C1D692A0AB7C393EE3CCE0 /* Assets.xcassets */,
+				CC9618A2DBBE55DDF8631873 /* JingliApp.swift */,
+				94DA84C0289342098B879CF7 /* RootView.swift */,
+				55E4ADA9813DD50298B67C62 /* Design */,
+			);
+			path = Jingli;
+			sourceTree = "<group>";
+		};
+		E57D9291E9C9FC423B254D6A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				83D70C90B6CB19BF9F0720D9 /* Jingli.app */,
+				1BF08515B42BC266448DC3CF /* JingliTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		EC6E98E96F4F32777DDC8EEF = {
+			isa = PBXGroup;
+			children = (
+				DBB32DD9EEC13BD511B4A2F0 /* Jingli */,
+				76DEF368BF4925F0C26E5ABC /* JingliTests */,
+				B3959EEEB3BA261B32889EE5 /* Packages */,
+				E57D9291E9C9FC423B254D6A /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		CBE485763CEDEAA4377D83BB /* Jingli */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = ABCB7A4743A2E465C18594B3 /* Build configuration list for PBXNativeTarget "Jingli" */;
+			buildPhases = (
+				2DB4D529CCEA0E94A23E4DEA /* Sources */,
+				E22ED99CB9EA9C19E4A1C4A8 /* Resources */,
+				59095B66D694BD2F9EF1AA71 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Jingli;
+			packageProductDependencies = (
+				00854301257684596A8AE39D /* JingliCore */,
+			);
+			productName = Jingli;
+			productReference = 83D70C90B6CB19BF9F0720D9 /* Jingli.app */;
+			productType = "com.apple.product-type.application";
+		};
+		D1937C75B46A7B6D5B48ECBB /* JingliTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F6479C0EEEB6484FB902989F /* Build configuration list for PBXNativeTarget "JingliTests" */;
+			buildPhases = (
+				6548D3707ECB36AE3A648FD9 /* Sources */,
+				10DFCF0156D6470749E2B0F8 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A2B8A9A9E8DE0D3DDA2367A3 /* PBXTargetDependency */,
+			);
+			name = JingliTests;
+			packageProductDependencies = (
+				8B43A917917AD4BD75DF5D28 /* JingliCore */,
+			);
+			productName = JingliTests;
+			productReference = 1BF08515B42BC266448DC3CF /* JingliTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		48B4D54387B94D9F745F9A7B /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					CBE485763CEDEAA4377D83BB = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Manual;
+					};
+					D1937C75B46A7B6D5B48ECBB = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Manual;
+					};
+				};
+			};
+			buildConfigurationList = DCFA703EEA55213148D3F7C3 /* Build configuration list for PBXProject "Jingli" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = EC6E98E96F4F32777DDC8EEF;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				5142151ACA68B8A33EF9E354 /* XCLocalSwiftPackageReference "../Packages/JingliCore" */,
+			);
+			preferredProjectObjectVersion = 77;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CBE485763CEDEAA4377D83BB /* Jingli */,
+				D1937C75B46A7B6D5B48ECBB /* JingliTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E22ED99CB9EA9C19E4A1C4A8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8BD20B4455E057AB5D7E093D /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		2DB4D529CCEA0E94A23E4DEA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A5465BE37DBAA78A1FB3C1A9 /* JingliApp.swift in Sources */,
+				CE4F61388333ED626B1C2209 /* RootView.swift in Sources */,
+				115F92C67CB33A4D41CA3C3D /* Theme.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6548D3707ECB36AE3A648FD9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F09691D382E6B33E87DDDAA4 /* JingliTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A2B8A9A9E8DE0D3DDA2367A3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CBE485763CEDEAA4377D83BB /* Jingli */;
+			targetProxy = FC75366C3281C5C37BEC2261 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		076C4F1DB54B2FDEF152029B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "精力管理";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.freedom-shen.jingli";
+				PRODUCT_NAME = Jingli;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		5AAB073A3DED64BFDBC44789 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		60D2803A47CDB684CA1BF4BA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.freedom-shen.JingliTests";
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Jingli.app/Contents/MacOS/Jingli";
+			};
+			name = Debug;
+		};
+		7A8754696B18B7E9DAA98FA8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "精力管理";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.freedom-shen.jingli";
+				PRODUCT_NAME = Jingli;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		8523CA794275CA075B832BE3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		CFB82EA2435F53F49E75BB7B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.freedom-shen.JingliTests";
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Jingli.app/Contents/MacOS/Jingli";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		ABCB7A4743A2E465C18594B3 /* Build configuration list for PBXNativeTarget "Jingli" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7A8754696B18B7E9DAA98FA8 /* Debug */,
+				076C4F1DB54B2FDEF152029B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		DCFA703EEA55213148D3F7C3 /* Build configuration list for PBXProject "Jingli" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8523CA794275CA075B832BE3 /* Debug */,
+				5AAB073A3DED64BFDBC44789 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F6479C0EEEB6484FB902989F /* Build configuration list for PBXNativeTarget "JingliTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				60D2803A47CDB684CA1BF4BA /* Debug */,
+				CFB82EA2435F53F49E75BB7B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		5142151ACA68B8A33EF9E354 /* XCLocalSwiftPackageReference "../Packages/JingliCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../Packages/JingliCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		00854301257684596A8AE39D /* JingliCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = JingliCore;
+		};
+		8B43A917917AD4BD75DF5D28 /* JingliCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = JingliCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 48B4D54387B94D9F745F9A7B /* Project object */;
+}
