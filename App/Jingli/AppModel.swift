@@ -7,6 +7,10 @@ final class AppModel: ObservableObject {
     @Published var selected: Set<String> = []
     @Published var errorMessage: String?
     @Published var isTaskEditorPresented = false
+    @Published var page: AppPage = .day
+    @Published var isProjectEditorPresented = false
+    @Published var editingProject: Project?
+    @Published var taskEditorProjectID: String?
     @Published private(set) var timer: FocusTimer?
     @Published private(set) var timerText = "25:00"
     @Published private(set) var isOnBreak = false
@@ -64,6 +68,10 @@ final class AppModel: ObservableObject {
                 selected = []
             } else {
                 selected = Set(next.selection)
+            }
+            if case let .project(id) = page,
+               !next.projects.contains(where: { $0.id == id }) {
+                page = .projects
             }
             errorMessage = nil
         } catch {
@@ -370,9 +378,93 @@ final class AppModel: ObservableObject {
         return 5 * 60 * 1000
     }
 
-    func openTaskEditor() {
+    func openTaskEditor(projectID: String? = nil) {
+        taskEditorProjectID = projectID
         isTaskEditorPresented = true
     }
+
+    func openProjects() {
+        page = .projects
+    }
+
+    func openProject(_ id: String) {
+        page = .project(id)
+    }
+
+    func goBack() {
+        switch page {
+        case .project:
+            page = .projects
+        default:
+            page = .day
+        }
+    }
+
+    func currentProject() -> Project? {
+        guard case let .project(id) = page else { return nil }
+        return projects.first { $0.id == id }
+    }
+
+    func projectTasks(_ id: String) -> [Task] {
+        (try? store.tasks(projectID: id)) ?? []
+    }
+
+    func projectTaskCount(_ id: String) -> Int {
+        projectTasks(id).count
+    }
+
+    func openProjectEditor(_ project: Project? = nil) {
+        editingProject = project
+        isProjectEditorPresented = true
+    }
+
+    @discardableResult
+    func saveProject(
+        name: String,
+        description: String,
+        color: String,
+        projectID: String?
+    ) -> Bool {
+        do {
+            if let projectID {
+                _ = try store.updateProject(
+                    id: projectID,
+                    name: name,
+                    description: description,
+                    color: color
+                )
+            } else {
+                _ = try store.createProject(
+                    name: name,
+                    description: description,
+                    color: color
+                )
+            }
+            editingProject = nil
+            reload()
+            return true
+        } catch {
+            errorMessage = error.localizedDescription
+            return false
+        }
+    }
+
+    func deleteProject(_ project: Project) {
+        do {
+            try store.deleteProject(id: project.id)
+            editingProject = nil
+            page = .projects
+            reload()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+}
+
+enum AppPage: Equatable {
+    case day
+    case projects
+    case project(String)
 }
 
 enum TaskFocusState {

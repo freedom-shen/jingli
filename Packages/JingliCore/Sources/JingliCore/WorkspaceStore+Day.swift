@@ -216,6 +216,52 @@ public extension WorkspaceStore {
     }
 
     @discardableResult
+    func updateProject(
+        id: String,
+        name: String,
+        description: String,
+        color: String
+    ) throws -> Project? {
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { throw StoreError.emptyTitle }
+        let normalizedColor = ["sage", "amber", "blue", "rose", "violet", "slate"].contains(color)
+            ? color : "sage"
+
+        return try database.queue.write { db in
+            try db.execute(
+                sql: "UPDATE project SET name = ?, description = ?, color = ? WHERE id = ?",
+                arguments: [String(trimmed.prefix(60)), String(description.prefix(500)), normalizedColor, id]
+            )
+            guard let row = try Row.fetchOne(
+                db,
+                sql: "SELECT * FROM project WHERE id = ?",
+                arguments: [id]
+            ) else { return nil }
+            return Project(row: row)
+        }
+    }
+
+    func deleteProject(id: String) throws {
+        try database.queue.write { db in
+            try db.execute(sql: "DELETE FROM project WHERE id = ?", arguments: [id])
+        }
+    }
+
+    func tasks(projectID: String) throws -> [Task] {
+        try database.queue.read { db in
+            try Row.fetchAll(
+                db,
+                sql: """
+                SELECT * FROM task
+                WHERE project_id = ?
+                ORDER BY done, sort_order, created_at
+                """,
+                arguments: [projectID]
+            ).map(Task.init(row:))
+        }
+    }
+
+    @discardableResult
     func toggleTask(id: String) throws -> Task? {
         try database.queue.write { db in
             guard let current = try Row.fetchOne(

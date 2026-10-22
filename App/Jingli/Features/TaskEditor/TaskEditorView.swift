@@ -9,6 +9,11 @@ struct TaskEditorView: View {
     @State private var lane = "main"
     @State private var projectID = ""
 
+    init(model: AppModel, defaultProjectID: String? = nil) {
+        self.model = model
+        _projectID = State(initialValue: defaultProjectID ?? "")
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             Text("新建任务")

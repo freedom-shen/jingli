@@ -11,24 +11,19 @@ struct RootView: View {
 
             VStack(alignment: .leading, spacing: 0) {
                 topBar
-
-                if let snapshot = model.snapshot {
-                    if snapshot.dayStarted {
-                        TodayView(model: model, snapshot: snapshot)
-                    } else {
-                        DayStartView(model: model, snapshot: snapshot)
-                    }
-                } else {
-                    ProgressView()
-                        .controlSize(.small)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                }
+                content
             }
         }
         .frame(minWidth: 1100, minHeight: 700)
         .preferredColorScheme(.dark)
         .sheet(isPresented: $model.isTaskEditorPresented) {
-            TaskEditorView(model: model)
+            TaskEditorView(
+                model: model,
+                defaultProjectID: model.taskEditorProjectID
+            )
+        }
+        .sheet(isPresented: $model.isProjectEditorPresented) {
+            ProjectEditorView(model: model, project: model.editingProject)
         }
         .alert(
             "出错了",
@@ -47,70 +42,87 @@ struct RootView: View {
         }
     }
 
+    @ViewBuilder
+    private var content: some View {
+        switch model.page {
+        case .projects:
+            ProjectListView(model: model)
+        case .project:
+            ProjectDetailView(model: model)
+        case .day:
+            if let snapshot = model.snapshot {
+                if snapshot.dayStarted {
+                    TodayView(model: model, snapshot: snapshot)
+                } else {
+                    DayStartView(model: model, snapshot: snapshot)
+                }
+            } else {
+                ProgressView()
+                    .controlSize(.small)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+        }
+    }
+
     private var topBar: some View {
         HStack(alignment: .firstTextBaseline, spacing: 12) {
-            Text(model.dayStarted ? "今日任务" : "开启一天")
+            if model.page != .day {
+                Button {
+                    model.goBack()
+                } label: {
+                    Image(systemName: "arrow.left")
+                        .font(.system(size: 13, weight: .semibold))
+                        .frame(width: 24, height: 24)
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+                .accessibilityIdentifier("back-button")
+            }
+
+            Text(pageTitle)
                 .font(.system(size: 28, weight: .semibold))
                 .foregroundStyle(Theme.textPrimary)
 
             Spacer()
 
             if model.isBusy {
-                HStack(spacing: 8) {
-                    Text(model.displayText)
-                        .font(.system(size: 13, weight: .semibold, design: .rounded))
-                        .foregroundStyle(Theme.accent)
-                        .monospacedDigit()
+                timerControls
+            }
 
-                    if model.isOnBreak {
-                        Button("跳过休息") {
-                            model.skipBreak()
-                        }
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
-                    } else {
-                        Button(model.timerIsPaused ? "继续" : "暂停") {
-                            if model.timerIsPaused {
-                                model.resumeFocus()
-                            } else {
-                                model.pauseFocus()
-                            }
-                        }
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
+            switch model.page {
+            case .day:
+                Text(countText)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(Theme.textSecondary)
 
-                        Button("废弃") {
-                            model.abandonFocus()
-                        }
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
+                if model.dayStarted {
+                    Button("重置") {
+                        model.resetDay()
                     }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                    .accessibilityIdentifier("reset-day-button")
+                }
+
+                iconButton("plus", identifier: "new-task-button") {
+                    model.openTaskEditor()
+                }
+
+                iconButton("folder", identifier: "projects-button") {
+                    model.openProjects()
+                }
+            case .projects:
+                iconButton("plus", identifier: "new-project-button") {
+                    model.openProjectEditor(nil)
+                }
+            case .project:
+                iconButton("plus", identifier: "new-project-task-button") {
+                    model.openTaskEditor(projectID: model.currentProject()?.id)
+                }
+                iconButton("pencil", identifier: "edit-project-button") {
+                    model.openProjectEditor(model.currentProject())
                 }
             }
-
-            Text(countText)
-                .font(.system(size: 12, weight: .medium))
-                .foregroundStyle(Theme.textSecondary)
-
-            if model.dayStarted {
-                Button("重置") {
-                    model.resetDay()
-                }
-                .buttonStyle(.bordered)
-                .controlSize(.small)
-                .accessibilityIdentifier("reset-day-button")
-            }
-
-            Button {
-                model.openTaskEditor()
-            } label: {
-                Image(systemName: "plus")
-                    .font(.system(size: 13, weight: .semibold))
-                    .frame(width: 24, height: 24)
-            }
-            .buttonStyle(.bordered)
-            .controlSize(.small)
-            .accessibilityIdentifier("new-task-button")
 
             Button("浮窗") {
                 FloatingPanelController.shared.show()
@@ -122,6 +134,65 @@ struct RootView: View {
         .padding(.horizontal, 40)
         .padding(.top, 28)
         .padding(.bottom, 18)
+    }
+
+    private var timerControls: some View {
+        HStack(spacing: 8) {
+            Text(model.displayText)
+                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .foregroundStyle(Theme.accent)
+                .monospacedDigit()
+
+            if model.isOnBreak {
+                Button("跳过休息") {
+                    model.skipBreak()
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+            } else {
+                Button(model.timerIsPaused ? "继续" : "暂停") {
+                    if model.timerIsPaused {
+                        model.resumeFocus()
+                    } else {
+                        model.pauseFocus()
+                    }
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+
+                Button("废弃") {
+                    model.abandonFocus()
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+            }
+        }
+    }
+
+    private func iconButton(
+        _ systemName: String,
+        identifier: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Image(systemName: systemName)
+                .font(.system(size: 13, weight: .semibold))
+                .frame(width: 24, height: 24)
+        }
+        .buttonStyle(.bordered)
+        .controlSize(.small)
+        .accessibilityIdentifier(identifier)
+    }
+
+    private var pageTitle: String {
+        switch model.page {
+        case .projects:
+            return "项目"
+        case .project:
+            return model.currentProject()?.name ?? "项目"
+        case .day:
+            return model.dayStarted ? "今日任务" : "开启一天"
+        }
     }
 
     private var countText: String {

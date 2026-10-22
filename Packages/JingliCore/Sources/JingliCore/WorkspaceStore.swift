@@ -31,14 +31,20 @@ public final class WorkspaceStore: @unchecked Sendable {
     }
 
     @discardableResult
-    public func createProject(name: String) throws -> Project {
+    public func createProject(
+        name: String,
+        description: String = "",
+        color: String = "sage"
+    ) throws -> Project {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { throw StoreError.emptyTitle }
+        let normalizedColor = ["sage", "amber", "blue", "rose", "violet", "slate"].contains(color)
+            ? color : "sage"
         let project = Project(
             id: UUID().uuidString,
             name: String(trimmed.prefix(60)),
-            description: "",
-            color: "sage",
+            description: String(description.prefix(500)),
+            color: normalizedColor,
             createdAt: Self.timestamp(),
             sortOrder: try nextSortOrder(table: "project")
         )
