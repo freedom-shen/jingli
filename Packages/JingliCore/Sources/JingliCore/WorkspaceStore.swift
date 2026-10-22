@@ -61,7 +61,8 @@ public final class WorkspaceStore: @unchecked Sendable {
     public func createTask(
         title: String,
         projectID: String? = nil,
-        lane: String = "main"
+        lane: String = "main",
+        plannedDate: String? = nil
     ) throws -> Task {
         let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { throw StoreError.emptyTitle }
@@ -71,7 +72,7 @@ public final class WorkspaceStore: @unchecked Sendable {
             title: String(trimmed.prefix(160)),
             projectID: projectID,
             lane: normalizedLane,
-            plannedDate: DayKey.make(),
+            plannedDate: plannedDate,
             note: "",
             done: false,
             createdAt: Self.timestamp(),

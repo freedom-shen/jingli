@@ -1,8 +1,8 @@
 # 精力管理 · Mac 应用规划
 
-> 版本：v3.2（P1 计时器核心）  
+> 版本：v3.3（P1 数据层完成）  
 > 日期：2026-10-22  
-> 状态：Phase 0 基本完成（P0-1 / P0-2 手工待验）；P1 计时器核心 `FocusTimer` 完成（7 tests）  
+> 状态：Phase 0 基本完成（P0-1 / P0-2 手工待验）；P1 数据层完成（FocusTimer + 日计划 API，28 tests）；UI 未接  
 > 输入材料：`精力管理 · Mac 应用设计稿 (1).pdf`、`精力管理 · Mac 应用设计稿.pdf`（v1，含项目页）、`精力管理 · App 图标.pdf`、`项目与任务管理器.html`、`项目与任务管理器-文字稿.txt`
 >
 > **2026-10-22 范围调整：应用只管理「今天」。不保留历史、不做 7 天 / 30 天图表、不迁移旧番茄历史。PDF 的「近 7 天柱状图」移出 v1。**
@@ -1361,10 +1361,10 @@ P0 完成：merge `main` + push + tag `v0.0.1-phase0`（可选）。
 
 ### 15.3 P1 核心闭环（5–7 天）
 
-当前进度：计时器核心 `FocusTimer` 已完成（prepare / start / pause / resume / tick / 加移任务 / 格式化，7 个测试）；尚未接 UI、持久化和 DND。
+当前进度：数据层完成 `FocusTimer`（7 tests）与 `WorkspaceStore` 日计划 API（分组 / 草稿 / start / reset，5 tests）；任务/项目 create/list 已有；共 28 tests。UI 尚未接线。
 
-- [ ] 任务 / 项目 CRUD
-- [ ] 开启一天（按项目分组，主线全局 4）
+- [ ] 任务 / 项目 CRUD（create/list 已有；UI 未接）
+- [ ] 开启一天（数据层完成；UI 未接）
 - [ ] 今日页（主线 / 临时）
 - [ ] 计时器（核心完成；UI / 持久化 / DND 未接）
 - [ ] 菜单栏倒计时
