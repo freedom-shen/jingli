@@ -50,6 +50,10 @@ if [ "$PERMISSIONS" != "600" ]; then
   exit 1
 fi
 
+json() {
+  python3 -c 'import json,sys; d=json.load(sys.stdin); print(d["result"]'"$1"')'
+}
+
 "$CLI" ping > "$TMP/ping.json"
 grep -q '"pong":true' "$TMP/ping.json"
 
@@ -70,4 +74,75 @@ if [ "$COUNT" != "20" ]; then
   exit 1
 fi
 
-echo "agent spike passed: socket=0600, ping=pong, tasks=$COUNT"
+"$CLI" project add "工作" > "$TMP/project.json"
+"$CLI" task add "写周报" --project 工作 --lane main --date today > "$TMP/task.json"
+TASK_ID="$(json '["id"]' < "$TMP/task.json")"
+
+"$CLI" day plan "$TASK_ID" --dry-run > "$TMP/plan-dry.json"
+python3 - "$TMP/plan-dry.json" <<'PY'
+import json, sys
+result = json.load(open(sys.argv[1]))["result"]
+assert result["dryRun"] is True, result
+assert result["mainCount"] == 1, result
+PY
+
+"$CLI" day plan "$TASK_ID" > "$TMP/plan.json"
+"$CLI" day start > "$TMP/start.json"
+python3 - "$TMP/start.json" <<'PY'
+import json, sys
+result = json.load(open(sys.argv[1]))["result"]
+assert result["dayStarted"] is True, result
+assert result["taskCount"] == 1, result
+PY
+
+"$CLI" focus start "$TASK_ID" > "$TMP/focus-start.json"
+python3 - "$TMP/focus-start.json" <<'PY'
+import json, sys
+result = json.load(open(sys.argv[1]))["result"]
+assert result["active"] is True, result
+assert result["phase"] == "running", result
+PY
+
+"$CLI" focus status > "$TMP/focus-status.json"
+grep -q '"active":true' "$TMP/focus-status.json"
+"$CLI" focus pause > "$TMP/focus-pause.json"
+grep -q '"phase":"paused"' "$TMP/focus-pause.json"
+"$CLI" focus resume > "$TMP/focus-resume.json"
+grep -q '"phase":"running"' "$TMP/focus-resume.json"
+"$CLI" focus stop --confirm > "$TMP/focus-stop.json"
+grep -q '"active":false' "$TMP/focus-stop.json"
+
+if "$CLI" day reset > "$TMP/reset-denied.json" 2>/dev/null; then
+  echo "day reset without --confirm should fail" >&2
+  exit 1
+fi
+grep -q 'confirm' "$TMP/reset-denied.json"
+
+"$CLI" task complete "$TASK_ID" > "$TMP/complete.json"
+grep -q '"done":true' "$TMP/complete.json"
+"$CLI" undo --confirm > "$TMP/undo.json"
+grep -q '"undone"' "$TMP/undo.json"
+"$CLI" task list --all > "$TMP/tasks-after-undo.json"
+python3 - "$TMP/tasks-after-undo.json" "$TASK_ID" <<'PY'
+import json, sys
+tasks = json.load(open(sys.argv[1]))["result"]["tasks"]
+task = next(t for t in tasks if t["id"] == sys.argv[2])
+assert task["done"] is False, task
+PY
+
+"$CLI" stats > "$TMP/stats.json"
+python3 - "$TMP/stats.json" <<'PY'
+import json, sys
+stats = json.load(open(sys.argv[1]))["result"]
+assert stats["pomodoros"] == 0, stats
+PY
+
+"$CLI" events > "$TMP/events.json"
+python3 - "$TMP/events.json" <<'PY'
+import json, sys
+events = json.load(open(sys.argv[1]))["result"]["events"]
+assert len(events) >= 4, events
+assert events[0]["actor"] == "agent", events[0]
+PY
+
+echo "agent spike passed: socket=0600, ping=pong, tasks=$COUNT, plan+focus+undo=ok"

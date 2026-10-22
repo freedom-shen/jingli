@@ -62,6 +62,62 @@ final class AgentServerTests: XCTestCase {
         XCTAssertTrue(failures.isEmpty, failures.joined(separator: "\n"))
         XCTAssertEqual(try store.taskCount(), 20)
     }
+
+    func testDestructiveOperationsRequireConfirmAndUndo() throws {
+        let database = try JingliDatabase.inMemory()
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let socketURL = directory.appendingPathComponent("agent.sock")
+        let server = AgentServer(database: database)
+        try server.start(socketURL: socketURL)
+        defer {
+            server.stop()
+            try? FileManager.default.removeItem(at: directory)
+        }
+
+        func call(_ object: [String: Any]) throws -> [String: Any] {
+            try TestClient(path: socketURL.path).send(object)
+        }
+
+        let created = try call([
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": "task.create",
+            "params": ["title": "待办"]
+        ])
+        let taskID = (created["result"] as? [String: Any])?["id"] as? String
+        XCTAssertNotNil(taskID)
+
+        let denied = try call([
+            "jsonrpc": "2.0",
+            "id": 2,
+            "method": "day.reset"
+        ])
+        XCTAssertNotNil(denied["error"])
+
+        _ = try call([
+            "jsonrpc": "2.0",
+            "id": 3,
+            "method": "task.complete",
+            "params": ["id": taskID ?? ""]
+        ])
+        let undone = try call([
+            "jsonrpc": "2.0",
+            "id": 4,
+            "method": "agent.undo",
+            "params": ["confirm": true]
+        ])
+        XCTAssertNotNil((undone["result"] as? [String: Any])?["undone"])
+
+        let listed = try call([
+            "jsonrpc": "2.0",
+            "id": 5,
+            "method": "task.list",
+            "params": ["includeDone": true]
+        ])
+        let tasks = (listed["result"] as? [String: Any])?["tasks"] as? [[String: Any]]
+        XCTAssertEqual(tasks?.first?["done"] as? Bool, false)
+    }
 }
 
 private final class TestClient {

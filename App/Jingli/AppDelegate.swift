@@ -36,7 +36,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func startAgentServer() {
         do {
-            let server = AgentServer(database: AppServices.shared.database)
+            let server = AgentServer(
+                database: AppServices.shared.database,
+                focus: AppServices.shared.model,
+                onChange: {
+                    DispatchQueue.main.async {
+                        AppServices.shared.model.reload()
+                    }
+                }
+            )
             try server.start(socketURL: AppPaths.socketURL)
             agentServer = server
         } catch {

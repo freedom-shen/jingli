@@ -574,3 +574,109 @@ enum TaskFocusState {
     case running
     case paused
 }
+
+extension AppModel: FocusAgentHandling {
+    func agentFocusStatus() throws -> [String: Any] {
+        var payload: [String: Any] = [
+            "active": timerIsActive,
+            "onBreak": isOnBreak,
+            "display": displayText,
+            "taskIds": timer?.taskIDs ?? []
+        ]
+        if let timer {
+            payload["phase"] = timer.phase.rawValue
+            payload["remainingMs"] = timer.remaining(now: nowMilliseconds())
+            payload["sessionDate"] = timer.sessionDate
+        } else {
+            payload["phase"] = "idle"
+            payload["remainingMs"] = 0
+        }
+        return payload
+    }
+
+    func agentStartFocus(taskIDs: [String]) throws -> [String: Any] {
+        if isOnBreak {
+            skipBreak()
+        }
+        if timerIsActive {
+            throw AgentError.invalidParams("已有进行中的番茄钟，请先 stop 或使用 focus add")
+        }
+        let tasks = try store.listTasks(includeDone: true)
+        let known = Set(tasks.map(\.id))
+        let unique = taskIDs.filter { known.contains($0) }
+        guard unique.count == taskIDs.count, !unique.isEmpty else {
+            throw AgentError.notFound("task IDs \(taskIDs)")
+        }
+        guard var next = FocusTimer(
+            taskIDs: unique,
+            sessionDate: DayKey.make(),
+            durationMs: timerDurationMs
+        ) else {
+            throw AgentError.invalidParams("任务列表为空")
+        }
+        next.start(now: nowMilliseconds(), sessionID: UUID().uuidString)
+        let outcome = focusMode.begin()
+        next.setFocusMode(on: outcome == .enabled, owned: outcome == .enabled)
+        timer = next
+        persistTimer()
+        persistFocusOwnership()
+        updateTimerText()
+        CompletionNotifier.shared.requestAuthorization()
+        return try agentFocusStatus()
+    }
+
+    func agentPauseFocus() throws -> [String: Any] {
+        guard timerIsActive, !timerIsPaused else {
+            throw AgentError.invalidParams("没有可暂停的番茄钟")
+        }
+        pauseFocus()
+        return try agentFocusStatus()
+    }
+
+    func agentResumeFocus() throws -> [String: Any] {
+        guard timerIsPaused else {
+            throw AgentError.invalidParams("番茄钟不在暂停状态")
+        }
+        resumeFocus()
+        return try agentFocusStatus()
+    }
+
+    func agentStopFocus() throws -> [String: Any] {
+        guard timerIsActive else {
+            throw AgentError.invalidParams("没有进行中的番茄钟")
+        }
+        abandonFocus()
+        return try agentFocusStatus()
+    }
+
+    func agentAddFocusTask(taskID: String) throws -> [String: Any] {
+        guard var current = timer, current.isActive else {
+            throw AgentError.invalidParams("没有进行中的番茄钟")
+        }
+        guard (try store.listTasks(includeDone: true)).contains(where: { $0.id == taskID }) else {
+            throw AgentError.notFound("task \(taskID)")
+        }
+        current = current.addingTask(taskID)
+        timer = current
+        persistTimer()
+        updateTimerText()
+        return try agentFocusStatus()
+    }
+
+    func agentRemoveFocusTask(taskID: String) throws -> [String: Any] {
+        guard let current = timer, current.isActive else {
+            throw AgentError.invalidParams("没有进行中的番茄钟")
+        }
+        guard current.taskIDs.contains(taskID) else {
+            throw AgentError.notFound("task \(taskID) 不在本轮")
+        }
+        if let updated = current.removingTask(taskID) {
+            timer = updated
+            persistTimer()
+            updateTimerText()
+        } else {
+            abandonFocus()
+        }
+        return try agentFocusStatus()
+    }
+}

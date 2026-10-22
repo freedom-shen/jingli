@@ -277,6 +277,21 @@ public extension WorkspaceStore {
         }
     }
 
+    func validateDaySelection(
+        taskIDs: [String],
+        today: String = DayKey.make()
+    ) throws -> [Task] {
+        try validateSelection(taskIDs, today: today, checkCompletedSlots: true)
+    }
+
+    @discardableResult
+    func deleteTask(id: String) throws -> Bool {
+        try database.queue.write { db in
+            try db.execute(sql: "DELETE FROM task WHERE id = ?", arguments: [id])
+            return db.changesCount > 0
+        }
+    }
+
     @discardableResult
     func updateTask(id: String, title: String, note: String) throws -> Task? {
         let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
