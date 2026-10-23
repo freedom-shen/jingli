@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.5.1 — 2026-10-23
+
+- 修复：在「开启一天」取消最后一个勾选时错误弹出「至少选择一件任务」。现在允许清空草稿选择，只有「开启一天」时才要求至少一件。
+- 图标按内容包围盒重新居中（原素材偏左 74px），重新生成 squircle / iconset / icns。
+- `DayKeyTests.testIsToday` 改为动态日期，不再依赖固定日期。
+- 版本 `0.5.1`，已打包安装到 `/Applications`。
+
 ## v0.5.0 — 2026-10-22
 
 - 新增 `scripts/package.sh`：Release 构建 → 可选 Developer ID 签名 → zip → 退出旧进程 → 替换 `/Applications/Jingli.app` → 重新注册 LaunchServices；`--run` 安装后启动，`--install-dir` 可改安装目录。

@@ -122,7 +122,9 @@ public extension WorkspaceStore {
         taskIDs: [String],
         today: String = DayKey.make()
     ) throws {
-        let tasks = try validateSelection(taskIDs, today: today, checkCompletedSlots: false)
+        let tasks = taskIDs.isEmpty
+            ? []
+            : try validateSelection(taskIDs, today: today, checkCompletedSlots: false)
         let unique = tasks.map(\.id)
 
         try database.queue.write { db in

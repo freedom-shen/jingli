@@ -277,3 +277,27 @@ extension WorkspaceDayTests {
         XCTAssertEqual(stats.records.first?.tasks.first?.share, 0.5)
     }
 }
+
+extension WorkspaceDayTests {
+    func testSaveDaySelectionAllowsClearingLastTask() throws {
+        let (store, _, t1, t2) = try makeStore()
+        try store.saveDaySelection(taskIDs: [t1.id, t2.id], today: "2026-10-22")
+        XCTAssertEqual(try store.snapshot(today: "2026-10-22").selection.count, 2)
+
+        XCTAssertNoThrow(try store.saveDaySelection(taskIDs: [], today: "2026-10-22"))
+        let snapshot = try store.snapshot(today: "2026-10-22")
+        XCTAssertTrue(snapshot.selection.isEmpty)
+        XCTAssertFalse(snapshot.dayStarted)
+    }
+
+    func testStartDayStillRejectsEmptySelection() throws {
+        let database = try JingliDatabase.inMemory()
+        let store = WorkspaceStore(database: database)
+
+        XCTAssertThrowsError(try store.startDay(taskIDs: [], today: "2026-10-22")) { error in
+            guard case DayPlanError.emptySelection = error else {
+                return XCTFail("unexpected error: \(error)")
+            }
+        }
+    }
+}
