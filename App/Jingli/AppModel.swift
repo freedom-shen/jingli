@@ -18,6 +18,7 @@ final class AppModel: ObservableObject {
     @Published private(set) var breakText = "05:00"
     @Published var completion: FocusCompletion?
     @Published private(set) var lastRoundTaskIDs: [String]
+    @Published private(set) var creditTotals: [String: Double] = [:]
     @Published var detailTask: Task?
     @Published private(set) var stats: TodayStats?
     @Published var isCommandBarPresented = false
@@ -94,6 +95,7 @@ final class AppModel: ObservableObject {
             try store.rolloverIfNeeded()
             let next = try store.snapshot()
             snapshot = next
+            creditTotals = (try? store.creditTotals(today: DayKey.make())) ?? [:]
             if next.dayStarted {
                 selected = []
             } else {
@@ -203,7 +205,7 @@ final class AppModel: ObservableObject {
     }
 
     func creditedPomodoros(for task: Task) -> Double {
-        (try? store.creditTotal(taskID: task.id)) ?? 0
+        creditTotals[task.id] ?? 0
     }
 
     func projectName(for task: Task) -> String {

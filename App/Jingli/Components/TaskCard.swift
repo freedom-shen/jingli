@@ -7,6 +7,7 @@ struct TaskCard: View {
     var disabled = false
     var focusState: TaskFocusState = .none
     var addsToRound = false
+    var pomodoroCount: Double = 0
     var onToggleSelection: (() -> Void)?
     var onDone: (() -> Void)?
     var onPlay: (() -> Void)?
@@ -40,6 +41,21 @@ struct TaskCard: View {
                     .padding(.vertical, 3)
                     .background(Capsule().fill(Color.white.opacity(0.06)))
                     .foregroundStyle(Theme.textSecondary)
+
+                if pomodoroCount > 0 {
+                    HStack(spacing: 3) {
+                        Circle()
+                            .fill(Theme.tomato.opacity(0.85))
+                            .frame(width: 5, height: 5)
+
+                        Text(formatPomodoros(pomodoroCount))
+                            .font(.system(size: 10, weight: .medium))
+                            .foregroundStyle(Theme.textSecondary)
+                            .monospacedDigit()
+                    }
+                    .help("今日已用 \(formatPomodoros(pomodoroCount)) 个番茄")
+                    .accessibilityLabel("今日已用 \(formatPomodoros(pomodoroCount)) 个番茄")
+                }
 
                 Spacer(minLength: 0)
 
@@ -93,6 +109,14 @@ struct TaskCard: View {
             guard !disabled else { return }
             onToggleSelection?()
         }
+    }
+
+    private func formatPomodoros(_ value: Double) -> String {
+        let rounded = FocusCredit.roundedForDisplay(value)
+        if rounded == rounded.rounded() {
+            return String(format: "%.0f", rounded)
+        }
+        return String(format: "%g", rounded)
     }
 
     private var playIcon: String {

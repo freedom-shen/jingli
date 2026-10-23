@@ -267,6 +267,27 @@ public extension WorkspaceStore {
     }
 
     /// 今日已计入这件任务的番茄数（按分摊份额累加）。
+    func creditTotals(today: String = DayKey.make()) throws -> [String: Double] {
+        try database.queue.read { db in
+            let rows = try Row.fetchAll(
+                db,
+                sql: """
+                SELECT fst.task_id AS task_id, SUM(fst.share) AS total
+                FROM focus_session_task fst
+                JOIN focus_session fs ON fs.id = fst.session_id
+                WHERE fs.session_date = ? AND fs.status = 'completed'
+                GROUP BY fst.task_id
+                """,
+                arguments: [today]
+            )
+            var result: [String: Double] = [:]
+            for row in rows {
+                result[row["task_id"]] = row["total"]
+            }
+            return result
+        }
+    }
+
     func creditTotal(taskID: String, today: String = DayKey.make()) throws -> Double {
         try database.queue.read { db in
             try Double.fetchOne(
