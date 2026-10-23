@@ -20,7 +20,7 @@ final class JingliDatabaseTests: XCTestCase {
         XCTAssertTrue(tables.contains("setting"))
     }
 
-    func testRolloverKeepsTodayAndClearsYesterday() throws {
+    func testRolloverUnplansYesterdayButKeepsHistory() throws {
         let db = try JingliDatabase.inMemory()
         try seed(db)
 
@@ -50,21 +50,21 @@ final class JingliDatabaseTests: XCTestCase {
             XCTAssertEqual(t3Date, "2026-10-22")
 
             let sessions = try Int.fetchOne(database, sql: "SELECT COUNT(*) FROM focus_session")
-            XCTAssertEqual(sessions, 1, "只保留今天的番茄记录")
+            XCTAssertEqual(sessions, 2, "跨天保留番茄记录，供历史查询使用")
 
             let oldSessionTasks = try Int.fetchOne(
                 database,
                 sql: "SELECT COUNT(*) FROM focus_session_task WHERE session_id = ?",
                 arguments: ["s-old"]
             )
-            XCTAssertEqual(oldSessionTasks, 0, "级联删除旧 session 的任务关联")
+            XCTAssertEqual(oldSessionTasks, 1, "旧 session 的任务关联保留")
 
             let oldPlans = try Int.fetchOne(
                 database,
                 sql: "SELECT COUNT(*) FROM day_plan WHERE date < ?",
                 arguments: ["2026-10-22"]
             )
-            XCTAssertEqual(oldPlans, 0)
+            XCTAssertEqual(oldPlans, 1, "旧日计划保留")
         }
     }
 

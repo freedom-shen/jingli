@@ -102,6 +102,8 @@ jingli day plan <id...>
 jingli day start
 jingli focus start <id...>
 jingli stats
+jingli stats --days 7
+jingli stats --date 2026-10-22
 jingli events
 jingli undo --confirm
 ```
@@ -150,7 +152,7 @@ docs/                  架构与操作说明
 
 ## 已知限制
 
-- 只管理今天，不保留历史，不提供 7 天 / 30 天图表。
+- UI 只管理今天，不提供 7 天 / 30 天图表；CLI / Skill 可查按天历史（从 v0.6.0 开始保留）。
 - 计时 / 休息长度固定 25 / 5 分钟。
 - 勿扰依赖两个 Shortcuts；本机已创建并验证，换机器需按 `docs/focus-shortcuts.md` 重建。
 - 通知需要用户在系统设置中允许；从 `/tmp` 直接运行开发包时 `usernoted` 可能拒绝校验，安装到 `~/Applications` 或 `/Applications` 后再试。

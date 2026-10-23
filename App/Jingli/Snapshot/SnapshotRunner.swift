@@ -65,10 +65,18 @@ enum SnapshotRunner {
 
             guard let panelPath else { exit(0) }
 
-            FloatingPanelController.shared.show()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                if let panel = NSApp.windows.first(where: { $0 is FloatingPanel }),
-                   let panelView = panel.contentView {
+            // 用独立窗口渲染浮窗内容，避免受真实面板位置 / 屏幕缩放影响。
+            let panelWindow = makeWindow(
+                rootView: AnyView(
+                    FloatingPanelView(model: AppServices.shared.model, onClose: {})
+                        .environment(\.controlActiveState, .key)
+                        .frame(width: 260, height: 360)
+                ),
+                size: NSSize(width: 260, height: 360)
+            )
+            panelWindow.makeKeyAndOrderFront(nil)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                if let panelView = panelWindow.contentView {
                     panelView.layoutSubtreeIfNeeded()
                     try? capture(panelView, to: URL(fileURLWithPath: panelPath))
                 }

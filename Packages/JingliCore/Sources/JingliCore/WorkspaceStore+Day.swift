@@ -337,6 +337,29 @@ public extension WorkspaceStore {
                 arguments: [nextDone, completedAt, id]
             )
 
+            if nextDone, let completedAt {
+                try db.execute(
+                    sql: """
+                    INSERT INTO task_completion (id, task_id, completed_at)
+                    VALUES (?, ?, ?)
+                    """,
+                    arguments: [UUID().uuidString, id, completedAt]
+                )
+            } else {
+                try db.execute(
+                    sql: """
+                    DELETE FROM task_completion
+                    WHERE id = (
+                        SELECT id FROM task_completion
+                        WHERE task_id = ?
+                        ORDER BY completed_at DESC, rowid DESC
+                        LIMIT 1
+                    )
+                    """,
+                    arguments: [id]
+                )
+            }
+
             guard let updated = try Row.fetchOne(
                 db,
                 sql: "SELECT * FROM task WHERE id = ?",

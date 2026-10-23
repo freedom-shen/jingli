@@ -137,6 +137,21 @@ stats = json.load(open(sys.argv[1]))["result"]
 assert stats["pomodoros"] == 0, stats
 PY
 
+"$CLI" stats --days 2 > "$TMP/history.json"
+python3 - "$TMP/history.json" <<'PY'
+import json, sys
+days = json.load(open(sys.argv[1]))["result"]["days"]
+assert len(days) == 2, days
+assert days[0]["date"] > days[1]["date"], days
+PY
+
+"$CLI" stats --date "$(date +%F)" > "$TMP/history-day.json"
+python3 - "$TMP/history-day.json" <<'PY'
+import json, sys
+days = json.load(open(sys.argv[1]))["result"]["days"]
+assert len(days) == 1, days
+PY
+
 "$CLI" events > "$TMP/events.json"
 python3 - "$TMP/events.json" <<'PY'
 import json, sys

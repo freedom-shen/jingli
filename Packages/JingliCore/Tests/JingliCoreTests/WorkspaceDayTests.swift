@@ -150,14 +150,17 @@ extension WorkspaceDayTests {
         XCTAssertNil(tasks.first { $0.id == open.id }?.plannedDate)
         XCTAssertEqual(tasks.first { $0.id == done.id }?.plannedDate, yesterday)
 
+        XCTAssertEqual(try store.todayStats(today: today).pomodoros, 0)
         try database.queue.read { db in
             XCTAssertEqual(
                 try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM focus_session"),
-                0
+                1,
+                "旧番茄记录保留供历史查询"
             )
             XCTAssertEqual(
                 try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM day_plan WHERE date = ?", arguments: [yesterday]),
-                0
+                1,
+                "旧日计划保留"
             )
             XCTAssertEqual(
                 try String.fetchOne(db, sql: "SELECT value FROM setting WHERE key = 'last_seen_day'"),

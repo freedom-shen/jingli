@@ -1,12 +1,12 @@
 import Foundation
 import GRDB
 
-/// 只管今天的 SQLite 存储。
+/// 本地 SQLite 存储。
 ///
 /// 约定：
-/// - `focus_session` 只保留 `session_date == today` 的记录，跨天删除。
+/// - UI 仍然只展示今天；`focus_session` 和日计划跨天保留，供 CLI / Skill 查询历史。
 /// - 未完成任务跨天回到未安排；已完成任务保留完成状态。
-/// - 旧番茄历史不导入、不保留。
+/// - 任务完成会写入 `task_completion` 事件，支持按天回顾「完成了哪些任务」。
 public final class JingliDatabase: @unchecked Sendable {
     public let queue: DatabaseQueue
 
@@ -102,10 +102,31 @@ public final class JingliDatabase: @unchecked Sendable {
                 t.column("value", .text).notNull()
             }
         }
+        migrator.registerMigration("v2_history") { db in
+            try db.create(table: "task_completion") { t in
+                t.column("id", .text).primaryKey()
+                t.column("task_id", .text).notNull()
+                    .references("task", onDelete: .cascade)
+                t.column("completed_at", .text).notNull()
+            }
+            try db.create(
+                index: "task_completion_date_idx",
+                on: "task_completion",
+                columns: ["completed_at"]
+            )
+            try db.execute(
+                sql: """
+                INSERT INTO task_completion (id, task_id, completed_at)
+                SELECT lower(hex(randomblob(16))), id, completed_at
+                FROM task
+                WHERE done = 1 AND completed_at IS NOT NULL
+                """
+            )
+        }
         return migrator
     }
 
-    /// 跨天：未完成任务回未安排；今日以前的番茄记录、旧日计划全部删除。
+    /// 跨天：未完成任务回未安排。番茄记录和日计划保留，供 CLI / Skill 查询历史。
     public func rollover(to today: String) throws {
         try queue.write { db in
             try db.execute(
@@ -114,18 +135,6 @@ public final class JingliDatabase: @unchecked Sendable {
                 SET planned_date = NULL
                 WHERE done = 0 AND planned_date IS NOT NULL AND planned_date < ?
                 """,
-                arguments: [today]
-            )
-            try db.execute(
-                sql: "DELETE FROM focus_session WHERE session_date < ?",
-                arguments: [today]
-            )
-            try db.execute(
-                sql: "DELETE FROM day_plan WHERE date < ?",
-                arguments: [today]
-            )
-            try db.execute(
-                sql: "DELETE FROM day_plan_task WHERE date < ?",
                 arguments: [today]
             )
         }

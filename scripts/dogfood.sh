@@ -174,9 +174,18 @@ sqlite3 "$TMP/jingli.sqlite" "
   SELECT 'last-seen=' || value FROM setting WHERE key='last_seen_day';
 " > "$TMP/rollover.txt"
 cat "$TMP/rollover.txt" >&2
-grep -q "old-sessions=0" "$TMP/rollover.txt"
+grep -q "old-sessions=1" "$TMP/rollover.txt"
 grep -q "today-sessions=3" "$TMP/rollover.txt"
 grep -q "open-planned=0" "$TMP/rollover.txt"
 grep -q "last-seen=$T" "$TMP/rollover.txt"
 
-echo "dogfood passed: 3 rounds, shared split, pause/resume, add/remove, break, next, stats, reset, backup, rollover"
+"$CLI" stats --days 2 > "$TMP/history.json"
+python3 - "$TMP/history.json" <<'PY'
+import json, sys
+days = json.load(open(sys.argv[1]))["result"]["days"]
+assert len(days) == 2, days
+assert days[0]["pomodoros"] == 3, days[0]
+assert days[1]["pomodoros"] == 1, days[1]
+PY
+
+echo "dogfood passed: 3 rounds, shared split, pause/resume, add/remove, break, next, stats, reset, backup, rollover, history"

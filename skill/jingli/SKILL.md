@@ -18,9 +18,10 @@ description: 管理「精力管理」Mac App 的项目、任务、今日计划�
 | 番茄钟：开始 / 状态 / 暂停 / 继续 / 加任务 / 移任务 / 停止 | `jingli focus …` |
 | 休息与下一轮 | `jingli focus break` / `skip-break` / `next` |
 | 今日统计 | `jingli stats` |
+| 历史回顾 | `jingli stats --days N` / `jingli stats --date YYYY-MM-DD` |
 | 审计 / 撤销 | `jingli events` / `jingli undo` |
 
-**不能做**：改计时长度（固定 25 分钟）、查历史 / 周报、把任务移到另一个项目、改任务的 lane / 日期。这些需要用户在 App 里操作。
+**不能做**：改计时长度（固定 25 分钟）、做周 / 月图表、把任务移到另一个项目、改任务的 lane / 日期。UI 仍然只展示今天；历史通过 CLI / Skill 按天查询。
 
 ## 快速示例：项目 → 任务 → 开启时钟
 
@@ -132,13 +133,30 @@ jingli focus next         # 复用本轮未完成任务，立即开始下一轮
 
 休息不计入统计；`focus next` 只在 `completion` 存在时可用。
 
-## 统计
+## 统计与历史
 
 ```bash
-jingli stats
+jingli stats                              # 今天
+jingli stats --days 7                     # 最近 7 天，含今天，按日期倒序
+jingli stats --date 2026-10-22            # 指定某一天
+jingli stats --date 2026-10-22 --days 3   # 截止该日期的 3 天
 ```
 
-返回 `pomodoros`（今日番茄数）、`focusSeconds`、`completedTasks`、`records`（每条含 `tasks[].share`）。
+返回结构：
+
+- 单日（`stats`）：`pomodoros`、`focusSeconds`、`completedTasks`（数字）、`records`
+- 历史（`--days` / `--date`）：`days[]`，每天包含
+  - `date`
+  - `pomodoros`：当天完成的番茄数
+  - `focusSeconds`：当天专注秒数
+  - `completedTasks[]`：当天完成的任务（`id` / `title` / `completedAt`）
+  - `records[]`：当天每轮番茄（`startedAt`、`durationSec`、`tasks[].share`）
+
+注意：
+
+- 历史从 v0.6.0 开始保留；升级前的旧番茄记录已经不存在，无法补回。
+- 任务被删除后，它的完成事件和番茄分摊也会一起消失。
+- UI 统计页仍然只显示今天；历史只在 CLI / Skill 输出。
 
 ## 安全约束
 

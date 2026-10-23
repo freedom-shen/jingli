@@ -179,7 +179,7 @@ guard let command = arguments.first else {
       jingli focus status|pause|resume
       jingli focus stop --confirm
       jingli focus add|remove <id>
-      jingli stats
+      jingli stats [--date YYYY-MM-DD] [--days N]
       jingli events [--limit 50]
       jingli undo [id] --confirm
     """)
@@ -193,7 +193,14 @@ case "ping":
 case "today":
     run("today")
 case "stats":
-    run("stats.today")
+    if let date = option("--date", in: rest) {
+        let days = Int(option("--days", in: rest) ?? "1") ?? 1
+        run("stats.history", params: ["days": days, "date": date])
+    } else if let raw = option("--days", in: rest), let days = Int(raw) {
+        run("stats.history", params: ["days": days])
+    } else {
+        run("stats.today")
+    }
 case "events":
     let limit = Int(option("--limit", in: rest) ?? "50") ?? 50
     run("agent.events", params: ["limit": limit])

@@ -402,14 +402,31 @@ public final class AgentServer: @unchecked Sendable {
                 "pomodoros": stats.pomodoros,
                 "focusSeconds": stats.focusSeconds,
                 "completedTasks": stats.completedTasks,
-                "records": stats.records.map { record in
+                "records": stats.records.map(recordPayload)
+            ]
+
+        case "stats.history":
+            let days = params["days"] as? Int ?? (params["date"] != nil ? 1 : 7)
+            let endingOn = params["date"] as? String ?? DayKey.make()
+            let history = try store.history(days: days, endingOn: endingOn)
+            return [
+                "days": history.map { day -> [String: Any] in
                     [
-                        "id": record.id,
-                        "startedAt": record.startedAt,
-                        "durationSec": record.durationSec,
-                        "tasks": record.tasks.map {
-                            ["id": $0.id, "title": $0.title, "share": $0.share]
-                        }
+                        "date": day.date,
+                        "pomodoros": day.pomodoros,
+                        "focusSeconds": day.focusSeconds,
+                        "completedTasks": day.completedTasks.map { task -> [String: Any] in
+                            var payload: [String: Any] = [
+                                "id": task.id,
+                                "title": task.title,
+                                "completedAt": task.completedAt
+                            ]
+                            if let projectID = task.projectID {
+                                payload["projectId"] = projectID
+                            }
+                            return payload
+                        },
+                        "records": day.records.map(recordPayload)
                     ]
                 }
             ]
@@ -636,6 +653,17 @@ public final class AgentServer: @unchecked Sendable {
     private func resolveDate(_ raw: Any?) -> String? {
         guard let value = raw as? String, !value.isEmpty else { return nil }
         return value == "today" ? DayKey.make() : value
+    }
+
+    private func recordPayload(_ record: FocusRecord) -> [String: Any] {
+        [
+            "id": record.id,
+            "startedAt": record.startedAt,
+            "durationSec": record.durationSec,
+            "tasks": record.tasks.map {
+                ["id": $0.id, "title": $0.title, "share": $0.share]
+            }
+        ]
     }
 
     private func taskPayload(_ task: Task) -> [String: Any] {
