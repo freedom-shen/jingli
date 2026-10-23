@@ -68,9 +68,15 @@ enum SnapshotRunner {
             // 用独立窗口渲染浮窗内容，避免受真实面板位置 / 屏幕缩放影响。
             let panelWindow = makeWindow(
                 rootView: AnyView(
-                    FloatingPanelView(model: AppServices.shared.model, onClose: {})
-                        .environment(\.controlActiveState, .key)
-                        .frame(width: 260, height: 404)
+                    FloatingPanelView(
+                        model: AppServices.shared.model,
+                        mode: .standard,
+                        onShrink: {},
+                        onExpand: {},
+                        onClose: {}
+                    )
+                    .environment(\.controlActiveState, .key)
+                    .frame(width: 260, height: 404)
                 ),
                 size: NSSize(width: 260, height: 404)
             )

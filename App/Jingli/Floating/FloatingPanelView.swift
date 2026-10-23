@@ -3,9 +3,53 @@ import JingliCore
 
 struct FloatingPanelView: View {
     @ObservedObject var model: AppModel
+    let mode: FloatingPanelMode
+    let onShrink: () -> Void
+    let onExpand: () -> Void
     let onClose: () -> Void
 
     var body: some View {
+        if mode == .mini {
+            miniPanel
+        } else {
+            standardPanel
+        }
+    }
+
+    private var miniPanel: some View {
+        ZStack {
+            Circle()
+                .fill(Theme.card.opacity(0.97))
+                .overlay(
+                    Circle().stroke(Color.white.opacity(0.10), lineWidth: 1)
+                )
+
+            Circle()
+                .trim(from: 0, to: model.panelProgress)
+                .stroke(ringColor, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                .rotationEffect(.degrees(-90))
+                .padding(3)
+
+            VStack(spacing: 3) {
+                Text(model.displayText)
+                    .font(.system(size: 21, weight: .semibold, design: .rounded))
+                    .foregroundStyle(model.timerIsPaused ? Theme.textSecondary : .white)
+                    .monospacedDigit()
+
+                Circle()
+                    .fill(dotColor)
+                    .frame(width: 4, height: 4)
+            }
+        }
+        .frame(width: 96, height: 96)
+        .contentShape(Circle())
+        .onTapGesture { onExpand() }
+        .help("点击放大")
+        .accessibilityLabel("浮窗倒计时，点击放大")
+        .accessibilityIdentifier("floating-panel-mini")
+    }
+
+    private var standardPanel: some View {
         VStack(spacing: 12) {
             HStack {
                 Text("浮动番茄钟")
@@ -14,15 +58,29 @@ struct FloatingPanelView: View {
 
                 Spacer()
 
-                Button(action: onClose) {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 10, weight: .semibold))
-                        .frame(width: 22, height: 22)
-                        .background(Circle().fill(Color.white.opacity(0.08)))
-                        .foregroundStyle(Theme.textSecondary)
+                HStack(spacing: 6) {
+                    Button(action: onShrink) {
+                        Image(systemName: "chevron.down")
+                            .font(.system(size: 10, weight: .semibold))
+                            .frame(width: 22, height: 22)
+                            .background(Circle().fill(Color.white.opacity(0.08)))
+                            .foregroundStyle(Theme.textSecondary)
+                    }
+                    .buttonStyle(.plain)
+                    .help("缩小为倒计时")
+                    .accessibilityLabel("缩小浮窗")
+                    .accessibilityIdentifier("floating-panel-shrink")
+
+                    Button(action: onClose) {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 10, weight: .semibold))
+                            .frame(width: 22, height: 22)
+                            .background(Circle().fill(Color.white.opacity(0.08)))
+                            .foregroundStyle(Theme.textSecondary)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("floating-panel-close")
                 }
-                .buttonStyle(.plain)
-                .accessibilityIdentifier("floating-panel-close")
             }
 
             Spacer()
@@ -101,6 +159,20 @@ struct FloatingPanelView: View {
                 .stroke(Color.white.opacity(0.08), lineWidth: 1)
         )
         .accessibilityIdentifier("floating-panel")
+    }
+
+    private var ringColor: Color {
+        if model.isOnBreak { return Theme.tomato }
+        guard model.timerIsActive else { return Color.white.opacity(0.16) }
+        return model.timerIsPaused ? Color.white.opacity(0.28) : Theme.tomato
+    }
+
+    private var dotColor: Color {
+        if model.isOnBreak { return Theme.tomato }
+        guard model.timerIsActive else { return Color.white.opacity(0.22) }
+        return model.timerIsPaused
+            ? Color.white.opacity(0.45)
+            : Color(red: 0.50, green: 0.75, blue: 0.54)
     }
 
     private var statusText: String {

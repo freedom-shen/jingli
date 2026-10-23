@@ -1,6 +1,18 @@
 import AppKit
 import SwiftUI
 
+enum FloatingPanelMode: String {
+    case standard
+    case mini
+
+    var size: NSSize {
+        switch self {
+        case .standard: return NSSize(width: 260, height: 404)
+        case .mini: return NSSize(width: 96, height: 96)
+        }
+    }
+}
+
 enum FloatingPanelConfiguration {
     static let level: NSWindow.Level = .screenSaver
     static let collectionBehavior: NSWindow.CollectionBehavior = [
@@ -8,11 +20,11 @@ enum FloatingPanelConfiguration {
         .fullScreenAuxiliary,
         .ignoresCycle
     ]
-    static let size = NSSize(width: 260, height: 404)
     static let margin: CGFloat = 24
     static let originDefaultsKey = "jingli.floatingPanel.origin"
     static let visibleDefaultsKey = "jingli.floatingPanel.visible"
     static let everOpenedDefaultsKey = "jingli.floatingPanel.everOpened"
+    static let modeDefaultsKey = "jingli.floatingPanel.mode"
 }
 
 final class FloatingPanel: NSPanel {
@@ -51,8 +63,12 @@ final class FloatingPanelController {
 
     private var panel: FloatingPanel?
     private var moveObserver: NSObjectProtocol?
+    private(set) var mode: FloatingPanelMode
 
-    private init() {}
+    private init() {
+        let raw = UserDefaults.standard.string(forKey: FloatingPanelConfiguration.modeDefaultsKey)
+        mode = raw.flatMap(FloatingPanelMode.init(rawValue:)) ?? .standard
+    }
 
     var wasVisible: Bool {
         UserDefaults.standard.bool(forKey: FloatingPanelConfiguration.visibleDefaultsKey)
@@ -71,16 +87,10 @@ final class FloatingPanelController {
             return
         }
 
-        let frame = NSRect(origin: restoredOrigin(), size: FloatingPanelConfiguration.size)
+        let frame = NSRect(origin: restoredOrigin(), size: mode.size)
 
         let panel = FloatingPanel(contentRect: frame)
-        let content = FloatingPanelView(
-            model: AppServices.shared.model,
-            onClose: { [weak self] in
-                self?.hide()
-            }
-        )
-        panel.contentView = FirstMouseHostingView(rootView: content)
+        panel.contentView = makeContent()
         panel.setFrame(frame, display: true)
         panel.orderFrontRegardless()
         self.panel = panel
@@ -107,6 +117,58 @@ final class FloatingPanelController {
         panel = nil
     }
 
+    func setMode(_ next: FloatingPanelMode) {
+        guard next != mode else { return }
+        mode = next
+        UserDefaults.standard.set(next.rawValue, forKey: FloatingPanelConfiguration.modeDefaultsKey)
+
+        guard let panel else { return }
+        panel.contentView = makeContent()
+
+        var frame = panel.frame
+        let top = frame.maxY
+        frame.size = next.size
+        frame.origin.y = top - next.size.height
+        frame = clamped(frame)
+        panel.setFrame(frame, display: true)
+        persistOrigin(of: panel)
+    }
+
+    func shrink() {
+        setMode(.mini)
+    }
+
+    func expand() {
+        setMode(.standard)
+    }
+
+    private func makeContent() -> FirstMouseHostingView<FloatingPanelView> {
+        FirstMouseHostingView(
+            rootView: FloatingPanelView(
+                model: AppServices.shared.model,
+                mode: mode,
+                onShrink: { [weak self] in self?.shrink() },
+                onExpand: { [weak self] in self?.expand() },
+                onClose: { [weak self] in self?.hide() }
+            )
+        )
+    }
+
+    private func clamped(_ frame: NSRect) -> NSRect {
+        let screen = NSScreen.screens.first { $0.frame.intersects(frame) } ?? NSScreen.main
+        guard let visible = screen?.visibleFrame else { return frame }
+        var result = frame
+        result.origin.x = min(
+            max(result.origin.x, visible.minX),
+            max(visible.minX, visible.maxX - result.width)
+        )
+        result.origin.y = min(
+            max(result.origin.y, visible.minY),
+            max(visible.minY, visible.maxY - result.height)
+        )
+        return result
+    }
+
     private func restoredOrigin() -> NSPoint {
         let fallback = defaultOrigin()
         guard
@@ -120,7 +182,7 @@ final class FloatingPanelController {
 
         let frame = NSRect(
             origin: NSPoint(x: x, y: y),
-            size: FloatingPanelConfiguration.size
+            size: mode.size
         )
         let visible = NSScreen.screens.contains {
             $0.visibleFrame.intersects(frame)
@@ -134,7 +196,7 @@ final class FloatingPanelController {
         } ?? NSScreen.main
         let visible = screen?.visibleFrame ?? .zero
         return NSPoint(
-            x: visible.maxX - FloatingPanelConfiguration.size.width - FloatingPanelConfiguration.margin,
+            x: visible.maxX - mode.size.width - FloatingPanelConfiguration.margin,
             y: visible.minY + FloatingPanelConfiguration.margin
         )
     }

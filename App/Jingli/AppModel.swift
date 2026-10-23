@@ -58,6 +58,18 @@ final class AppModel: ObservableObject {
         isOnBreak ? breakText : timerText
     }
 
+    /// 迷你浮窗的进度环：剩余时间占整轮的比例（0…1）。
+    var panelProgress: Double {
+        if isOnBreak {
+            guard breakEndsAt > 0, breakDurationMs > 0 else { return 0 }
+            let remaining = Double(breakEndsAt - nowMilliseconds())
+            return max(0, min(1, remaining / Double(breakDurationMs)))
+        }
+        guard let timer, timer.isActive, timer.durationMs > 0 else { return 0 }
+        let remaining = Double(timer.remaining(now: nowMilliseconds()))
+        return max(0, min(1, remaining / Double(timer.durationMs)))
+    }
+
     var projects: [Project] {
         snapshot?.projects ?? []
     }
