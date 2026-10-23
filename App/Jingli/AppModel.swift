@@ -227,6 +227,11 @@ final class AppModel: ObservableObject {
             skipBreak()
         }
 
+        if completion != nil {
+            CompletionPanelController.shared.hide()
+            completion = nil
+        }
+
         if var current = timer, current.isActive {
             guard !current.taskIDs.contains(task.id) else { return }
             current = current.addingTask(task.id)
@@ -330,33 +335,6 @@ final class AppModel: ObservableObject {
         breakText = "05:00"
     }
 
-    func startNextRound() {
-        guard let completion else { return }
-        let candidates = (snapshot?.todayTasks ?? []).filter {
-            !$0.done && completion.taskIDs.contains($0.id)
-        }
-        CompletionPanelController.shared.hide()
-        self.completion = nil
-        reload()
-
-        guard let first = candidates.first,
-              var next = FocusTimer(
-                taskIDs: candidates.map(\.id),
-                sessionDate: DayKey.make(),
-                durationMs: timerDurationMs
-              ) else { return }
-
-        next.start(now: nowMilliseconds(), sessionID: UUID().uuidString)
-        let outcome = beginFocusMode()
-        next.setFocusMode(on: outcome == .enabled, owned: outcome == .enabled)
-        timer = next
-        persistTimer()
-        persistFocusOwnership()
-        updateTimerText()
-        CompletionNotifier.shared.requestAuthorization()
-        _ = first
-    }
-
     private func tickBreak() {
         let remaining = max(0, Int(breakEndsAt - nowMilliseconds()))
         breakText = FocusTimer.format(remaining)
@@ -386,9 +364,6 @@ final class AppModel: ObservableObject {
                     tasks: tasks,
                     onBreak: { [weak self] in
                         self?.startBreak()
-                    },
-                    onNextRound: { [weak self] in
-                        self?.startNextRound()
                     },
                     onClose: { [weak self] in
                         self?.dismissCompletion()
@@ -774,17 +749,6 @@ extension AppModel: FocusAgentHandling {
             throw AgentError.invalidParams("当前不在休息")
         }
         skipBreak()
-        return try agentFocusStatus()
-    }
-
-    func agentNextRound() throws -> [String: Any] {
-        guard completion != nil else {
-            throw AgentError.invalidParams("本轮尚未结束")
-        }
-        startNextRound()
-        guard timerIsActive else {
-            throw AgentError.invalidParams("没有可复用的未完成任务")
-        }
         return try agentFocusStatus()
     }
 

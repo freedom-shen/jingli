@@ -16,7 +16,7 @@ description: 管理「精力管理」Mac App 的项目、任务、今日计划�
 | 任务：列表 / 新建 / 修改 / 完成 / 恢复 / 删除 | `jingli task list` / `add` / `update` / `complete` / `reopen` / `delete` |
 | 今日计划：预演 / 保存 / 开始 / 重置 | `jingli day plan` / `day start` / `day reset` |
 | 番茄钟：开始 / 状态 / 暂停 / 继续 / 加任务 / 移任务 / 停止 | `jingli focus …` |
-| 休息与下一轮 | `jingli focus break` / `skip-break` / `next` |
+| 休息 | `jingli focus break` / `skip-break` |
 | 今日统计 | `jingli stats` |
 | 历史回顾 | `jingli stats --days N` / `jingli stats --date YYYY-MM-DD` |
 | 审计 / 撤销 | `jingli events` / `jingli undo` |
@@ -126,15 +126,15 @@ jingli focus stop --confirm             # 废弃本轮，不记账
 - 暂停保持勿扰；完成 / 停止 / 休息会退出由 App 开启的勿扰。
 - 一轮结束后 `focus status` 会带 `completion`（任务与 `1/n` 分摊）。
 
-## 休息与再来一轮
+## 休息
 
 ```bash
 jingli focus break        # 开始 5 分钟休息（需本轮已结束）
 jingli focus skip-break   # 跳过休息
-jingli focus next         # 复用本轮未完成任务，立即开始下一轮
 ```
 
-休息不计入统计；`focus next` 只在 `completion` 存在时可用。
+按番茄钟规则，本轮结束先休息 5 分钟，不提供「直接下一轮」；休息结束后再 `focus start`。
+休息不计入统计。
 
 ## 统计与历史
 
@@ -187,5 +187,5 @@ jingli undo <event-id> --confirm
 | `今天已经开始，主线任务只能在项目里维护` | 改用 `--lane temporary`；主线留到明天，或在项目里先建好 |
 | `找不到：project X` | 先 `jingli project list`，或用 `project add` 创建 |
 | `已有进行中的番茄钟` | 先 `focus stop --confirm`，或用 `focus add` 加入 |
-| `本轮尚未结束` | `focus break` / `focus next` 需要先等本轮完成 |
+| `本轮尚未结束` | `focus break` 需要先等本轮完成 |
 | `无法连接 ...` | App 未运行；提示用户打开「精力管理」 |

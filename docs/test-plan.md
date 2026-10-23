@@ -14,7 +14,7 @@
 | App 测试 | `xcodebuild … test` | App 层 smoke |
 | 截图回归 | `scripts/snapshot.sh compare` / `--determinism` | `day-start` / `today-running` / `stats` / `completion` |
 | Agent 契约 | `scripts/agent-spike.sh` | socket 权限、并发写、plan / start / focus / undo、confirm 拒绝 |
-| 模拟一天 | `scripts/dogfood.sh` | 3 轮短计时、共享分摊、暂停 / 继续、加 / 移任务、休息、再来一轮、统计、重置、备份、跨天 |
+| 模拟一天 | `scripts/dogfood.sh` | 3 轮短计时、共享分摊、暂停 / 继续、加 / 移任务、每轮后休息、统计、重置、备份、跨天 |
 | 总入口 | `scripts/self-test.sh --fast` / `--full` | 以上全部；`--full` 含 determinism + dogfood |
 
 ## 环境

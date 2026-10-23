@@ -178,6 +178,7 @@ guard let command = arguments.first else {
       jingli focus start <id...>
       jingli focus status|pause|resume
       jingli focus stop --confirm
+      jingli focus break|skip-break
       jingli focus add|remove <id>
       jingli stats [--date YYYY-MM-DD] [--days N]
       jingli events [--limit 50]
@@ -312,8 +313,6 @@ case "focus":
         run("focus.break")
     case "skip-break":
         run("focus.skipBreak")
-    case "next":
-        run("focus.next")
     default:
         fail("unknown focus command: \(sub)")
     }

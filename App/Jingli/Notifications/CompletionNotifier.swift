@@ -7,7 +7,6 @@ final class CompletionNotifier: NSObject, UNUserNotificationCenterDelegate, @unc
 
     static let categoryID = "FOCUS_COMPLETE"
     static let breakActionID = "JINGLI_BREAK"
-    static let nextRoundActionID = "JINGLI_NEXT_ROUND"
     static let closeActionID = "JINGLI_CLOSE"
 
     private var requested = false
@@ -29,11 +28,6 @@ final class CompletionNotifier: NSObject, UNUserNotificationCenterDelegate, @unc
             title: "开始休息 5 分钟",
             options: [.foreground]
         )
-        let nextAction = UNNotificationAction(
-            identifier: Self.nextRoundActionID,
-            title: "再来一轮",
-            options: [.foreground]
-        )
         let closeAction = UNNotificationAction(
             identifier: Self.closeActionID,
             title: "回到清单",
@@ -41,7 +35,7 @@ final class CompletionNotifier: NSObject, UNUserNotificationCenterDelegate, @unc
         )
         let category = UNNotificationCategory(
             identifier: Self.categoryID,
-            actions: [breakAction, nextAction, closeAction],
+            actions: [breakAction, closeAction],
             intentIdentifiers: [],
             options: []
         )
@@ -110,9 +104,6 @@ final class CompletionNotifier: NSObject, UNUserNotificationCenterDelegate, @unc
                 case Self.breakActionID:
                     NSApp.activate(ignoringOtherApps: true)
                     model.startBreak()
-                case Self.nextRoundActionID:
-                    NSApp.activate(ignoringOtherApps: true)
-                    model.startNextRound()
                 case Self.closeActionID:
                     model.dismissCompletion()
                 default:

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# 模拟一天：短计时跑完 3 轮、暂停 / 继续、加 / 移任务、休息、再来一轮、统计、重置、备份、跨天。
+# 模拟一天：短计时跑完 3 轮、暂停 / 继续、加 / 移任务、每轮后休息、统计、重置、备份、跨天。
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 BUILD_DIR="${BUILD_DIR:-/tmp/jingli-dd}"
 APP="$BUILD_DIR/Build/Products/Debug/Jingli.app"
@@ -125,8 +125,12 @@ sleep 1.5
 
 "$CLI" focus start "$A" > /dev/null
 wait_finished > /dev/null
-"$CLI" focus next > "$TMP/next.json"
-grep -q '"active":true' "$TMP/next.json"
+
+"$CLI" focus break | grep -q '"onBreak":true'
+sleep 1.5
+"$CLI" focus status | grep -q '"onBreak":false'
+
+"$CLI" focus start "$A" > /dev/null
 wait_finished > /dev/null
 
 "$CLI" stats > "$TMP/stats.json"
@@ -188,4 +192,4 @@ assert days[0]["pomodoros"] == 3, days[0]
 assert days[1]["pomodoros"] == 1, days[1]
 PY
 
-echo "dogfood passed: 3 rounds, shared split, pause/resume, add/remove, break, next, stats, reset, backup, rollover, history"
+echo "dogfood passed: 3 rounds, shared split, pause/resume, add/remove, break between rounds, stats, reset, backup, rollover, history"

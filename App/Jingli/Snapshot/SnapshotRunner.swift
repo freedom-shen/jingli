@@ -100,7 +100,6 @@ enum SnapshotRunner {
             tasks: tasks,
             dimmed: false,
             onBreak: {},
-            onNextRound: {},
             onClose: {}
         )
         .environment(\.controlActiveState, .key)
