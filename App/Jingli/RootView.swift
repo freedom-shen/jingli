@@ -48,9 +48,6 @@ struct RootView: View {
             Text(model.errorMessage ?? "")
         }
         .onAppear { model.reload() }
-        .onReceive(Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()) { _ in
-            model.tickFocus()
-        }
     }
 
     @ViewBuilder

@@ -18,6 +18,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         CompletionNotifier.shared.configure()
         startAgentServer()
         runDailyBackup()
+        AppServices.shared.model.startTicking()
 
         if CommandLine.arguments.contains("--show-panel") {
             DispatchQueue.main.async {

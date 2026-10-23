@@ -45,9 +45,7 @@ struct FloatingPanelView: View {
                 }
             }
 
-            Text(participantsText)
-                .font(.system(size: 11))
-                .foregroundStyle(Theme.textSecondary)
+            roundTasks
 
             Spacer()
 
@@ -84,7 +82,7 @@ struct FloatingPanelView: View {
             }
         }
         .padding(16)
-        .frame(width: 260, height: 360)
+        .frame(width: 260, height: 404)
         .background(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .fill(Theme.card.opacity(0.96))
@@ -102,11 +100,71 @@ struct FloatingPanelView: View {
         return model.timerIsPaused ? "已暂停" : "专注中"
     }
 
-    private var participantsText: String {
-        if model.isOnBreak { return "休息 5 分钟" }
-        guard let timer = model.timer, model.timerIsActive else {
-            return "本轮 0 件任务"
+    @ViewBuilder
+    private var roundTasks: some View {
+        if model.isOnBreak {
+            Text("休息 5 分钟")
+                .font(.system(size: 11))
+                .foregroundStyle(Theme.textSecondary)
+        } else if roundTaskRows.isEmpty {
+            Text("本轮 0 件任务")
+                .font(.system(size: 11))
+                .foregroundStyle(Theme.textSecondary)
+        } else {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    Text("本轮任务")
+                        .font(.system(size: 10))
+                        .foregroundStyle(Theme.textSecondary)
+                    Spacer()
+                    Text("\(roundTaskRows.count) 件")
+                        .font(.system(size: 10))
+                        .foregroundStyle(Theme.textSecondary)
+                }
+
+                ForEach(Array(roundTaskRows.prefix(3)), id: \.id) { row in
+                    HStack(spacing: 7) {
+                        Circle()
+                            .fill(Theme.tomato)
+                            .frame(width: 5, height: 5)
+
+                        Text(row.title)
+                            .font(.system(size: 11))
+                            .foregroundStyle(Theme.textPrimary)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+
+                        Spacer(minLength: 4)
+
+                        Text(shareText(total: roundTaskRows.count))
+                            .font(.system(size: 9))
+                            .foregroundStyle(Theme.textSecondary)
+                            .monospacedDigit()
+                    }
+                }
+
+                if roundTaskRows.count > 3 {
+                    Text("还有 \(roundTaskRows.count - 3) 件")
+                        .font(.system(size: 10))
+                        .foregroundStyle(Theme.textSecondary)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        return "本轮 \(timer.taskIDs.count) 件任务"
+    }
+
+    private var roundTaskRows: [(id: String, title: String)] {
+        guard let timer = model.timer, timer.isActive else { return [] }
+        let titles = Dictionary(
+            (model.snapshot?.todayTasks ?? []).map { ($0.id, $0.title) },
+            uniquingKeysWith: { first, _ in first }
+        )
+        return timer.taskIDs.map { id in
+            (id: id, title: titles[id] ?? "任务已删除")
+        }
+    }
+
+    private func shareText(total: Int) -> String {
+        total > 1 ? "1/\(total)" : "1"
     }
 }

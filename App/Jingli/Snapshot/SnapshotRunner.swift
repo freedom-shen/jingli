@@ -70,9 +70,9 @@ enum SnapshotRunner {
                 rootView: AnyView(
                     FloatingPanelView(model: AppServices.shared.model, onClose: {})
                         .environment(\.controlActiveState, .key)
-                        .frame(width: 260, height: 360)
+                        .frame(width: 260, height: 404)
                 ),
-                size: NSSize(width: 260, height: 360)
+                size: NSSize(width: 260, height: 404)
             )
             panelWindow.makeKeyAndOrderFront(nil)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {

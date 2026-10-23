@@ -28,6 +28,7 @@ final class AppModel: ObservableObject {
     private let focusMode = FocusModeCoordinator.shared
     private var breakEndsAt: Int64 = 0
     private var currentDay = DayKey.make()
+    private var tickTimer: Timer?
 
     init(store: WorkspaceStore = AppServices.shared.store) {
         self.store = store
@@ -294,6 +295,18 @@ final class AppModel: ObservableObject {
         focusMode.end()
         persistFocusOwnership()
         updateTimerText()
+    }
+
+    /// 计时刷新挂在 App 级：主窗口关掉后倒计时与结算仍然继续。
+    func startTicking() {
+        guard tickTimer == nil else { return }
+        let timer = Timer(timeInterval: 0.5, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated {
+                self?.tickFocus()
+            }
+        }
+        RunLoop.main.add(timer, forMode: .common)
+        tickTimer = timer
     }
 
     func tickFocus() {

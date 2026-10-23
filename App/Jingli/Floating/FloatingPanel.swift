@@ -8,7 +8,7 @@ enum FloatingPanelConfiguration {
         .fullScreenAuxiliary,
         .ignoresCycle
     ]
-    static let size = NSSize(width: 260, height: 360)
+    static let size = NSSize(width: 260, height: 404)
     static let margin: CGFloat = 24
     static let originDefaultsKey = "jingli.floatingPanel.origin"
 }
