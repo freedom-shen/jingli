@@ -20,7 +20,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         runDailyBackup()
         AppServices.shared.model.startTicking()
 
-        if CommandLine.arguments.contains("--show-panel") {
+        if CommandLine.arguments.contains("--show-panel")
+            || FloatingPanelController.shared.wasVisible {
             DispatchQueue.main.async {
                 FloatingPanelController.shared.show()
             }

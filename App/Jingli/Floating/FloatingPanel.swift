@@ -11,6 +11,8 @@ enum FloatingPanelConfiguration {
     static let size = NSSize(width: 260, height: 404)
     static let margin: CGFloat = 24
     static let originDefaultsKey = "jingli.floatingPanel.origin"
+    static let visibleDefaultsKey = "jingli.floatingPanel.visible"
+    static let everOpenedDefaultsKey = "jingli.floatingPanel.everOpened"
 }
 
 final class FloatingPanel: NSPanel {
@@ -52,7 +54,18 @@ final class FloatingPanelController {
 
     private init() {}
 
+    var wasVisible: Bool {
+        UserDefaults.standard.bool(forKey: FloatingPanelConfiguration.visibleDefaultsKey)
+    }
+
+    var hasEverOpened: Bool {
+        UserDefaults.standard.bool(forKey: FloatingPanelConfiguration.everOpenedDefaultsKey)
+    }
+
     func show() {
+        UserDefaults.standard.set(true, forKey: FloatingPanelConfiguration.visibleDefaultsKey)
+        UserDefaults.standard.set(true, forKey: FloatingPanelConfiguration.everOpenedDefaultsKey)
+
         if let panel {
             panel.orderFrontRegardless()
             return
@@ -63,8 +76,8 @@ final class FloatingPanelController {
         let panel = FloatingPanel(contentRect: frame)
         let content = FloatingPanelView(
             model: AppServices.shared.model,
-            onClose: { [weak panel] in
-                panel?.orderOut(nil)
+            onClose: { [weak self] in
+                self?.hide()
             }
         )
         panel.contentView = FirstMouseHostingView(rootView: content)
@@ -85,7 +98,13 @@ final class FloatingPanelController {
     }
 
     func hide() {
+        UserDefaults.standard.set(false, forKey: FloatingPanelConfiguration.visibleDefaultsKey)
+        if let moveObserver {
+            NotificationCenter.default.removeObserver(moveObserver)
+            self.moveObserver = nil
+        }
         panel?.orderOut(nil)
+        panel = nil
     }
 
     private func restoredOrigin() -> NSPoint {

@@ -121,6 +121,9 @@ final class AppModel: ObservableObject {
         do {
             try store.startDay(taskIDs: Array(selected))
             reload()
+            if FloatingPanelController.shared.hasEverOpened {
+                FloatingPanelController.shared.show()
+            }
         } catch {
             errorMessage = error.localizedDescription
         }
