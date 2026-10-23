@@ -75,6 +75,15 @@ struct FloatingPanelView: View {
                         .controlSize(.small)
                     }
                 }
+            } else if !model.lastRoundTasks.isEmpty {
+                Button("继续上一轮") {
+                    model.continueLastRound()
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.small)
+                .tint(Theme.textPrimary)
+                .foregroundStyle(Theme.background)
+                .accessibilityIdentifier("continue-last-round-button")
             } else {
                 Text("从今日页开始一件任务")
                     .font(.system(size: 10))
@@ -106,6 +115,54 @@ struct FloatingPanelView: View {
             Text("休息 5 分钟")
                 .font(.system(size: 11))
                 .foregroundStyle(Theme.textSecondary)
+        } else if !model.timerIsActive, !model.lastRoundTasks.isEmpty {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    Text("上一轮任务")
+                        .font(.system(size: 10))
+                        .foregroundStyle(Theme.textSecondary)
+                    Spacer()
+                    Text("\(model.lastRoundTasks.count) 件")
+                        .font(.system(size: 10))
+                        .foregroundStyle(Theme.textSecondary)
+                }
+
+                ForEach(Array(model.lastRoundTasks.prefix(3))) { task in
+                    HStack(spacing: 7) {
+                        Circle()
+                            .fill(Theme.tomato.opacity(0.5))
+                            .frame(width: 5, height: 5)
+
+                        Text(task.title)
+                            .font(.system(size: 11))
+                            .foregroundStyle(Theme.textPrimary)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+
+                        Spacer(minLength: 4)
+
+                        Button {
+                            model.removeFromLastRound(task.id)
+                        } label: {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 8, weight: .semibold))
+                                .frame(width: 16, height: 16)
+                        }
+                        .buttonStyle(.plain)
+                        .foregroundStyle(Theme.textSecondary)
+                        .help("从这一轮移除")
+                        .accessibilityLabel("从上一轮移除 \(task.title)")
+                        .accessibilityIdentifier("remove-last-round-\(task.id)")
+                    }
+                }
+
+                if model.lastRoundTasks.count > 3 {
+                    Text("还有 \(model.lastRoundTasks.count - 3) 件")
+                        .font(.system(size: 10))
+                        .foregroundStyle(Theme.textSecondary)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
         } else if roundTaskRows.isEmpty {
             Text("本轮 0 件任务")
                 .font(.system(size: 11))

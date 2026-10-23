@@ -17,11 +17,14 @@ final class AppModel: ObservableObject {
     @Published private(set) var isOnBreak = false
     @Published private(set) var breakText = "05:00"
     @Published var completion: FocusCompletion?
+    @Published private(set) var lastRoundTaskIDs: [String]
     @Published var detailTask: Task?
     @Published private(set) var stats: TodayStats?
     @Published var isCommandBarPresented = false
     @Published var commandText = ""
     @Published var commandMessage: String?
+
+    private static let lastRoundDefaultsKey = "jingli.lastRoundTaskIDs"
 
     private let store: WorkspaceStore
     private let timerStore: FocusTimerStore
@@ -34,6 +37,8 @@ final class AppModel: ObservableObject {
     init(store: WorkspaceStore = AppServices.shared.store) {
         self.store = store
         self.timerStore = FocusTimerStore(database: store.database)
+        self.lastRoundTaskIDs = UserDefaults.standard
+            .stringArray(forKey: Self.lastRoundDefaultsKey) ?? []
         self.timer = try? timerStore.loadActive()
         restoreFocusMode()
         updateTimerText()
@@ -247,8 +252,22 @@ final class AppModel: ObservableObject {
             return
         }
 
+        startFocus(taskIDs: [task.id])
+    }
+
+    func startFocus(taskIDs: [String]) {
+        if isOnBreak {
+            skipBreak()
+        }
+
+        if completion != nil {
+            CompletionPanelController.shared.hide()
+            completion = nil
+        }
+
+        guard !timerIsActive else { return }
         guard var next = FocusTimer(
-            taskIDs: [task.id],
+            taskIDs: taskIDs,
             sessionDate: DayKey.make(),
             durationMs: timerDurationMs
         ) else { return }
@@ -260,6 +279,29 @@ final class AppModel: ObservableObject {
         persistFocusOwnership()
         updateTimerText()
         CompletionNotifier.shared.requestAuthorization()
+    }
+
+    var lastRoundTasks: [Task] {
+        let byID = Dictionary(
+            (snapshot?.todayTasks ?? []).map { ($0.id, $0) },
+            uniquingKeysWith: { first, _ in first }
+        )
+        return lastRoundTaskIDs.compactMap { byID[$0] }.filter { !$0.done }
+    }
+
+    func removeFromLastRound(_ taskID: String) {
+        lastRoundTaskIDs.removeAll { $0 == taskID }
+        persistLastRound()
+    }
+
+    func continueLastRound() {
+        let ids = lastRoundTasks.map(\.id)
+        guard !ids.isEmpty else { return }
+        startFocus(taskIDs: ids)
+    }
+
+    private func persistLastRound() {
+        UserDefaults.standard.set(lastRoundTaskIDs, forKey: Self.lastRoundDefaultsKey)
     }
 
     func canAddToRound(_ task: Task) -> Bool {
@@ -388,6 +430,8 @@ final class AppModel: ObservableObject {
     }
 
     private func finish(_ finished: FocusTimer) {
+        lastRoundTaskIDs = finished.taskIDs
+        persistLastRound()
         let tasks = snapshot?.todayTasks ?? []
         do {
             completion = try timerStore.complete(finished)
