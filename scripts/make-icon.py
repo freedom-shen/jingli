@@ -14,6 +14,32 @@ CANVAS = 1024
 ART = 824
 MARGIN = (CANVAS - ART) // 2
 RADIUS = 185
+CONTENT_THRESHOLD = 30
+
+
+def content_bbox(image: Image.Image, threshold: int = CONTENT_THRESHOLD):
+    gray = image.convert("L")
+    mask = gray.point(lambda value: 255 if value > threshold else 0)
+    return mask.getbbox()
+
+
+def centered_art(source: Image.Image) -> Image.Image:
+    """按非黑内容包围盒把素材移到画布中心，避免素材本身偏心。"""
+    bbox = content_bbox(source)
+    if not bbox:
+        return source
+
+    center_x = (bbox[0] + bbox[2]) / 2
+    center_y = (bbox[1] + bbox[3]) / 2
+    dx = round(CANVAS / 2 - center_x)
+    dy = round(CANVAS / 2 - center_y)
+    if dx == 0 and dy == 0:
+        return source
+
+    centered = Image.new("RGBA", source.size, (0, 0, 0, 255))
+    centered.paste(source, (dx, dy))
+    print(f"recentered artwork: shift=({dx:+d}, {dy:+d}) from bbox={bbox}")
+    return centered
 
 
 def rounded_mask(size: int, radius: int, scale: int = 4) -> Image.Image:
@@ -29,7 +55,8 @@ def rounded_mask(size: int, radius: int, scale: int = 4) -> Image.Image:
 
 
 def main() -> None:
-    art = Image.open(SOURCE).convert("RGBA").resize((ART, ART), Image.LANCZOS)
+    source = centered_art(Image.open(SOURCE).convert("RGBA"))
+    art = source.resize((ART, ART), Image.LANCZOS)
     art.putalpha(rounded_mask(ART, RADIUS))
 
     canvas = Image.new("RGBA", (CANVAS, CANVAS), (0, 0, 0, 0))
