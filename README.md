@@ -8,9 +8,7 @@
 
 每天从项目里挑最多 4 件主线任务，再带上几件临时任务，一起进入一轮 25 分钟共享番茄钟；结束后按 `1/n` 自动分摊。菜单栏倒计时、置顶浮窗、全局完成弹窗和系统通知，让你在写代码、开会、切应用时都不用回到主窗口。
 
-界面刻意不堆历史：打开就是今天，跨天自动清空今日视图，未完成任务回到未安排。但**数据不会丢**——`jingli` CLI 和 Agent Skill 可以按天回顾「哪天完成了哪些任务、花了多少时间」。
-
-原生 **SwiftUI + AppKit**，本地 **SQLite**，Agent 通过 **Unix socket + CLI + Skill** 接入，没有云同步，也没有账号。
+界面刻意不堆历史：打开就是今天，跨天回到「开启一天」，未完成任务回到未安排。但数据不会丢，需要复盘时可以让 Agent 按天回顾「哪天完成了哪些任务、花了多少时间」。
 
 ## 设计稿
 
@@ -22,173 +20,84 @@
 | **完成弹窗** | **统计设计稿** |
 | ![完成弹窗](Design/preview/03-completion.png) | ![统计](Design/preview/04-stats.png) |
 
-> 设计稿第 4 页包含「近 7 天番茄钟」柱状图；v1 的 UI 没有做这张图，统计页只显示今日 KPI + 今日记录。历史回顾通过 CLI / Skill 的 `stats --days` 提供。
+> 设计稿第 4 页包含「近 7 天番茄钟」柱状图；当前版本的界面没有做这张图，统计页只展示今日 KPI 和今日记录。历史回顾通过 Agent 的按天查询完成。
 
-## 为什么是「只管今天」
+## 它解决什么问题
 
-- **减少决策成本**：每天只选 4 件主线，避免面对一个无限长的 backlog。
-- **共享番茄钟**：多个任务同时计时，结束时按参与任务均分 `1/n`，不重复记账。
-- **界面不背历史包袱**：主界面只展示今天；需要复盘时用 Agent 查按天历史，而不是把图表塞进每天的工作界面。
-- **本地优先**：数据只在本机 SQLite，备份是可直接阅读的 JSON。
+- **每天只选 4 件主线**：减少面对无限长待办清单的决策成本。
+- **多任务共享一轮番茄钟**：适合「写方案 + 回消息 + 查资料」这类并行工作，结束时按参与任务均分，不会重复计时。
+- **专注状态始终可见**：菜单栏、浮窗、完成弹窗、通知四个层级，不打断当前应用。
+- **今天归今天**：主界面不背历史包袱；需要复盘时再按天查。
 
-## 功能
+## 核心功能
 
-- **开启一天**：按项目分组勾选任务，主线最多 4 件，支持临时任务。
-- **今日**：主线 / 临时分区；播放、暂停、完成、任务详情（标题 / 备注 / 今日番茄）。
-- **共享番茄钟**：25 分钟固定，多任务 `1/n` 分摊；暂停、继续、废弃、休息 5 分钟、再来一轮。
-- **全局反馈**：菜单栏倒计时、置顶浮窗（跨 Space、位置记忆）、全局完成弹窗、系统通知（含「开始休息 / 再来一轮 / 回到清单」操作）。
-- **勿扰联动**：开始专注运行 `Jingli Focus On`；完成 / 废弃 / 休息 / 退出运行 `Jingli Focus Off`；已有 Focus 时不接管。
-- **项目**：项目列表、详情、颜色、新建 / 编辑 / 删除；删除项目时任务保留并移到未分类。
-- **统计与历史**：今日 KPI + 今日记录；`jingli stats --days N` / `--date` 按天回顾番茄、专注时长、完成任务与每轮记录。
-- **设置**：勿扰开关、快捷指令检查、测试通知、每日 JSON 备份 / 导入、开机自启。
-- **Agent**：Unix socket JSON-RPC + `jingli` CLI + `skill/jingli/SKILL.md`；支持项目 / 任务 / 排期 / 计时 / 统计 / 审计 / 撤销。
-- **跨天**：UI 回到「开启一天」；未完成任务回未安排；番茄、日计划与任务完成事件保留供历史查询。
+### 开启一天
 
-## 环境
+按项目分组展示未完成任务，勾选今天要推进的几件。主线最多 4 件，临时任务不限。底部实时显示已选数量，点「开启一天」进入今日页。
 
-- macOS 15+
-- Xcode 26（Swift 6）
-- [XcodeGen](https://github.com/yonaskolb/XcodeGen)
-- 图标生成可选：Python 3 + Pillow
+### 今日任务
 
-## 构建、打包与安装
+主线任务和临时任务分区展示。每张卡片可以直接开始 / 暂停番茄钟、标记完成、打开详情修改标题和备注。完成的任务置灰划线，仍占主线名额；「重置」可以把今天退回开启一天。
 
-开发调试：
+### 共享番茄钟
 
-```bash
-cd App && xcodegen generate && cd ..
-xcodebuild -project App/Jingli.xcodeproj -scheme Jingli \
-  -configuration Debug -destination 'platform=macOS' \
-  -derivedDataPath /tmp/jingli-dd build
-open /tmp/jingli-dd/Build/Products/Debug/Jingli.app
-```
+一轮固定 25 分钟。可以先选一件任务开始，再把其他任务加入同一轮；中途加入的任务从加入时刻开始参与分摊。暂停保持当前剩余时间，继续后接着走。结束、废弃、休息、再来一轮都有明确入口。
 
-打包并安装到 `/Applications`：
+### 完成结算
 
-```bash
-scripts/package.sh            # Release 构建 + zip + 替换 /Applications/Jingli.app
-scripts/package.sh --run      # 安装后启动
-scripts/package.sh --no-install   # 只构建 + zip
-scripts/package.sh --no-zip       # 只构建 + 安装
-scripts/package.sh --install-dir ~/Applications
-SIGN_IDENTITY=<证书 SHA-1 或名称> scripts/package.sh
-NOTARY_PROFILE=<keychain profile> scripts/package.sh   # 可选公证
-```
+一轮结束后弹出全局完成弹窗，逐个任务显示 `+1/n` 分摊，并提供「开始休息 5 分钟」「再来一轮」「回到清单」。休息是独立的 5 分钟倒计时，可跳过，不计入番茄统计；再来一轮会复用本轮未完成的任务。
 
-产物：
+### 菜单栏、浮窗与通知
 
-- `/Applications/Jingli.app`
-- `artifacts/release/Jingli-<version>.zip`
+- 菜单栏实时显示剩余时间，可直接暂停 / 继续 / 废弃 / 快速添加任务。
+- 浮窗始终置顶、跨 Space，可拖动并记住位置；显示当前计时和本轮任务数。
+- 完成时发系统通知，通知上直接带「开始休息 / 再来一轮 / 回到清单」操作。
+- 主窗口关闭后 App 留在菜单栏，不会退出。
 
-独立数据目录运行（不污染正式数据）：
+### 勿扰联动
 
-```bash
-JINGLI_SUPPORT_DIR=/tmp/jingli-dev \
-  /tmp/jingli-dd/Build/Products/Debug/Jingli.app/Contents/MacOS/Jingli
-```
+开始番茄钟自动进入勿扰；暂停保持；完成、废弃、休息、退出时自动退出。开始前如果已经有其他 Focus，不会接管，也不会在结束时关掉它。没有配置快捷指令时只提示，不影响计时。
 
-## CLI 与 Skill
+### 项目
 
-```bash
-scripts/install.sh   # 安装 jingli 到 ~/.local/bin，并链接 skill 到 ~/.agents/skills/jingli
-```
+项目网格展示每个项目的任务数；项目详情里可以添加任务、编辑项目名称 / 描述 / 颜色、删除项目。删除项目时任务会保留，并移到「未分类」。
 
-常用命令：
+### 统计与历史
 
-```bash
-jingli today
-jingli project add "工作" --color blue
-jingli task add "写周报" --project 工作 --lane main --date today
-jingli day plan <id...> --dry-run
-jingli day plan <id...>
-jingli day start
-jingli focus start <id...>
-jingli stats
-jingli stats --days 7
-jingli stats --date 2026-10-22
-jingli events
-jingli undo --confirm
-```
+统计页展示今日番茄数、专注时长、完成任务数和今日专注记录。
 
-完整命令与安全约束见 [`skill/jingli/SKILL.md`](skill/jingli/SKILL.md)。
+需要回顾更长时间时，可以让 Agent 查询任意日期或最近 N 天：每天返回番茄数、专注时长、完成的任务、每一轮番茄及任务分摊。历史从当前版本开始保留。
 
-## 统计与历史
+### 设置与数据
 
-```bash
-jingli stats --days 7                     # 最近 7 天，含今天，按日期倒序
-jingli stats --date 2026-10-22            # 指定一天
-jingli stats --date 2026-10-22 --days 3   # 截止该日期的 3 天
-```
+- 勿扰开关、快捷指令检查、测试通知。
+- 每日首次启动自动生成 JSON 备份，保留 14 天；支持手动备份和从备份导入。
+- 可选择开机自动启动。
+- 所有数据只存在本机，不上传云端。
 
-每天返回：
+### Agent 支持
 
-- `pomodoros`：当天完成的番茄数
-- `focusSeconds`：当天专注秒数
-- `completedTasks[]`：当天完成的任务（标题 / 完成时间）
-- `records[]`：当天每一轮番茄，包含参与任务与 `1/n` 分摊
+内置 CLI 和 Agent Skill，可以创建项目、添加 / 修改 / 完成任务、排今天的主线、开始 / 暂停 / 停止番茄钟、查今日统计和历史、查看审计记录、撤销写操作。破坏性操作需要确认。
 
-历史从 **v0.6.0** 开始保留；升级前按旧策略清掉的记录无法恢复。
+## 使用流程
 
-## 数据与备份
+1. 打开 App，在「开启一天」里勾选今天的主线任务和临时任务。
+2. 点「开启一天」，进入今日页。
+3. 点任意任务的播放按钮开始 25 分钟；需要一起计时就把其他任务加入本轮。
+4. 结束后在完成弹窗里选择休息、再来一轮或回到清单。
+5. 需要复盘时，让 Agent 查某一天或最近几天的番茄和任务完成情况。
 
-- 数据目录：`~/Library/Application Support/Jingli/`
-  - `jingli.sqlite`：SQLite（WAL）
-  - `Backups/jingli-YYYY-MM-DD.json`：每日首次启动自动备份，保留 14 天
-  - `agent.sock`：本地 Agent socket（`0600`）
-- `JINGLI_SUPPORT_DIR` 可覆盖数据目录，测试 / 多环境隔离用。
-- 备份 / 导入只覆盖项目、任务与今日计划；历史番茄记录在 SQLite 中。
+## 设计原则
 
-## 勿扰快捷指令
+- **今天优先**：主界面永远只回答「今天做什么」，不把历史图表塞进每天的工作流。
+- **少打扰**：常驻菜单栏和浮窗，但只在轮次结束时主动出现。
+- **本地优先**：SQLite + 本地 socket，账号、云同步、远端服务都不是必需。
+- **可被 Agent 操作**：所有核心能力都有稳定的 CLI / Skill 接口，而不只是 UI 点击。
 
-见 [`docs/focus-shortcuts.md`](docs/focus-shortcuts.md)。
+## 当前状态
 
-1. `Jingli Focus On`：Set Focus → 勿扰模式 → 打开。
-2. `Jingli Focus Off`：Set Focus → 勿扰模式 → 关闭。
-
-未创建时计时不受影响，设置页会显示「未配置」。
-
-## 测试
-
-```bash
-scripts/self-test.sh --fast    # unit + app tests + 4 场景截图 + agent spike
-scripts/self-test.sh --full    # 额外跑截图 determinism + 模拟一天 dogfood
-scripts/snapshot.sh compare
-scripts/snapshot.sh --determinism
-scripts/dogfood.sh             # 3 轮短计时、共享分摊、休息、再来一轮、统计、重置、备份、跨天、历史
-scripts/agent-spike.sh
-```
-
-当前：**53 个 Core 测试**、App 测试、4 个状态 / 6 张截图基线（`day-start` / `today-running` / `stats` / `completion`）。
-
-## 测试钩子
-
-| 环境变量 | 作用 |
-|---|---|
-| `JINGLI_SUPPORT_DIR` | 覆盖数据目录 |
-| `JINGLI_TIMER_SECONDS` | 缩短专注时长（测试） |
-| `JINGLI_BREAK_SECONDS` | 缩短休息时长（测试） |
-| `JINGLI_NO_NOTIFICATIONS=1` | 关闭真实通知 |
-| `JINGLI_NO_BACKUP=1` | 关闭每日备份 |
-| `JINGLI_SHORTCUTS_BIN` | 替换 `/usr/bin/shortcuts`（勿扰测试） |
-| `JINGLI_FAKE_NOW_MS` | 固定当前时间（截图） |
-
-## 目录
-
-```text
-App/                   SwiftUI App（XcodeGen 工程）
-Packages/JingliCore/   数据层、计时、统计、历史、备份、Agent server、CLI
-skill/jingli/          Agent Skill
-scripts/               构建、自测、截图、打包、安装、图标
-Tests/Snapshots/       截图基线
-Design/                设计稿、预览图、App 图标
-docs/                  设计说明、快捷键、测试与验收文档
-```
-
-## 已知限制
-
-- UI 只展示今天，不做 7 天 / 30 天图表；历史通过 CLI / Skill 查询。
-- 计时 / 休息长度固定 25 / 5 分钟。
-- 勿扰依赖两个 Shortcuts；本机已创建并验证，换机器需按文档重建。
-- 通知需要用户在系统设置中允许；从 `/tmp` 直接运行开发包时 `usernoted` 可能拒绝校验，安装到 `~/Applications` 或 `/Applications` 后再试。
-- 任务删除会同时移除它的完成事件与番茄分摊。
-- 未做签名 / 公证 / 自动更新。
+- 原生 SwiftUI + AppKit，本地 SQLite。
+- 已实现项目 / 任务 / 今日计划 / 共享番茄钟 / 休息 / 勿扰 / 通知 / 浮窗 / 统计 / 历史 / 备份 / Agent。
+- 计时与休息长度固定 25 / 5 分钟。
+- 勿扰需要两个系统快捷指令；未配置时计时不受影响。
+- 历史从当前版本开始保留，更早的记录无法恢复。
