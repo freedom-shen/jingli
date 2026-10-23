@@ -29,6 +29,7 @@ final class AppModel: ObservableObject {
     private var breakEndsAt: Int64 = 0
     private var currentDay = DayKey.make()
     private var tickTimer: Timer?
+    private var activityToken: NSObjectProtocol?
 
     init(store: WorkspaceStore = AppServices.shared.store) {
         self.store = store
@@ -37,6 +38,7 @@ final class AppModel: ObservableObject {
         restoreFocusMode()
         updateTimerText()
         reload()
+        syncActivity()
     }
 
     var dayStarted: Bool {
@@ -310,6 +312,7 @@ final class AppModel: ObservableObject {
     }
 
     func tickFocus() {
+        syncActivity()
         rolloverIfDayChanged()
         if isOnBreak {
             tickBreak()
@@ -346,6 +349,20 @@ final class AppModel: ObservableObject {
         isOnBreak = false
         breakEndsAt = 0
         breakText = "05:00"
+    }
+
+    /// 计时期间持有活动断言，避免 App Nap 在后台节流定时器。
+    private func syncActivity() {
+        let shouldHold = timerIsActive || isOnBreak
+        if shouldHold, activityToken == nil {
+            activityToken = ProcessInfo.processInfo.beginActivity(
+                options: [.userInitiated],
+                reason: "番茄钟计时"
+            )
+        } else if !shouldHold, let token = activityToken {
+            ProcessInfo.processInfo.endActivity(token)
+            activityToken = nil
+        }
     }
 
     private func tickBreak() {
