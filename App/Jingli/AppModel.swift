@@ -251,6 +251,11 @@ final class AppModel: ObservableObject {
         CompletionNotifier.shared.requestAuthorization()
     }
 
+    func canAddToRound(_ task: Task) -> Bool {
+        guard let timer, timer.isActive, !isOnBreak else { return false }
+        return !timer.taskIDs.contains(task.id)
+    }
+
     func toggleFocus(for task: Task) {
         switch focusState(for: task) {
         case .running:

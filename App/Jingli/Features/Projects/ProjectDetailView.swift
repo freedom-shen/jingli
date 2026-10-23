@@ -71,6 +71,7 @@ struct ProjectDetailView: View {
                             TaskCard(
                                 task: task,
                                 focusState: model.focusState(for: task),
+                                addsToRound: model.canAddToRound(task),
                                 onDone: { model.toggleDone(task) },
                                 onPlay: { model.toggleFocus(for: task) }
                             )

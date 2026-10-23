@@ -6,6 +6,7 @@ struct TaskCard: View {
     var selected: Bool?
     var disabled = false
     var focusState: TaskFocusState = .none
+    var addsToRound = false
     var onToggleSelection: (() -> Void)?
     var onDone: (() -> Void)?
     var onPlay: (() -> Void)?
@@ -45,12 +46,13 @@ struct TaskCard: View {
                 if selected == nil {
                     HStack(spacing: 6) {
                         Button(action: { onPlay?() }) {
-                            Image(systemName: focusState == .running ? "pause.fill" : "play.fill")
-                                .font(.system(size: 10))
+                            Image(systemName: playIcon)
+                                .font(.system(size: addsToRound ? 12 : 10, weight: addsToRound ? .semibold : .regular))
                                 .frame(width: 28, height: 28)
                         }
                         .buttonStyle(TaskIconButtonStyle(active: focusState != .none))
-                        .help(focusState == .running ? "暂停专注" : "开始专注")
+                        .help(playHelp)
+                        .accessibilityLabel(playHelp)
 
                         Button(action: { onDone?() }) {
                             Image(systemName: task.done ? "checkmark.circle.fill" : "circle")
@@ -91,6 +93,16 @@ struct TaskCard: View {
             guard !disabled else { return }
             onToggleSelection?()
         }
+    }
+
+    private var playIcon: String {
+        if addsToRound { return "plus" }
+        return focusState == .running ? "pause.fill" : "play.fill"
+    }
+
+    private var playHelp: String {
+        if addsToRound { return "加入本轮" }
+        return focusState == .running ? "暂停专注" : "开始专注"
     }
 }
 
