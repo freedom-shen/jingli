@@ -6,19 +6,34 @@ struct TaskEditorView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var title = ""
-    @State private var lane = "main"
+    @State private var lane: String
     @State private var projectID = ""
+    private let fixedLane: String?
 
-    init(model: AppModel, defaultProjectID: String? = nil) {
+    init(
+        model: AppModel,
+        defaultProjectID: String? = nil,
+        fixedLane: String? = nil
+    ) {
         self.model = model
+        self.fixedLane = fixedLane
+        _lane = State(initialValue: fixedLane ?? "main")
         _projectID = State(initialValue: defaultProjectID ?? "")
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
-            Text("新建任务")
-                .font(.system(size: 22, weight: .semibold))
-                .foregroundStyle(Theme.textPrimary)
+            VStack(alignment: .leading, spacing: 6) {
+                Text(fixedLane == "temporary" ? "新建临时任务" : "新建任务")
+                    .font(.system(size: 22, weight: .semibold))
+                    .foregroundStyle(Theme.textPrimary)
+
+                if fixedLane == "temporary" {
+                    Text("临时任务直接进入今天，不占 4 件主线名额。")
+                        .font(.system(size: 11))
+                        .foregroundStyle(Theme.textSecondary)
+                }
+            }
 
             VStack(alignment: .leading, spacing: 8) {
                 Text("任务名称")
@@ -35,16 +50,18 @@ struct TaskEditorView: View {
                     .accessibilityIdentifier("task-title-field")
             }
 
-            VStack(alignment: .leading, spacing: 8) {
-                Text("任务标签")
-                    .font(.system(size: 11))
-                    .foregroundStyle(Theme.textSecondary)
-                Picker("任务标签", selection: $lane) {
-                    Text("主线任务").tag("main")
-                    Text("临时任务").tag("temporary")
+            if fixedLane == nil {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("任务标签")
+                        .font(.system(size: 11))
+                        .foregroundStyle(Theme.textSecondary)
+                    Picker("任务标签", selection: $lane) {
+                        Text("主线任务").tag("main")
+                        Text("临时任务").tag("temporary")
+                    }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
                 }
-                .pickerStyle(.segmented)
-                .labelsHidden()
             }
 
             VStack(alignment: .leading, spacing: 8) {

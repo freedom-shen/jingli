@@ -72,7 +72,7 @@ struct MenuBarPanel: View {
                     .first(where: { !($0 is FloatingPanel) })?
                     .makeKeyAndOrderFront(nil)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    model.openTaskEditor()
+                    model.openTaskEditor(lane: "temporary")
                 }
             }
 

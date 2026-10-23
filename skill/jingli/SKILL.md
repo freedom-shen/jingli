@@ -70,16 +70,19 @@ jingli project delete <id> --confirm
 ## 创建与修改任务
 
 ```bash
-jingli task add "写周报" --project 工作 --lane main --date today
-jingli task add "回邮件" --lane temporary
+jingli task add "回邮件" --lane temporary            # 临时任务：默认直接进今天
+jingli task add "临时插单" --lane temporary --date today
+jingli task add "写周报" --project 工作              # 项目主线：先进项目，不自动进今天
 jingli task update <id> --title "写季度周报" --note "重点写复购"
 jingli task complete <id>
 jingli task reopen <id>
 jingli task delete <id> --confirm
 ```
 
+- **临时任务**：不限量，随时可加；加完立刻出现在「今日任务 · 临时任务」，不占 4 件主线名额。不传 `--date` 时默认排到今天。
+- **主线任务**：属于项目，只能在项目里创建。要进今天，走「开启一天」或 `day plan` + `day start`；今天已经开始后不能再加主线（会报 `今天已经开始…`），此时只能加临时任务，或先把主线留在项目里等明天。
 - `--project` 用项目名称，不是 ID；不存在会报错，先 `project list`。
-- `--date today` 只对「今天」有意义；不传则任务先进入未安排。
+- `--date today` 只对「今天」有意义。
 - `task update` 只能改标题和备注。
 - `task delete` 必须 `--confirm`，不可撤销；删除后该任务在今日记录里的分摊也会一起消失（番茄总数不变）。
 
@@ -181,6 +184,7 @@ jingli undo <event-id> --confirm
 |---|---|
 | `破坏性操作需要 --confirm` | 向用户确认后加 `--confirm` |
 | `主线任务最多 4 个` | 减少主线，或把其中一件改为临时 |
+| `今天已经开始，主线任务只能在项目里维护` | 改用 `--lane temporary`；主线留到明天，或在项目里先建好 |
 | `找不到：project X` | 先 `jingli project list`，或用 `project add` 创建 |
 | `已有进行中的番茄钟` | 先 `focus stop --confirm`，或用 `focus add` 加入 |
 | `本轮尚未结束` | `focus break` / `focus next` 需要先等本轮完成 |

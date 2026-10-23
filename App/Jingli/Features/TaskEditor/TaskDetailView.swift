@@ -4,14 +4,16 @@ import JingliCore
 struct TaskDetailView: View {
     @ObservedObject var model: AppModel
     let task: Task
+    let locked: Bool
     @Environment(\.dismiss) private var dismiss
 
     @State private var title: String
     @State private var note: String
 
-    init(model: AppModel, task: Task) {
+    init(model: AppModel, task: Task, locked: Bool = false) {
         self.model = model
         self.task = task
+        self.locked = locked
         _title = State(initialValue: task.title)
         _note = State(initialValue: task.note)
     }
@@ -33,6 +35,12 @@ struct TaskDetailView: View {
                     .foregroundStyle(Theme.textSecondary)
             }
 
+            if locked {
+                Text("主线任务在项目中维护，这里只能查看和完成任务。")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Theme.textSecondary)
+            }
+
             VStack(alignment: .leading, spacing: 8) {
                 Text("任务名称")
                     .font(.system(size: 11))
@@ -45,6 +53,7 @@ struct TaskDetailView: View {
                         RoundedRectangle(cornerRadius: 9, style: .continuous)
                             .fill(Theme.card)
                     )
+                    .disabled(locked)
                     .accessibilityIdentifier("task-detail-title")
             }
 
@@ -58,16 +67,31 @@ struct TaskDetailView: View {
                 Text("备注")
                     .font(.system(size: 11))
                     .foregroundStyle(Theme.textSecondary)
-                TextEditor(text: $note)
-                    .font(.system(size: 13))
-                    .scrollContentBackground(.hidden)
-                    .padding(8)
-                    .frame(height: 110)
-                    .background(
-                        RoundedRectangle(cornerRadius: 9, style: .continuous)
-                            .fill(Theme.card)
-                    )
-                    .accessibilityIdentifier("task-detail-note")
+                if locked {
+                    Text(task.note.isEmpty ? "无备注" : task.note)
+                        .font(.system(size: 13))
+                        .foregroundStyle(
+                            task.note.isEmpty ? Theme.textSecondary : Theme.textPrimary
+                        )
+                        .frame(maxWidth: .infinity, minHeight: 110, alignment: .topLeading)
+                        .padding(8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                                .fill(Theme.card)
+                        )
+                        .accessibilityIdentifier("task-detail-note")
+                } else {
+                    TextEditor(text: $note)
+                        .font(.system(size: 13))
+                        .scrollContentBackground(.hidden)
+                        .padding(8)
+                        .frame(height: 110)
+                        .background(
+                            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                                .fill(Theme.card)
+                        )
+                        .accessibilityIdentifier("task-detail-note")
+                }
             }
 
             HStack {
@@ -79,19 +103,25 @@ struct TaskDetailView: View {
 
                 Spacer()
 
-                Button("取消") { dismiss() }
-                    .buttonStyle(.bordered)
+                if locked {
+                    Button("关闭") { dismiss() }
+                        .buttonStyle(.bordered)
+                        .accessibilityIdentifier("close-task-detail")
+                } else {
+                    Button("取消") { dismiss() }
+                        .buttonStyle(.bordered)
 
-                Button("保存") {
-                    if model.updateTask(id: task.id, title: title, note: note) {
-                        dismiss()
+                    Button("保存") {
+                        if model.updateTask(id: task.id, title: title, note: note) {
+                            dismiss()
+                        }
                     }
+                    .buttonStyle(.borderedProminent)
+                    .tint(Theme.textPrimary)
+                    .foregroundStyle(Theme.background)
+                    .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .accessibilityIdentifier("save-task-detail")
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(Theme.textPrimary)
-                .foregroundStyle(Theme.background)
-                .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                .accessibilityIdentifier("save-task-detail")
             }
         }
         .padding(24)

@@ -219,6 +219,7 @@ public final class AgentServer: @unchecked Sendable {
             let lane = params["lane"] as? String ?? "main"
             let projectID = try resolveProjectID(params)
             let plannedDate = resolveDate(params["date"])
+                ?? (lane == "temporary" ? DayKey.make() : nil)
             let task = try store.createTask(
                 title: title,
                 projectID: projectID,

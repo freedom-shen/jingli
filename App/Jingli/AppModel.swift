@@ -11,6 +11,7 @@ final class AppModel: ObservableObject {
     @Published var isProjectEditorPresented = false
     @Published var editingProject: Project?
     @Published var taskEditorProjectID: String?
+    @Published var taskEditorLane: String?
     @Published private(set) var timer: FocusTimer?
     @Published private(set) var timerText = "25:00"
     @Published private(set) var isOnBreak = false
@@ -194,7 +195,7 @@ final class AppModel: ObservableObject {
                 title: title,
                 projectID: projectID,
                 lane: lane,
-                plannedDate: dayStarted ? DayKey.make() : nil
+                plannedDate: (dayStarted && lane == "temporary") ? DayKey.make() : nil
             )
             reload()
             return true
@@ -469,8 +470,9 @@ final class AppModel: ObservableObject {
         return 5 * 60 * 1000
     }
 
-    func openTaskEditor(projectID: String? = nil) {
+    func openTaskEditor(projectID: String? = nil, lane: String? = nil) {
         taskEditorProjectID = projectID
+        taskEditorLane = lane
         isTaskEditorPresented = true
     }
 

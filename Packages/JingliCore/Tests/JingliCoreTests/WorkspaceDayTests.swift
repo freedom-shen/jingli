@@ -47,6 +47,34 @@ final class WorkspaceDayTests: XCTestCase {
         }
     }
 
+    func testStartedDayOnlyAcceptsTemporaryTasks() throws {
+        let database = try JingliDatabase.inMemory()
+        let store = WorkspaceStore(database: database)
+        let main = try store.createTask(title: "主线", lane: "main")
+        try store.startDay(taskIDs: [main.id], today: "2026-10-22")
+
+        XCTAssertThrowsError(
+            try store.createTask(
+                title: "新主线",
+                lane: "main",
+                plannedDate: "2026-10-22"
+            )
+        ) { error in
+            guard case DayPlanError.mainTaskLocked = error else {
+                return XCTFail("unexpected error: \(error)")
+            }
+        }
+
+        let temporary = try store.createTask(
+            title: "临时插单",
+            lane: "temporary",
+            plannedDate: "2026-10-22"
+        )
+        let snapshot = try store.snapshot(today: "2026-10-22")
+        XCTAssertEqual(Set(snapshot.todayTasks.map(\.id)), Set([main.id, temporary.id]))
+        XCTAssertEqual(snapshot.todayTasks.first { $0.id == temporary.id }?.lane, "temporary")
+    }
+
     func testCompletedMainStillOccupiesSlot() throws {
         let database = try JingliDatabase.inMemory()
         let store = WorkspaceStore(database: database)

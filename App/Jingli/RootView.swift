@@ -19,14 +19,19 @@ struct RootView: View {
         .sheet(isPresented: $model.isTaskEditorPresented) {
             TaskEditorView(
                 model: model,
-                defaultProjectID: model.taskEditorProjectID
+                defaultProjectID: model.taskEditorProjectID,
+                fixedLane: model.taskEditorLane
             )
         }
         .sheet(isPresented: $model.isProjectEditorPresented) {
             ProjectEditorView(model: model, project: model.editingProject)
         }
         .sheet(item: $model.detailTask) { task in
-            TaskDetailView(model: model, task: task)
+            TaskDetailView(
+                model: model,
+                task: task,
+                locked: model.page == .day && task.lane == "main"
+            )
         }
         .sheet(isPresented: $model.isCommandBarPresented) {
             CommandBarView(model: model)
@@ -122,8 +127,8 @@ struct RootView: View {
                     model.openSettings()
                 }
 
-                iconButton("plus", label: "新建任务", identifier: "new-task-button") {
-                    model.openTaskEditor()
+                iconButton("plus", label: "新建临时任务", identifier: "new-task-button") {
+                    model.openTaskEditor(lane: "temporary")
                 }
 
                 iconButton("folder", label: "项目", identifier: "projects-button") {

@@ -73,6 +73,10 @@ public final class WorkspaceStore: @unchecked Sendable {
         let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { throw StoreError.emptyTitle }
         let normalizedLane = lane == "temporary" ? "temporary" : "main"
+        if normalizedLane == "main", let plannedDate,
+           try isDayStarted(plannedDate) {
+            throw DayPlanError.mainTaskLocked
+        }
         let task = Task(
             id: UUID().uuidString,
             title: String(trimmed.prefix(160)),
@@ -105,6 +109,16 @@ public final class WorkspaceStore: @unchecked Sendable {
     public func taskCount() throws -> Int {
         try database.queue.read { db in
             try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM task") ?? 0
+        }
+    }
+
+    private func isDayStarted(_ date: String) throws -> Bool {
+        try database.queue.read { db in
+            try Bool.fetchOne(
+                db,
+                sql: "SELECT started FROM day_plan WHERE date = ?",
+                arguments: [date]
+            ) ?? false
         }
     }
 

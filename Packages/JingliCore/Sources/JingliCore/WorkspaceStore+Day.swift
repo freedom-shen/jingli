@@ -20,6 +20,7 @@ public enum DayPlanError: Error, LocalizedError {
     case taskNotFound
     case taskCompleted
     case tooManyMainTasks(Int)
+    case mainTaskLocked
 
     public var errorDescription: String? {
         switch self {
@@ -31,6 +32,8 @@ public enum DayPlanError: Error, LocalizedError {
             return "已完成的任务不能加入今日计划"
         case let .tooManyMainTasks(count):
             return "主线任务最多 4 个，当前会变成 \(count) 个"
+        case .mainTaskLocked:
+            return "今天已经开始，主线任务只能在项目里维护；今天要加任务请用临时任务"
         }
     }
 }

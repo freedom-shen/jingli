@@ -95,6 +95,28 @@ assert result["dayStarted"] is True, result
 assert result["taskCount"] == 1, result
 PY
 
+"$CLI" task add "临时插单" --lane temporary > "$TMP/temp.json"
+TEMP_ID="$(json '["id"]' < "$TMP/temp.json")"
+python3 - "$TMP/temp.json" <<'PY'
+import datetime, json, sys
+task = json.load(open(sys.argv[1]))["result"]
+assert task["lane"] == "temporary", task
+assert task["plannedDate"] == datetime.date.today().isoformat(), task
+PY
+
+"$CLI" today > "$TMP/today-temp.json"
+python3 - "$TMP/today-temp.json" "$TEMP_ID" <<'PY'
+import json, sys
+tasks = json.load(open(sys.argv[1]))["result"]["tasks"]
+assert any(t["id"] == sys.argv[2] for t in tasks), tasks
+PY
+
+if "$CLI" task add "不该加的主线" --lane main --date today > "$TMP/main-locked.json" 2>/dev/null; then
+  echo "main task should be locked after day start" >&2
+  exit 1
+fi
+grep -q '今天已经开始' "$TMP/main-locked.json"
+
 "$CLI" focus start "$TASK_ID" > "$TMP/focus-start.json"
 python3 - "$TMP/focus-start.json" <<'PY'
 import json, sys
