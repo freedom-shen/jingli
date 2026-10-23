@@ -45,3 +45,31 @@ final class WorkspaceProjectTests: XCTestCase {
         XCTAssertEqual(try store.tasks(projectID: project.id).count, 2)
     }
 }
+
+extension WorkspaceProjectTests {
+    func testTasksAreOrderedNewestFirst() throws {
+        let database = try JingliDatabase.inMemory()
+        let store = WorkspaceStore(database: database)
+        let project = try store.createProject(name: "工作")
+        let today = "2026-10-22"
+
+        _ = try store.createTask(title: "A", projectID: project.id)
+        _ = try store.createTask(title: "B", projectID: project.id)
+        _ = try store.createTask(title: "C", projectID: project.id)
+        _ = try store.createTask(title: "D1", projectID: project.id, plannedDate: today)
+        _ = try store.createTask(title: "D2", projectID: project.id, plannedDate: today)
+
+        XCTAssertEqual(
+            try store.tasks(projectID: project.id).map(\.title),
+            ["D2", "D1", "C", "B", "A"]
+        )
+        XCTAssertEqual(
+            try store.listTasks().map(\.title),
+            ["D2", "D1", "C", "B", "A"]
+        )
+        XCTAssertEqual(
+            try store.todayTasks(today: today).map(\.title),
+            ["D2", "D1"]
+        )
+    }
+}

@@ -50,7 +50,7 @@ public extension WorkspaceStore {
             let condition = includeDone ? "" : " WHERE done = 0"
             return try Row.fetchAll(
                 db,
-                sql: "SELECT * FROM task\(condition) ORDER BY sort_order, created_at"
+                sql: "SELECT * FROM task\(condition) ORDER BY created_at DESC, sort_order DESC"
             ).map(Task.init(row:))
         }
     }
@@ -62,7 +62,7 @@ public extension WorkspaceStore {
                 sql: """
                 SELECT * FROM task
                 WHERE planned_date = ?
-                ORDER BY lane = 'temporary', sort_order, created_at
+                ORDER BY lane = 'temporary', created_at DESC, sort_order DESC
                 """,
                 arguments: [today]
             ).map(Task.init(row:))
@@ -256,7 +256,7 @@ public extension WorkspaceStore {
                 sql: """
                 SELECT * FROM task
                 WHERE project_id = ?
-                ORDER BY done, sort_order, created_at
+                ORDER BY done, created_at DESC, sort_order DESC
                 """,
                 arguments: [projectID]
             ).map(Task.init(row:))
