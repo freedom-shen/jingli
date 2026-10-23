@@ -111,6 +111,21 @@ tasks = json.load(open(sys.argv[1]))["result"]["tasks"]
 assert any(t["id"] == sys.argv[2] for t in tasks), tasks
 PY
 
+"$CLI" task add "先记下的临时任务" --lane temporary --undated > "$TMP/undated.json"
+python3 - "$TMP/undated.json" <<'PY'
+import json, sys
+task = json.load(open(sys.argv[1]))["result"]
+assert task["lane"] == "temporary", task
+assert "plannedDate" not in task, task
+PY
+
+"$CLI" today > "$TMP/today-undated.json"
+python3 - "$TMP/today-undated.json" <<'PY'
+import json, sys
+tasks = json.load(open(sys.argv[1]))["result"]["tasks"]
+assert all(t["title"] != "先记下的临时任务" for t in tasks), tasks
+PY
+
 if "$CLI" task add "不该加的主线" --lane main --date today > "$TMP/main-locked.json" 2>/dev/null; then
   echo "main task should be locked after day start" >&2
   exit 1

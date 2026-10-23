@@ -71,6 +71,7 @@ jingli project delete <id> --confirm
 
 ```bash
 jingli task add "回邮件" --lane temporary            # 临时任务：默认直接进今天
+jingli task add "先记下" --lane temporary --undated   # 只记录，不排今天
 jingli task add "临时插单" --lane temporary --date today
 jingli task add "写周报" --project 工作              # 项目主线：先进项目，不自动进今天
 jingli task update <id> --title "写季度周报" --note "重点写复购"
@@ -79,7 +80,7 @@ jingli task reopen <id>
 jingli task delete <id> --confirm
 ```
 
-- **临时任务**：不限量，随时可加；加完立刻出现在「今日任务 · 临时任务」，不占 4 件主线名额。不传 `--date` 时默认排到今天。
+- **临时任务**：不限量，随时可加；加完立刻出现在「今日任务 · 临时任务」，不占 4 件主线名额。不传 `--date` 时默认排到今天；只想记下来不排期，就加 `--undated`。
 - **主线任务**：属于项目，只能在项目里创建。要进今天，走「开启一天」或 `day plan` + `day start`；今天已经开始后不能再加主线（会报 `今天已经开始…`），此时只能加临时任务，或先把主线留在项目里等明天。
 - `--project` 用项目名称，不是 ID；不存在会报错，先 `project list`。
 - `--date today` 只对「今天」有意义。

@@ -163,7 +163,7 @@ guard let command = arguments.first else {
     fail("""
     usage:
       jingli today
-      jingli task add <title> [--project 名称] [--lane main|temporary] [--date today]
+      jingli task add <title> [--project 名称] [--lane main|temporary] [--date today] [--undated]
       jingli task list [--all]
       jingli task update <id> [--title 标题] [--note 备注]
       jingli task complete|reopen <id>
@@ -219,6 +219,7 @@ case "task":
         if let project = option("--project", in: tail) { params["project"] = project }
         if let lane = option("--lane", in: tail) { params["lane"] = lane }
         if let date = option("--date", in: tail) { params["date"] = date }
+        if hasFlag("--undated", in: tail) { params["undated"] = true }
         run("task.create", params: params)
     case "list":
         run("task.list", params: ["includeDone": hasFlag("--all", in: tail)])

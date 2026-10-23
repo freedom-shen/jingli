@@ -29,8 +29,8 @@ targets:
       base:
         PRODUCT_NAME: Jingli
         PRODUCT_BUNDLE_IDENTIFIER: com.freedom-shen.jingli
-        MARKETING_VERSION: "0.6.7"
-        CURRENT_PROJECT_VERSION: "15"
+        MARKETING_VERSION: "0.6.8"
+        CURRENT_PROJECT_VERSION: "16"
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: 精力管理
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
