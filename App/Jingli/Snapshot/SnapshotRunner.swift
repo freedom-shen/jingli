@@ -108,7 +108,7 @@ enum SnapshotRunner {
             onBreak: {},
             onClose: {}
         )
-        .environment(\.controlActiveState, .key)
+        .environment(\.controlActiveState, .inactive)
         .preferredColorScheme(.dark)
 
         let window = makeWindow(

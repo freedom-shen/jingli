@@ -25,6 +25,7 @@
 		8BD20B4455E057AB5D7E093D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 71C1D692A0AB7C393EE3CCE0 /* Assets.xcassets */; };
 		90303DFEFF8EC8C5ED6C6A96 /* CompletionNotifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54C77D9C2834106F90D19635 /* CompletionNotifier.swift */; };
 		A5465BE37DBAA78A1FB3C1A9 /* JingliApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC9618A2DBBE55DDF8631873 /* JingliApp.swift */; };
+		AD87D7CBEE663DBFCE120A0D /* PrimaryButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14CB5DD3A5581A0172D878B6 /* PrimaryButtonStyle.swift */; };
 		AE5E95FED3D3F8CFB42AA741 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E13E357DCCBD85D8BA129B9 /* TodayView.swift */; };
 		B407DA8F60F40AA58E0A9AC2 /* ProjectListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 938ED09AFAC7425161A796E1 /* ProjectListView.swift */; };
 		B862C145333F68C7C2EF3F26 /* ProjectDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D8D22FCAA3726195BB9946 /* ProjectDetailView.swift */; };
@@ -50,6 +51,7 @@
 
 /* Begin PBXFileReference section */
 		01AAF237ABC51D878145362B /* CompletionOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionOverlay.swift; sourceTree = "<group>"; };
+		14CB5DD3A5581A0172D878B6 /* PrimaryButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryButtonStyle.swift; sourceTree = "<group>"; };
 		1BF08515B42BC266448DC3CF /* JingliTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JingliTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1D9911A61D3379CC6094732C /* TaskEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskEditorView.swift; sourceTree = "<group>"; };
 		4B4E251DE0C315724C6D9C37 /* FloatingPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingPanel.swift; sourceTree = "<group>"; };
@@ -146,6 +148,7 @@
 		55E4ADA9813DD50298B67C62 /* Design */ = {
 			isa = PBXGroup;
 			children = (
+				14CB5DD3A5581A0172D878B6 /* PrimaryButtonStyle.swift */,
 				69C109D6B349355695ABB984 /* Theme.swift */,
 			);
 			path = Design;
@@ -395,6 +398,7 @@
 				A5465BE37DBAA78A1FB3C1A9 /* JingliApp.swift in Sources */,
 				BFBF0D6A490FBF4989631CA0 /* LaunchAtLogin.swift in Sources */,
 				7BCF357191B3DEB13320C106 /* MenuBarView.swift in Sources */,
+				AD87D7CBEE663DBFCE120A0D /* PrimaryButtonStyle.swift in Sources */,
 				B862C145333F68C7C2EF3F26 /* ProjectDetailView.swift in Sources */,
 				C8105E25A8F30B4F8D83B091 /* ProjectEditorView.swift in Sources */,
 				B407DA8F60F40AA58E0A9AC2 /* ProjectListView.swift in Sources */,
@@ -434,7 +438,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 18;
+				CURRENT_PROJECT_VERSION = 19;
 				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "精力管理";
@@ -445,7 +449,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.6.10;
+				MARKETING_VERSION = 0.6.11;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.freedom-shen.jingli";
 				PRODUCT_NAME = Jingli;
 				SDKROOT = macosx;
@@ -533,7 +537,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 18;
+				CURRENT_PROJECT_VERSION = 19;
 				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "精力管理";
@@ -544,7 +548,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.6.10;
+				MARKETING_VERSION = 0.6.11;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.freedom-shen.jingli";
 				PRODUCT_NAME = Jingli;
 				SDKROOT = macosx;

@@ -49,22 +49,17 @@ struct CompletionOverlay: View {
                     }
                 }
 
-                VStack(spacing: 8) {
+                VStack(spacing: 4) {
                     Button("开始休息 5 分钟") {
                         onBreak()
                     }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.large)
-                    .tint(Theme.textPrimary)
-                    .foregroundStyle(Theme.background)
-                    .frame(maxWidth: .infinity)
+                    .buttonStyle(PrimaryButtonStyle())
                     .accessibilityIdentifier("completion-break-button")
 
                     Button("回到清单") {
                         onClose()
                     }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
+                    .buttonStyle(QuietButtonStyle())
                     .accessibilityIdentifier("completion-close-button")
                 }
             }
