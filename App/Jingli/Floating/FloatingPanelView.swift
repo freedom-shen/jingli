@@ -134,13 +134,20 @@ struct FloatingPanelView: View {
                     }
                 }
             } else if !model.lastRoundTasks.isEmpty {
-                Button("继续上一轮") {
+                Button {
                     model.continueLastRound()
+                } label: {
+                    Text("继续上一轮")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(Theme.background)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 30)
+                        .background(
+                            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                .fill(Theme.textPrimary)
+                        )
                 }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.small)
-                .tint(Theme.textPrimary)
-                .foregroundStyle(Theme.background)
+                .buttonStyle(.plain)
                 .accessibilityIdentifier("continue-last-round-button")
             } else {
                 Text("从今日页开始一件任务")
