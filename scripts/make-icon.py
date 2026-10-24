@@ -17,20 +17,32 @@ RADIUS = 185
 CONTENT_THRESHOLD = 30
 
 
-def content_bbox(image: Image.Image, threshold: int = CONTENT_THRESHOLD):
+def content_centroid(image: Image.Image, threshold: int = CONTENT_THRESHOLD):
+    """亮度加权质心：比包围盒更接近人眼感知的视觉重心（底部反光会拉偏包围盒）。"""
     gray = image.convert("L")
-    mask = gray.point(lambda value: 255 if value > threshold else 0)
-    return mask.getbbox()
+    pixels = gray.load()
+    total = 0.0
+    sum_x = 0.0
+    sum_y = 0.0
+    for y in range(gray.height):
+        for x in range(gray.width):
+            value = pixels[x, y]
+            if value > threshold:
+                total += value
+                sum_x += x * value
+                sum_y += y * value
+    if total == 0:
+        return None
+    return sum_x / total, sum_y / total
 
 
 def centered_art(source: Image.Image) -> Image.Image:
-    """按非黑内容包围盒把素材移到画布中心，避免素材本身偏心。"""
-    bbox = content_bbox(source)
-    if not bbox:
+    """按内容视觉重心把素材移到画布中心，避免素材本身偏心。"""
+    centroid = content_centroid(source)
+    if not centroid:
         return source
 
-    center_x = (bbox[0] + bbox[2]) / 2
-    center_y = (bbox[1] + bbox[3]) / 2
+    center_x, center_y = centroid
     dx = round(CANVAS / 2 - center_x)
     dy = round(CANVAS / 2 - center_y)
     if dx == 0 and dy == 0:
@@ -38,7 +50,7 @@ def centered_art(source: Image.Image) -> Image.Image:
 
     centered = Image.new("RGBA", source.size, (0, 0, 0, 255))
     centered.paste(source, (dx, dy))
-    print(f"recentered artwork: shift=({dx:+d}, {dy:+d}) from bbox={bbox}")
+    print(f"recentered artwork: shift=({dx:+d}, {dy:+d}) from centroid=({center_x:.1f}, {center_y:.1f})")
     return centered
 
 
