@@ -29,20 +29,12 @@ struct FloatingPanelView: View {
                         endPoint: .bottomTrailing
                     )
                 )
-                .overlay(
-                    Circle().stroke(Color.white.opacity(0.16), lineWidth: 1)
-                )
-                .shadow(color: Theme.tomato.opacity(0.35), radius: 16, y: 7)
-
-            Circle()
-                .stroke(Color.white.opacity(0.20), lineWidth: 2.5)
-                .padding(3)
 
             Circle()
                 .trim(from: 0, to: model.panelProgress)
-                .stroke(arcColor, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                .stroke(arcColor, style: StrokeStyle(lineWidth: 3, lineCap: .round))
                 .rotationEffect(.degrees(-90))
-                .padding(3)
+                .padding(7)
 
             VStack(spacing: 3) {
                 Text(model.displayText)

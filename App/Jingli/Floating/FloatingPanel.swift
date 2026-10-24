@@ -91,6 +91,7 @@ final class FloatingPanelController {
 
         let panel = FloatingPanel(contentRect: frame)
         panel.contentView = makeContent()
+        panel.hasShadow = mode == .standard
         panel.setFrame(frame, display: true)
         panel.orderFrontRegardless()
         self.panel = panel
@@ -130,6 +131,7 @@ final class FloatingPanelController {
         frame.size = next.size
         frame.origin.y = top - next.size.height
         frame = clamped(frame)
+        panel.hasShadow = next == .standard
         panel.setFrame(frame, display: true)
         persistOrigin(of: panel)
     }
