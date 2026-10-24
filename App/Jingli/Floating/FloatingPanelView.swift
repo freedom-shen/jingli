@@ -19,21 +19,35 @@ struct FloatingPanelView: View {
     private var miniPanel: some View {
         ZStack {
             Circle()
-                .fill(Theme.card.opacity(0.97))
-                .overlay(
-                    Circle().stroke(Color.white.opacity(0.10), lineWidth: 1)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color(red: 0.84, green: 0.42, blue: 0.29),
+                            Color(red: 0.62, green: 0.24, blue: 0.16)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
                 )
+                .overlay(
+                    Circle().stroke(Color.white.opacity(0.16), lineWidth: 1)
+                )
+                .shadow(color: Theme.tomato.opacity(0.35), radius: 16, y: 7)
+
+            Circle()
+                .stroke(Color.white.opacity(0.20), lineWidth: 2.5)
+                .padding(3)
 
             Circle()
                 .trim(from: 0, to: model.panelProgress)
-                .stroke(ringColor, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                .stroke(arcColor, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
                 .rotationEffect(.degrees(-90))
                 .padding(3)
 
             VStack(spacing: 3) {
                 Text(model.displayText)
                     .font(.system(size: 21, weight: .semibold, design: .rounded))
-                    .foregroundStyle(model.timerIsPaused ? Theme.textSecondary : .white)
+                    .foregroundStyle(.white.opacity(model.timerIsPaused ? 0.72 : 1))
                     .monospacedDigit()
 
                 Circle()
@@ -41,6 +55,7 @@ struct FloatingPanelView: View {
                     .frame(width: 4, height: 4)
             }
         }
+        .opacity(model.timerIsPaused ? 0.88 : 1)
         .frame(width: 96, height: 96)
         .contentShape(Circle())
         .onTapGesture { onExpand() }
@@ -168,18 +183,16 @@ struct FloatingPanelView: View {
         .accessibilityIdentifier("floating-panel")
     }
 
-    private var ringColor: Color {
-        if model.isOnBreak { return Theme.tomato }
-        guard model.timerIsActive else { return Color.white.opacity(0.16) }
-        return model.timerIsPaused ? Color.white.opacity(0.28) : Theme.tomato
+    private var arcColor: Color {
+        if model.isOnBreak { return Color.white.opacity(0.85) }
+        guard model.timerIsActive else { return Color.white.opacity(0.25) }
+        return model.timerIsPaused ? Color.white.opacity(0.45) : Color.white.opacity(0.92)
     }
 
     private var dotColor: Color {
-        if model.isOnBreak { return Theme.tomato }
-        guard model.timerIsActive else { return Color.white.opacity(0.22) }
-        return model.timerIsPaused
-            ? Color.white.opacity(0.45)
-            : Color(red: 0.50, green: 0.75, blue: 0.54)
+        if model.isOnBreak { return Color.white.opacity(0.85) }
+        guard model.timerIsActive else { return Color.white.opacity(0.30) }
+        return model.timerIsPaused ? Color.white.opacity(0.50) : Color.white.opacity(0.95)
     }
 
     private var statusText: String {
