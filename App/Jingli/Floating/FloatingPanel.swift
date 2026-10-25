@@ -25,6 +25,10 @@ enum FloatingPanelConfiguration {
     static let visibleDefaultsKey = "jingli.floatingPanel.visible"
     static let everOpenedDefaultsKey = "jingli.floatingPanel.everOpened"
     static let modeDefaultsKey = "jingli.floatingPanel.mode"
+
+    static func originKey(for mode: FloatingPanelMode) -> String {
+        "jingli.floatingPanel.origin.\(mode.rawValue)"
+    }
 }
 
 final class FloatingPanel: NSPanel {
@@ -87,7 +91,7 @@ final class FloatingPanelController {
             return
         }
 
-        let frame = NSRect(origin: restoredOrigin(), size: mode.size)
+        let frame = NSRect(origin: restoredOrigin(for: mode), size: mode.size)
 
         let panel = FloatingPanel(contentRect: frame)
         panel.contentView = makeContent()
@@ -126,10 +130,10 @@ final class FloatingPanelController {
         guard let panel else { return }
         panel.contentView = makeContent()
 
+        // 切换模式时各回各位：小圆盘用记住的位置（默认右下角），大窗用自己的。
         var frame = panel.frame
-        let top = frame.maxY
         frame.size = next.size
-        frame.origin.y = top - next.size.height
+        frame.origin = restoredOrigin(for: next)
         frame = clamped(frame)
         panel.hasShadow = next == .standard
         panel.setFrame(frame, display: true)
@@ -171,28 +175,35 @@ final class FloatingPanelController {
         return result
     }
 
-    private func restoredOrigin() -> NSPoint {
-        let fallback = defaultOrigin()
-        guard
-            let saved = UserDefaults.standard.array(forKey: FloatingPanelConfiguration.originDefaultsKey),
-            saved.count == 2,
-            let x = (saved[0] as? NSNumber)?.doubleValue,
-            let y = (saved[1] as? NSNumber)?.doubleValue
-        else {
-            return fallback
-        }
+    private func restoredOrigin(for mode: FloatingPanelMode) -> NSPoint {
+        let fallback = defaultOrigin(for: mode)
+        let keys = mode == .standard
+            ? [FloatingPanelConfiguration.originKey(for: mode), FloatingPanelConfiguration.originDefaultsKey]
+            : [FloatingPanelConfiguration.originKey(for: mode)]
 
-        let frame = NSRect(
-            origin: NSPoint(x: x, y: y),
-            size: mode.size
-        )
-        let visible = NSScreen.screens.contains {
-            $0.visibleFrame.intersects(frame)
+        for key in keys {
+            guard
+                let saved = UserDefaults.standard.array(forKey: key),
+                saved.count == 2,
+                let x = (saved[0] as? NSNumber)?.doubleValue,
+                let y = (saved[1] as? NSNumber)?.doubleValue
+            else {
+                continue
+            }
+
+            let frame = NSRect(
+                origin: NSPoint(x: x, y: y),
+                size: mode.size
+            )
+            let visible = NSScreen.screens.contains {
+                $0.visibleFrame.intersects(frame)
+            }
+            if visible { return frame.origin }
         }
-        return visible ? frame.origin : fallback
+        return fallback
     }
 
-    private func defaultOrigin() -> NSPoint {
+    private func defaultOrigin(for mode: FloatingPanelMode) -> NSPoint {
         let screen = NSScreen.screens.first {
             $0.frame.contains(NSEvent.mouseLocation)
         } ?? NSScreen.main
@@ -207,7 +218,7 @@ final class FloatingPanelController {
         guard panel.isVisible else { return }
         UserDefaults.standard.set(
             [panel.frame.origin.x, panel.frame.origin.y],
-            forKey: FloatingPanelConfiguration.originDefaultsKey
+            forKey: FloatingPanelConfiguration.originKey(for: mode)
         )
     }
 }
