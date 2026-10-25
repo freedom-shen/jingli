@@ -203,6 +203,84 @@ public extension WorkspaceStore {
         }
     }
 
+    /// 把已有任务追加进今天：不复制任务、不改 lane 和项目归属，只挂到今日计划。
+    /// 主线任务占用今天的 4 个空位（含已完成的），满了会抛 tooManyMainTasks。
+    @discardableResult
+    func addToToday(
+        taskIDs: [String],
+        today: String = DayKey.make()
+    ) throws -> [Task] {
+        var seen = Set<String>()
+        let unique = taskIDs.filter { id in
+            guard !seen.contains(id) else { return false }
+            seen.insert(id)
+            return true
+        }
+        guard !unique.isEmpty else { throw DayPlanError.emptySelection }
+
+        let placeholders = Array(repeating: "?", count: unique.count).joined(separator: ",")
+        let tasks = try database.queue.read { db in
+            try Row.fetchAll(
+                db,
+                sql: "SELECT * FROM task WHERE id IN (\(placeholders))",
+                arguments: StatementArguments(unique)
+            ).map(Task.init(row:))
+        }
+        guard tasks.count == unique.count else { throw DayPlanError.taskNotFound }
+        guard tasks.allSatisfy({ !$0.done }) else { throw DayPlanError.taskCompleted }
+
+        let fresh = tasks.filter { $0.plannedDate != today }
+        let newMain = fresh.filter { $0.lane == "main" }.count
+        if newMain > 0 {
+            let usedMain = try plannedMainCount(today: today)
+            guard usedMain + newMain <= 4 else {
+                throw DayPlanError.tooManyMainTasks(usedMain + newMain)
+            }
+        }
+        guard !fresh.isEmpty else { return [] }
+
+        let now = Self.timestamp()
+        try database.queue.write { db in
+            for task in fresh {
+                try db.execute(
+                    sql: "UPDATE task SET planned_date = ? WHERE id = ?",
+                    arguments: [today, task.id]
+                )
+                try db.execute(
+                    sql: """
+                    INSERT INTO day_plan_task (date, task_id, lane, selected_at)
+                    VALUES (?, ?, ?, ?)
+                    """,
+                    arguments: [today, task.id, task.lane, now]
+                )
+            }
+            try db.execute(
+                sql: """
+                INSERT INTO day_plan (date, started, started_at)
+                VALUES (?, 0, NULL)
+                ON CONFLICT(date) DO NOTHING
+                """,
+                arguments: [today]
+            )
+        }
+        return fresh
+    }
+
+    /// 今天已占用多少个主线名额（含未开工时勾选的和已完成的）。
+    func plannedMainCount(today: String = DayKey.make()) throws -> Int {
+        try database.queue.read { db in
+            try Int.fetchOne(
+                db,
+                sql: """
+                SELECT COUNT(*) FROM task t
+                JOIN day_plan_task d ON d.task_id = t.id AND d.date = ?
+                WHERE t.lane = 'main'
+                """,
+                arguments: [today]
+            ) ?? 0
+        }
+    }
+
     func resetDay(today: String = DayKey.make()) throws {
         try database.queue.write { db in
             try db.execute(

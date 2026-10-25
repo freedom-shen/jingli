@@ -331,4 +331,90 @@ extension WorkspaceDayTests {
             }
         }
     }
+
+    func testAddToTodayAppendsWithoutReplacingSelection() throws {
+        let (store, _, t1, t2) = try makeStore()
+        try store.saveDaySelection(taskIDs: [t1.id], today: "2026-10-22")
+
+        let added = try store.addToToday(taskIDs: [t2.id], today: "2026-10-22")
+        XCTAssertEqual(added.map(\.id), [t2.id])
+
+        let snapshot = try store.snapshot(today: "2026-10-22")
+        XCTAssertFalse(snapshot.dayStarted)
+        XCTAssertEqual(Set(snapshot.selection), Set([t1.id, t2.id]))
+        XCTAssertEqual(snapshot.todayTasks.first { $0.id == t2.id }?.lane, "temporary")
+    }
+
+    func testAddToTodayKeepsLaneAndProjectAfterDayStarted() throws {
+        let (store, project, t1, _) = try makeStore()
+        try store.startDay(taskIDs: [t1.id], today: "2026-10-22")
+
+        let main = try store.createTask(title: "上线数据库", projectID: project.id, lane: "main")
+        let temp = try store.createTask(title: "回邮件", lane: "temporary")
+        _ = try store.addToToday(taskIDs: [main.id, temp.id], today: "2026-10-22")
+
+        let snapshot = try store.snapshot(today: "2026-10-22")
+        XCTAssertTrue(snapshot.dayStarted)
+        XCTAssertEqual(snapshot.todayTasks.count, 3)
+        let addedMain = snapshot.todayTasks.first { $0.id == main.id }
+        XCTAssertEqual(addedMain?.lane, "main")
+        XCTAssertEqual(addedMain?.projectID, project.id)
+        XCTAssertEqual(snapshot.todayTasks.first { $0.id == temp.id }?.lane, "temporary")
+    }
+
+    func testAddToTodayCountsMainSlotsIncludingCompleted() throws {
+        let database = try JingliDatabase.inMemory()
+        let store = WorkspaceStore(database: database)
+        let mains = try (0..<4).map {
+            try store.createTask(title: "main-\($0)", lane: "main")
+        }
+        try store.startDay(taskIDs: mains.map(\.id), today: "2026-10-22")
+        _ = try store.toggleTask(id: mains[0].id)
+
+        let extra = try store.createTask(title: "多出来", lane: "main")
+        XCTAssertThrowsError(
+            try store.addToToday(taskIDs: [extra.id], today: "2026-10-22")
+        ) { error in
+            guard case DayPlanError.tooManyMainTasks = error else {
+                return XCTFail("unexpected error: \(error)")
+            }
+        }
+    }
+
+    func testAddToTodayCountsSelectionBeforeDayStarts() throws {
+        let database = try JingliDatabase.inMemory()
+        let store = WorkspaceStore(database: database)
+        let mains = try (0..<4).map {
+            try store.createTask(title: "main-\($0)", lane: "main")
+        }
+        try store.saveDaySelection(taskIDs: mains.map(\.id), today: "2026-10-22")
+        XCTAssertEqual(try store.plannedMainCount(today: "2026-10-22"), 4)
+
+        let extra = try store.createTask(title: "第五个", lane: "main")
+        XCTAssertThrowsError(
+            try store.addToToday(taskIDs: [extra.id], today: "2026-10-22")
+        ) { error in
+            guard case DayPlanError.tooManyMainTasks = error else {
+                return XCTFail("unexpected error: \(error)")
+            }
+        }
+    }
+
+    func testAddToTodaySkipsDuplicatesAndRejectsDone() throws {
+        let (store, _, t1, _) = try makeStore()
+        try store.startDay(taskIDs: [t1.id], today: "2026-10-22")
+
+        let already = try store.addToToday(taskIDs: [t1.id], today: "2026-10-22")
+        XCTAssertTrue(already.isEmpty)
+
+        let done = try store.createTask(title: "已完成", lane: "temporary")
+        _ = try store.toggleTask(id: done.id)
+        XCTAssertThrowsError(
+            try store.addToToday(taskIDs: [done.id], today: "2026-10-22")
+        ) { error in
+            guard case DayPlanError.taskCompleted = error else {
+                return XCTFail("unexpected error: \(error)")
+            }
+        }
+    }
 }

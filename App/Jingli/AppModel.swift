@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import JingliCore
 
@@ -437,10 +438,21 @@ final class AppModel: ObservableObject {
         )
     }
 
+    /// 回到清单：关掉完成面板后，把主窗口（今天清单）带到前台并激活。
+    func openMainWindow() {
+        NSApp.activate(ignoringOtherApps: true)
+        NSApp.windows
+            .first(where: {
+                !($0 is FloatingPanel) && !($0 is CompletionPanel)
+            })?
+            .makeKeyAndOrderFront(nil)
+    }
+
     func dismissCompletion() {
         CompletionPanelController.shared.hide()
         completion = nil
         reload()
+        openMainWindow()
     }
 
     private func finish(_ finished: FocusTimer) {
@@ -545,6 +557,87 @@ final class AppModel: ObservableObject {
         taskEditorProjectID = projectID
         taskEditorLane = lane
         isTaskEditorPresented = true
+    }
+
+    // MARK: - 添加今日任务
+
+    @Published var isAddTaskPresented = false
+
+    func openAddTask() {
+        isAddTaskPresented = true
+    }
+
+    /// 「添加今日任务」左栏分组：临时任务 → 各项目 → 未归项目的主线任务。
+    /// 只包含未完成且不在今天里的任务。
+    func addTaskPickerGroups() -> [AddTaskPickerGroup] {
+        guard let snapshot else { return [] }
+        let todayIDs = Set(snapshot.todayTasks.map(\.id))
+        guard let all = try? store.listTasks(includeDone: false) else { return [] }
+        let pool = all.filter { !todayIDs.contains($0.id) }
+
+        var groups: [AddTaskPickerGroup] = []
+        let temporary = pool.filter { $0.lane == "temporary" }
+        if !temporary.isEmpty {
+            groups.append(
+                AddTaskPickerGroup(
+                    id: "temporary", title: "临时任务", color: nil, tasks: temporary
+                )
+            )
+        }
+        for project in snapshot.projects {
+            let tasks = pool.filter { $0.lane == "main" && $0.projectID == project.id }
+            guard !tasks.isEmpty else { continue }
+            groups.append(
+                AddTaskPickerGroup(
+                    id: project.id, title: project.name, color: project.color, tasks: tasks
+                )
+            )
+        }
+        let unassigned = pool.filter { $0.lane == "main" && $0.projectID == nil }
+        if !unassigned.isEmpty {
+            groups.append(
+                AddTaskPickerGroup(
+                    id: "unassigned", title: "未归项目", color: "slate", tasks: unassigned
+                )
+            )
+        }
+        return groups
+    }
+
+    var mainSlotsRemaining: Int {
+        let used = (try? store.plannedMainCount()) ?? 0
+        return max(0, 4 - used)
+    }
+
+    /// 左栏点选：把已有任务挂到今天（不复制，保留 lane 与项目归属）。
+    @discardableResult
+    func addExistingToToday(_ task: Task) -> Bool {
+        do {
+            try store.addToToday(taskIDs: [task.id])
+            reload()
+            return true
+        } catch {
+            errorMessage = error.localizedDescription
+            return false
+        }
+    }
+
+    /// 右栏创建：无项目 = 临时任务；选了项目 = 项目任务（主线，占名额）。
+    @discardableResult
+    func addNewTaskToToday(title: String, projectID: String?) -> Bool {
+        do {
+            let task = try store.createTask(
+                title: title,
+                projectID: projectID,
+                lane: projectID == nil ? "temporary" : "main"
+            )
+            try store.addToToday(taskIDs: [task.id])
+            reload()
+            return true
+        } catch {
+            errorMessage = error.localizedDescription
+            return false
+        }
     }
 
     /// 截图测试专用：不触发勿扰、不做持久化的进行中计时。

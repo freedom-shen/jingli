@@ -23,6 +23,9 @@ struct RootView: View {
                 fixedLane: model.taskEditorLane
             )
         }
+        .sheet(isPresented: $model.isAddTaskPresented) {
+            AddTaskView(model: model)
+        }
         .sheet(isPresented: $model.isProjectEditorPresented) {
             ProjectEditorView(model: model, project: model.editingProject)
         }
@@ -124,8 +127,8 @@ struct RootView: View {
                     model.openSettings()
                 }
 
-                iconButton("plus", label: "新建临时任务", identifier: "new-task-button") {
-                    model.openTaskEditor(lane: "temporary")
+                iconButton("plus", label: "添加今日任务", identifier: "new-task-button") {
+                    model.openAddTask()
                 }
 
                 iconButton("folder", label: "项目", identifier: "projects-button") {
