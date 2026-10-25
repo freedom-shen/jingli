@@ -100,7 +100,7 @@ struct MenuBarPanel: View {
     }
 
     private var participantsText: String {
-        if model.isOnBreak { return "休息 5 分钟" }
+        if model.isOnBreak { return "休息 \(model.breakMinutes) 分钟" }
         guard let timer = model.timer, model.timerIsActive else {
             return "从今日页开始一件任务"
         }

@@ -196,7 +196,7 @@ struct FloatingPanelView: View {
     @ViewBuilder
     private var roundTasks: some View {
         if model.isOnBreak {
-            Text("休息 5 分钟")
+            Text("休息 \(model.breakMinutes) 分钟")
                 .font(.system(size: 11))
                 .foregroundStyle(Theme.textSecondary)
         } else if !model.timerIsActive, !model.lastRoundTasks.isEmpty {

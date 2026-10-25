@@ -60,7 +60,7 @@ struct SettingsView: View {
                         .controlSize(.small)
                     }
 
-                    Text("计时固定 25 分钟；休息 5 分钟，可跳过，不计入统计。")
+                    Text("计时固定 25 分钟；每轮后休息 5 分钟，连续完成 4 个钟长休 25 分钟；休息可跳过，不计入统计。")
                         .font(.system(size: 11))
                         .foregroundStyle(Theme.textSecondary)
                 }

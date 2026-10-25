@@ -16,7 +16,8 @@ final class AppModel: ObservableObject {
     @Published private(set) var timer: FocusTimer?
     @Published private(set) var timerText = "25:00"
     @Published private(set) var isOnBreak = false
-    @Published private(set) var breakText = "05:00"
+    @Published private(set) var breakText = FocusTimer.format(AppModel.shortBreakMinutes * 60 * 1000)
+    @Published private(set) var consecutiveCompletions = 0
     @Published var completion: FocusCompletion?
     @Published private(set) var lastRoundTaskIDs: [String]
     @Published private(set) var creditTotals: [String: Double] = [:]
@@ -27,11 +28,17 @@ final class AppModel: ObservableObject {
     @Published var commandMessage: String?
 
     private static let lastRoundDefaultsKey = "jingli.lastRoundTaskIDs"
+    private static let streakSettingKey = "focus_streak"
+    static let longBreakMinutes = 25
+    private static let shortBreakMinutes = 5
 
     private let store: WorkspaceStore
     private let timerStore: FocusTimerStore
     private let focusMode = FocusModeCoordinator.shared
     private var breakEndsAt: Int64 = 0
+    private var streak: FocusStreak
+    /// 第 4 个连续钟已完成、等待下一次休息：那次休息升级为 25 分钟长休。
+    private var longBreakPending = false
     private var currentDay = DayKey.make()
     private var tickTimer: Timer?
     private var activityToken: NSObjectProtocol?
@@ -41,6 +48,10 @@ final class AppModel: ObservableObject {
         self.timerStore = FocusTimerStore(database: store.database)
         self.lastRoundTaskIDs = UserDefaults.standard
             .stringArray(forKey: Self.lastRoundDefaultsKey) ?? []
+        let persistedStreak = (try? store.settingValue(Self.streakSettingKey))
+            .flatMap(Int.init) ?? 0
+        self.streak = FocusStreak(count: persistedStreak)
+        self.consecutiveCompletions = streak.count
         self.timer = try? timerStore.loadActive()
         restoreFocusMode()
         updateTimerText()
@@ -58,6 +69,11 @@ final class AppModel: ObservableObject {
 
     var displayText: String {
         isOnBreak ? breakText : timerText
+    }
+
+    /// 休息时长（分钟）：连续 4 个钟后升级为长休。
+    var breakMinutes: Int {
+        breakDurationMs / 60_000
     }
 
     /// 迷你浮窗的进度环：剩余时间占整轮的比例（0…1）。
@@ -252,6 +268,7 @@ final class AppModel: ObservableObject {
         if isOnBreak {
             skipBreak()
         }
+        longBreakPending = false
 
         if completion != nil {
             CompletionPanelController.shared.hide()
@@ -274,6 +291,7 @@ final class AppModel: ObservableObject {
         if isOnBreak {
             skipBreak()
         }
+        longBreakPending = false
 
         if completion != nil {
             CompletionPanelController.shared.hide()
@@ -354,6 +372,8 @@ final class AppModel: ObservableObject {
     func abandonFocus() {
         timer = nil
         try? timerStore.clearActive()
+        streak = streak.reset()
+        persistStreak()
         focusMode.end()
         persistFocusOwnership()
         updateTimerText()
@@ -391,6 +411,9 @@ final class AppModel: ObservableObject {
         let today = DayKey.make()
         guard today != currentDay else { return }
         currentDay = today
+        streak = streak.reset()
+        persistStreak()
+        longBreakPending = false
         reload()
     }
 
@@ -406,9 +429,10 @@ final class AppModel: ObservableObject {
     }
 
     func skipBreak() {
+        longBreakPending = false
         isOnBreak = false
         breakEndsAt = 0
-        breakText = "05:00"
+        breakText = FocusTimer.format(breakDurationMs)
     }
 
     /// 计时期间持有活动断言，避免 App Nap 在后台节流定时器。
@@ -429,9 +453,10 @@ final class AppModel: ObservableObject {
         let remaining = max(0, Int(breakEndsAt - nowMilliseconds()))
         breakText = FocusTimer.format(remaining)
         guard remaining == 0 else { return }
+        longBreakPending = false
         isOnBreak = false
         breakEndsAt = 0
-        breakText = "05:00"
+        breakText = FocusTimer.format(breakDurationMs)
         CompletionNotifier.shared.notify(
             title: "休息结束",
             body: "可以开始下一轮了"
@@ -458,6 +483,10 @@ final class AppModel: ObservableObject {
     private func finish(_ finished: FocusTimer) {
         lastRoundTaskIDs = finished.taskIDs
         persistLastRound()
+        let outcome = streak.completed()
+        streak = outcome.streak
+        persistStreak()
+        longBreakPending = outcome.earnedLongBreak
         let tasks = snapshot?.todayTasks ?? []
         do {
             completion = try timerStore.complete(finished)
@@ -465,6 +494,7 @@ final class AppModel: ObservableObject {
                 CompletionPanelController.shared.show(
                     completion: completion,
                     tasks: tasks,
+                    longBreak: longBreakPending,
                     onBreak: { [weak self] in
                         self?.startBreak()
                     },
@@ -474,7 +504,8 @@ final class AppModel: ObservableObject {
                 )
                 CompletionNotifier.shared.notify(
                     taskCount: finished.taskIDs.count,
-                    durationSeconds: finished.durationMs / 1000
+                    durationSeconds: finished.durationMs / 1000,
+                    longBreak: longBreakPending
                 )
             }
         } catch {
@@ -521,6 +552,14 @@ final class AppModel: ObservableObject {
         }
     }
 
+    private func persistStreak() {
+        consecutiveCompletions = streak.count
+        try? store.setSettingValue(
+            Self.streakSettingKey,
+            streak.count > 0 ? String(streak.count) : nil
+        )
+    }
+
     private func updateTimerText() {
         guard let timer else {
             timerText = "25:00"
@@ -550,7 +589,8 @@ final class AppModel: ObservableObject {
            let seconds = Int(raw), seconds > 0 {
             return seconds * 1000
         }
-        return 5 * 60 * 1000
+        return (longBreakPending ? Self.longBreakMinutes : Self.shortBreakMinutes)
+            * 60 * 1000
     }
 
     func openTaskEditor(projectID: String? = nil, lane: String? = nil) {
@@ -832,7 +872,10 @@ extension AppModel: FocusAgentHandling {
             "active": timerIsActive,
             "onBreak": isOnBreak,
             "display": displayText,
-            "taskIds": timer?.taskIDs ?? []
+            "taskIds": timer?.taskIDs ?? [],
+            "consecutiveCompletions": consecutiveCompletions,
+            "longBreakPending": longBreakPending,
+            "breakMinutes": breakMinutes
         ]
         if let timer {
             payload["phase"] = timer.phase.rawValue
@@ -855,6 +898,7 @@ extension AppModel: FocusAgentHandling {
         if isOnBreak {
             skipBreak()
         }
+        longBreakPending = false
         if timerIsActive {
             throw AgentError.invalidParams("已有进行中的番茄钟，请先 stop 或使用 focus add")
         }

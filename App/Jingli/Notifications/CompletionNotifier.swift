@@ -6,6 +6,7 @@ final class CompletionNotifier: NSObject, UNUserNotificationCenterDelegate, @unc
     static let shared = CompletionNotifier()
 
     static let categoryID = "FOCUS_COMPLETE"
+    static let longBreakCategoryID = "FOCUS_COMPLETE_LONG_BREAK"
     static let breakActionID = "JINGLI_BREAK"
     static let closeActionID = "JINGLI_CLOSE"
 
@@ -39,7 +40,18 @@ final class CompletionNotifier: NSObject, UNUserNotificationCenterDelegate, @unc
             intentIdentifiers: [],
             options: []
         )
-        center.setNotificationCategories([category])
+        let longBreakAction = UNNotificationAction(
+            identifier: Self.breakActionID,
+            title: "连续 4 个钟了，休息一下",
+            options: [.foreground]
+        )
+        let longBreakCategory = UNNotificationCategory(
+            identifier: Self.longBreakCategoryID,
+            actions: [longBreakAction, closeAction],
+            intentIdentifiers: [],
+            options: []
+        )
+        center.setNotificationCategories([category, longBreakCategory])
     }
 
     func requestAuthorization() {
@@ -54,14 +66,17 @@ final class CompletionNotifier: NSObject, UNUserNotificationCenterDelegate, @unc
         ) { _, _ in }
     }
 
-    func notify(taskCount: Int, durationSeconds: Int) {
+    func notify(taskCount: Int, durationSeconds: Int, longBreak: Bool = false) {
         notify(
             title: "本轮番茄钟完成",
-            body: "\(taskCount) 件任务 · \(durationSeconds / 60) 分钟"
+            body: longBreak
+                ? "已连续完成 4 个番茄钟 · 休息 25 分钟"
+                : "\(taskCount) 件任务 · \(durationSeconds / 60) 分钟",
+            category: longBreak ? Self.longBreakCategoryID : Self.categoryID
         )
     }
 
-    func notify(title: String, body: String) {
+    func notify(title: String, body: String, category: String? = nil) {
         guard ProcessInfo.processInfo.environment["JINGLI_NO_NOTIFICATIONS"] != "1" else {
             return
         }
@@ -70,7 +85,7 @@ final class CompletionNotifier: NSObject, UNUserNotificationCenterDelegate, @unc
         content.title = title
         content.body = body
         content.sound = .default
-        content.categoryIdentifier = Self.categoryID
+        content.categoryIdentifier = category ?? Self.categoryID
 
         let request = UNNotificationRequest(
             identifier: UUID().uuidString,

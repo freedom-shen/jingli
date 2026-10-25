@@ -5,6 +5,8 @@ struct CompletionOverlay: View {
     let completion: FocusCompletion
     let tasks: [Task]
     var dimmed = true
+    /// 已连续完成 4 个番茄钟：提示长休，按钮不再写「休息 5 分钟」。
+    var longBreak = false
     let onBreak: () -> Void
     let onClose: () -> Void
 
@@ -21,7 +23,11 @@ struct CompletionOverlay: View {
                         .font(.system(size: 22, weight: .semibold))
                         .foregroundStyle(Theme.textPrimary)
 
-                    Text("25 分钟 · \(completion.taskIDs.count) 件任务共同计时")
+                    Text(
+                        longBreak
+                            ? "已连续完成 4 个番茄钟 · 休息 25 分钟"
+                            : "25 分钟 · \(completion.taskIDs.count) 件任务共同计时"
+                    )
                         .font(.system(size: 12))
                         .foregroundStyle(Theme.textSecondary)
                 }
@@ -50,7 +56,7 @@ struct CompletionOverlay: View {
                 }
 
                 VStack(spacing: 4) {
-                    Button("开始休息 5 分钟") {
+                    Button(longBreak ? "连续 4 个钟了，休息一下" : "开始休息 5 分钟") {
                         onBreak()
                     }
                     .buttonStyle(PrimaryButtonStyle())

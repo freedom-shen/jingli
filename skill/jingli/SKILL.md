@@ -130,12 +130,13 @@ jingli focus stop --confirm             # 废弃本轮，不记账
 ## 休息
 
 ```bash
-jingli focus break        # 开始 5 分钟休息（需本轮已结束）
+jingli focus break        # 开始休息（需本轮已结束）：平时 5 分钟，连续 4 个钟后 25 分钟长休
 jingli focus skip-break   # 跳过休息
 ```
 
-按番茄钟规则，本轮结束先休息 5 分钟，不提供「直接下一轮」；休息结束后再 `focus start`。
-休息不计入统计。
+按番茄钟规则，本轮结束先休息，不提供「直接下一轮」；休息结束后再 `focus start`。
+连续完成 4 个番茄钟（中途没有废弃）后触发长休：App 提示「连续 4 个钟了，休息一下」，下一次休息为 25 分钟。完成一轮 +1；废弃一轮清零；直接开新一轮、跳过休息或跨天也会结束长休待触发状态。
+休息不计入统计。`focus status` 额外返回 `consecutiveCompletions`、`longBreakPending`、`breakMinutes`。
 
 ## 统计与历史
 
