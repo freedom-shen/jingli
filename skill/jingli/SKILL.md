@@ -99,7 +99,7 @@ jingli task delete <id> --confirm
 写一段 Markdown 详情（提示：用 `$'...'` 保留换行）：
 
 ```bash
-jingli task update <id> --note $'## 背景\n客户反馈地图 region 更新后显示错位。\n\n## 复现\n- [ ] pid gukgi2aa\n- [ ] 右上角搜索 → 地图页\n\n> 更新在杭州，显示在深圳。'
+jingli task update <id> --note $'## 背景\n客户反馈地图 region 更新后显示错位。\n\n## 复现\n- [ ] 打开面板 → 右上角搜索 → 地图页\n- [ ] 更新区域后截图\n\n> 先记录当前版本和账号。'
 ```
 
 ## 预估怎么填

@@ -245,7 +245,7 @@ enum SnapshotRunner {
 
     private static func seedTaskDetail() throws -> Task {
         let task = try AppServices.shared.store.createTask(
-            title: "RN 地图问题排查",
+            title: "整理季度复盘初稿",
             lane: "temporary",
             estimate: 2
         )
@@ -254,17 +254,17 @@ enum SnapshotRunner {
             title: task.title,
             note: """
             ## 背景
-            Sven 反馈：在鸿蒙上更新 `mapView.region` 后，地图显示的位置和传入的坐标不一致。
+            把本季度的进展整理成一页复盘：目标、结果、偏差和下一步。
 
-            ## 复现
-            - [x] 拿到 pid `gukgi2aa`，白名单已加
-            - [x] 进入面板 → 右上角搜索 → 地图页
-            - [ ] 抓一份区域更新前后的日志
+            ## 待办
+            - [x] 收集三个方向的产出
+            - [x] 对齐时间线
+            - [ ] 补一版数据对比
 
-            > 更新在杭州，显示却是在深圳。
+            > 先写结论，再补论据。
 
-            ```swift
-            mapView.update(region: hangzhou)
+            ```bash
+            git log --since="3 months ago" --oneline
             ```
             """,
             estimate: 2
