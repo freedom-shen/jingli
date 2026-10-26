@@ -249,6 +249,12 @@ final class AppModel: ObservableObject {
         return projects.first { $0.id == id }?.name ?? "无项目"
     }
 
+    /// 任务所属项目名；没有项目时返回 nil，卡片上回退到 lane 标签。
+    func assignedProjectName(for task: Task) -> String? {
+        guard let id = task.projectID else { return nil }
+        return projects.first { $0.id == id }?.name
+    }
+
     @discardableResult
     func createTask(
         title: String,

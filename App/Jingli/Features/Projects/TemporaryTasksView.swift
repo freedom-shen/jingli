@@ -83,6 +83,7 @@ struct TemporaryTasksView: View {
             focusState: model.focusState(for: task),
             addsToRound: model.canAddToRound(task),
             pomodoroCount: model.creditedPomodoros(for: task),
+            projectName: model.assignedProjectName(for: task),
             onDone: { model.toggleDone(task) },
             onPlay: { model.toggleFocus(for: task) },
             onDetail: { model.openTaskDetail(task) }

@@ -8,6 +8,8 @@ struct TaskCard: View {
     var focusState: TaskFocusState = .none
     var addsToRound = false
     var pomodoroCount: Double = 0
+    /// 有项目时徽章显示项目名；nil 时回退成「主线 / 临时」。
+    var projectName: String?
     var onToggleSelection: (() -> Void)?
     var onDone: (() -> Void)?
     var onPlay: (() -> Void)?
@@ -35,12 +37,15 @@ struct TaskCard: View {
             Spacer(minLength: 0)
 
             HStack(spacing: 8) {
-                Text(task.lane == "temporary" ? "临时" : "主线")
+                Text(badgeText)
                     .font(.system(size: 10, weight: .medium))
+                    .lineLimit(1)
+                    .truncationMode(.tail)
                     .padding(.horizontal, 7)
                     .padding(.vertical, 3)
                     .background(Capsule().fill(Color.white.opacity(0.06)))
                     .foregroundStyle(Theme.textSecondary)
+                    .help(badgeHelp)
 
                 if let estimate = task.estimate {
                     pomodoroEstimate(estimate: estimate)
@@ -111,6 +116,15 @@ struct TaskCard: View {
             guard !disabled else { return }
             onToggleSelection?()
         }
+    }
+
+    private var badgeText: String {
+        if let projectName, !projectName.isEmpty { return projectName }
+        return task.lane == "temporary" ? "临时" : "主线"
+    }
+
+    private var badgeHelp: String {
+        task.lane == "temporary" ? "临时任务" : "主线任务"
     }
 
     private func formatPomodoros(_ value: Double) -> String {
