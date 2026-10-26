@@ -160,6 +160,7 @@ struct StatsView: View {
             return "--:--"
         }
         let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "HH:mm"
         return formatter.string(from: date)
     }
