@@ -74,7 +74,8 @@ struct ProjectDetailView: View {
                                 addsToRound: model.canAddToRound(task),
                                 pomodoroCount: model.creditedPomodoros(for: task),
                                 onDone: { model.toggleDone(task) },
-                                onPlay: { model.toggleFocus(for: task) }
+                                onPlay: { model.toggleFocus(for: task) },
+                                onDetail: { model.openTaskDetail(task) }
                             )
                         }
                     }
