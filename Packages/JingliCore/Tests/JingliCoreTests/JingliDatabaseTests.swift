@@ -68,24 +68,6 @@ final class JingliDatabaseTests: XCTestCase {
         }
     }
 
-    func testPurgeSessionsDoesNotTouchTasks() throws {
-        let db = try JingliDatabase.inMemory()
-        try seed(db)
-
-        try db.purgeSessions(before: "2026-10-22")
-
-        try db.queue.read { database in
-            XCTAssertEqual(
-                try Int.fetchOne(database, sql: "SELECT COUNT(*) FROM focus_session"),
-                1
-            )
-            XCTAssertEqual(
-                try Int.fetchOne(database, sql: "SELECT COUNT(*) FROM task"),
-                3
-            )
-        }
-    }
-
     func testDeletingProjectKeepsTasksUncategorized() throws {
         let db = try JingliDatabase.inMemory()
         try seed(db)

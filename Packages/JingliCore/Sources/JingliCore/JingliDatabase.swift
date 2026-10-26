@@ -142,14 +142,4 @@ public final class JingliDatabase: @unchecked Sendable {
             )
         }
     }
-
-    /// 只清番茄记录，不动任务。
-    public func purgeSessions(before today: String) throws {
-        try queue.write { db in
-            try db.execute(
-                sql: "DELETE FROM focus_session WHERE session_date < ?",
-                arguments: [today]
-            )
-        }
-    }
 }
