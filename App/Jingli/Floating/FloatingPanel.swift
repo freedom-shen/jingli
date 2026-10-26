@@ -67,6 +67,8 @@ final class FloatingPanelController {
 
     private var panel: FloatingPanel?
     private var moveObserver: NSObjectProtocol?
+    private var dragEndMonitors: [Any] = []
+    private var isSettling = false
     private(set) var mode: FloatingPanelMode
 
     private init() {
@@ -107,9 +109,57 @@ final class FloatingPanelController {
         ) { [weak panel] _ in
             guard let panel else { return }
             MainActor.assumeIsolated {
-                FloatingPanelController.shared.persistOrigin(of: panel)
+                let controller = FloatingPanelController.shared
+                guard !controller.isSettling else { return }
+                controller.persistOrigin(of: panel)
             }
         }
+
+        watchDragEnd(for: panel)
+    }
+
+    private func watchDragEnd(for panel: FloatingPanel) {
+        stopWatchingDragEnd()
+        let handler: (NSEvent) -> Void = { [weak self, weak panel] _ in
+            guard let self, let panel else { return }
+            self.settle(panel)
+        }
+        if let global = NSEvent.addGlobalMonitorForEvents(
+            matching: [.leftMouseUp],
+            handler: handler
+        ) {
+            dragEndMonitors.append(global)
+        }
+        dragEndMonitors.append(
+            NSEvent.addLocalMonitorForEvents(matching: [.leftMouseUp]) { event in
+                handler(event)
+                return event
+            } as Any
+        )
+    }
+
+    private func stopWatchingDragEnd() {
+        for monitor in dragEndMonitors {
+            NSEvent.removeMonitor(monitor)
+        }
+        dragEndMonitors.removeAll()
+    }
+
+    /// 松手归位：超出所在屏幕的可见区域时，动画滑回屏幕内并贴住越过的边。
+    private func settle(_ panel: FloatingPanel) {
+        let target = clamped(panel.frame)
+        guard target != panel.frame else { return }
+        isSettling = true
+        NSAnimationContext.runAnimationGroup({ context in
+            context.duration = 0.22
+            context.timingFunction = CAMediaTimingFunction(name: .easeOut)
+            panel.animator().setFrame(target, display: true)
+        }, completionHandler: { [weak self] in
+            MainActor.assumeIsolated {
+                self?.isSettling = false
+            }
+        })
+        persist(origin: target.origin)
     }
 
     func hide() {
@@ -118,6 +168,7 @@ final class FloatingPanelController {
             NotificationCenter.default.removeObserver(moveObserver)
             self.moveObserver = nil
         }
+        stopWatchingDragEnd()
         panel?.orderOut(nil)
         panel = nil
     }
@@ -160,9 +211,22 @@ final class FloatingPanelController {
         )
     }
 
+    /// 以窗口中心点判定所属屏幕；中心落在屏幕缝隙时取交集最大的屏。
     private func clamped(_ frame: NSRect) -> NSRect {
-        let screen = NSScreen.screens.first { $0.frame.intersects(frame) } ?? NSScreen.main
-        guard let visible = screen?.visibleFrame else { return frame }
+        let center = NSPoint(x: frame.midX, y: frame.midY)
+        var screen = NSScreen.screens.first { $0.frame.contains(center) }
+        if screen == nil {
+            var bestArea: CGFloat = 0
+            for candidate in NSScreen.screens {
+                let area = candidate.frame.intersection(frame).width
+                    * candidate.frame.intersection(frame).height
+                if area > bestArea {
+                    bestArea = area
+                    screen = candidate
+                }
+            }
+        }
+        guard let visible = (screen ?? NSScreen.main)?.visibleFrame else { return frame }
         var result = frame
         result.origin.x = min(
             max(result.origin.x, visible.minX),
@@ -216,8 +280,12 @@ final class FloatingPanelController {
 
     private func persistOrigin(of panel: NSPanel) {
         guard panel.isVisible else { return }
+        persist(origin: panel.frame.origin)
+    }
+
+    private func persist(origin: NSPoint) {
         UserDefaults.standard.set(
-            [panel.frame.origin.x, panel.frame.origin.y],
+            [origin.x, origin.y],
             forKey: FloatingPanelConfiguration.originKey(for: mode)
         )
     }
