@@ -7,6 +7,10 @@ enum Theme {
     static let textSecondary = Color(white: 0.56)
     static let accent = Color(red: 0.56, green: 0.66, blue: 0.91)
     static let tomato = Color(red: 0.78, green: 0.36, blue: 0.25)
+    /// 休息模式：绿色调，和专注的番茄色区分开。
+    static let breakGreen = Color(red: 0.36, green: 0.62, blue: 0.46)
+    static let breakGreenLight = Color(red: 0.48, green: 0.74, blue: 0.56)
+    static let breakGreenDark = Color(red: 0.21, green: 0.41, blue: 0.30)
 
     static func projectColor(_ name: String) -> Color {
         switch name {

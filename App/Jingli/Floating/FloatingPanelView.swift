@@ -21,10 +21,12 @@ struct FloatingPanelView: View {
             Circle()
                 .fill(
                     LinearGradient(
-                        colors: [
-                            Color(red: 0.84, green: 0.42, blue: 0.29),
-                            Color(red: 0.62, green: 0.24, blue: 0.16)
-                        ],
+                        colors: model.isOnBreak
+                            ? [Theme.breakGreenLight, Theme.breakGreenDark]
+                            : [
+                                Color(red: 0.84, green: 0.42, blue: 0.29),
+                                Color(red: 0.62, green: 0.24, blue: 0.16)
+                            ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
@@ -94,9 +96,13 @@ struct FloatingPanelView: View {
 
             ZStack {
                 Circle()
-                    .fill(Theme.tomato)
+                    .fill(model.isOnBreak ? Theme.breakGreen : Theme.tomato)
                     .frame(width: 140, height: 140)
-                    .shadow(color: Theme.tomato.opacity(0.35), radius: 24, y: 10)
+                    .shadow(
+                        color: (model.isOnBreak ? Theme.breakGreen : Theme.tomato).opacity(0.35),
+                        radius: 24,
+                        y: 10
+                    )
 
                 VStack(spacing: 2) {
                     Text(model.displayText)

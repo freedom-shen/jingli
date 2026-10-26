@@ -183,7 +183,7 @@ struct RootView: View {
         HStack(spacing: 8) {
             Text(model.displayText)
                 .font(.system(size: 13, weight: .semibold, design: .rounded))
-                .foregroundStyle(Theme.accent)
+                .foregroundStyle(model.isOnBreak ? Theme.breakGreen : Theme.accent)
                 .monospacedDigit()
 
             if model.isOnBreak {

@@ -21,7 +21,7 @@ struct MenuBarPanel: View {
             HStack(alignment: .firstTextBaseline) {
                 Text(model.displayText)
                     .font(.system(size: 24, weight: .semibold, design: .rounded))
-                    .foregroundStyle(Theme.textPrimary)
+                    .foregroundStyle(model.isOnBreak ? Theme.breakGreen : Theme.textPrimary)
                     .monospacedDigit()
 
                 Spacer()
