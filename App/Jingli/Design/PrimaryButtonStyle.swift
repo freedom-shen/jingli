@@ -48,3 +48,25 @@ struct QuietButtonStyle: ButtonStyle {
             .animation(.easeOut(duration: 0.12), value: isHovered)
     }
 }
+
+/// 表单里的小号主按钮：不依赖窗口是否激活，始终可见。
+struct CompactPrimaryButtonStyle: ButtonStyle {
+    @Environment(\.isEnabled) private var isEnabled
+    @State private var isHovered = false
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(size: 12, weight: .semibold))
+            .foregroundStyle(Theme.background)
+            .padding(.horizontal, 16)
+            .frame(height: 28)
+            .background(
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(Theme.textPrimary)
+                    .brightness(isHovered ? 0.04 : 0)
+            )
+            .opacity(isEnabled ? (configuration.isPressed ? 0.85 : 1) : 0.35)
+            .onHover { isHovered = $0 }
+            .animation(.easeOut(duration: 0.12), value: isHovered)
+    }
+}

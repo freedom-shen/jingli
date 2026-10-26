@@ -42,7 +42,9 @@ struct TaskCard: View {
                     .background(Capsule().fill(Color.white.opacity(0.06)))
                     .foregroundStyle(Theme.textSecondary)
 
-                if pomodoroCount > 0 {
+                if let estimate = task.estimate {
+                    pomodoroEstimate(estimate: estimate)
+                } else if pomodoroCount > 0 {
                     HStack(spacing: 3) {
                         Circle()
                             .fill(Theme.tomato.opacity(0.85))
@@ -79,13 +81,13 @@ struct TaskCard: View {
                         .help(task.done ? "恢复任务" : "完成任务")
 
                         Button(action: { onDetail?() }) {
-                            Image(systemName: "ellipsis")
-                                .font(.system(size: 12))
+                            Image(systemName: "pencil")
+                                .font(.system(size: 11))
                                 .frame(width: 28, height: 28)
                         }
                         .buttonStyle(TaskIconButtonStyle())
-                        .help("任务详情")
-                        .accessibilityLabel("任务详情")
+                        .help("编辑详情")
+                        .accessibilityLabel("编辑详情")
                     }
                 }
             }
@@ -117,6 +119,35 @@ struct TaskCard: View {
             return String(format: "%.0f", rounded)
         }
         return String(format: "%g", rounded)
+    }
+
+    /// 今天已用 / 预计：进度环 + 数字；超出预计时整体变番茄色。
+    private func pomodoroEstimate(estimate: Int) -> some View {
+        let used = pomodoroCount
+        let over = used > Double(estimate)
+        let progress = estimate > 0 ? min(1, used / Double(estimate)) : 0
+
+        return HStack(spacing: 4) {
+            ZStack {
+                Circle()
+                    .stroke(Color.white.opacity(0.13), lineWidth: 2)
+                Circle()
+                    .trim(from: 0, to: progress)
+                    .stroke(
+                        over ? Theme.tomato : Theme.tomato.opacity(0.9),
+                        style: StrokeStyle(lineWidth: 2, lineCap: .round)
+                    )
+                    .rotationEffect(.degrees(-90))
+            }
+            .frame(width: 13, height: 13)
+
+            Text("\(formatPomodoros(used)) / \(estimate)\(over ? " 超出" : "")")
+                .font(.system(size: 10, weight: .medium))
+                .foregroundStyle(over ? Theme.tomato : Theme.textSecondary)
+                .monospacedDigit()
+        }
+        .help("今日已用 \(formatPomodoros(used)) 个番茄，预计 \(estimate) 个")
+        .accessibilityLabel("今日已用 \(formatPomodoros(used)) 个番茄，预计 \(estimate) 个")
     }
 
     private var playIcon: String {

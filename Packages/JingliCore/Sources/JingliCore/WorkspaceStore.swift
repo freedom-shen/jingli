@@ -21,6 +21,8 @@ public struct Task: Codable, Sendable, Identifiable {
     public let createdAt: String
     public let completedAt: String?
     public let sortOrder: Int
+    /// 预计需要几个番茄；nil 表示没估。
+    public let estimate: Int?
 }
 
 public final class WorkspaceStore: @unchecked Sendable {
@@ -68,11 +70,13 @@ public final class WorkspaceStore: @unchecked Sendable {
         title: String,
         projectID: String? = nil,
         lane: String = "main",
-        plannedDate: String? = nil
+        plannedDate: String? = nil,
+        estimate: Int? = nil
     ) throws -> Task {
         let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { throw StoreError.emptyTitle }
         let normalizedLane = lane == "temporary" ? "temporary" : "main"
+        let normalizedEstimate = estimate.map { max(1, min(32, $0)) }
         if normalizedLane == "main", let plannedDate,
            try isDayStarted(plannedDate) {
             throw DayPlanError.mainTaskLocked
@@ -87,19 +91,20 @@ public final class WorkspaceStore: @unchecked Sendable {
             done: false,
             createdAt: Self.timestamp(),
             completedAt: nil,
-            sortOrder: try nextSortOrder(table: "task")
+            sortOrder: try nextSortOrder(table: "task"),
+            estimate: normalizedEstimate
         )
         try database.queue.write { db in
             try db.execute(
                 sql: """
                 INSERT INTO task
-                (id, title, project_id, lane, planned_date, note, done, created_at, completed_at, sort_order)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (id, title, project_id, lane, planned_date, note, done, created_at, completed_at, sort_order, estimate)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 arguments: [
                     task.id, task.title, task.projectID, task.lane,
                     task.plannedDate, task.note, task.done, task.createdAt,
-                    task.completedAt, task.sortOrder
+                    task.completedAt, task.sortOrder, task.estimate
                 ]
             )
         }

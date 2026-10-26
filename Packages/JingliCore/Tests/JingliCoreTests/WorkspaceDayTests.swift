@@ -218,11 +218,18 @@ extension WorkspaceDayTests {
         let store = WorkspaceStore(database: database)
         let task = try store.createTask(title: "原标题", lane: "main")
 
-        let updated = try store.updateTask(id: task.id, title: "  新标题  ", note: "备注内容")
+        let updated = try store.updateTask(
+            id: task.id,
+            title: "  新标题  ",
+            note: "备注内容",
+            estimate: nil
+        )
         XCTAssertEqual(updated?.title, "新标题")
         XCTAssertEqual(updated?.note, "备注内容")
 
-        XCTAssertThrowsError(try store.updateTask(id: task.id, title: "   ", note: "")) { error in
+        XCTAssertThrowsError(
+            try store.updateTask(id: task.id, title: "   ", note: "", estimate: nil)
+        ) { error in
             guard case StoreError.emptyTitle = error else {
                 return XCTFail("unexpected error: \(error)")
             }

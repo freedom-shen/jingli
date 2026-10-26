@@ -397,14 +397,25 @@ public extension WorkspaceStore {
     }
 
     @discardableResult
-    func updateTask(id: String, title: String, note: String) throws -> Task? {
+    func updateTask(
+        id: String,
+        title: String,
+        note: String,
+        estimate: Int?
+    ) throws -> Task? {
         let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { throw StoreError.emptyTitle }
+        let normalizedEstimate = estimate.map { max(1, min(32, $0)) }
 
         return try database.queue.write { db in
             try db.execute(
-                sql: "UPDATE task SET title = ?, note = ? WHERE id = ?",
-                arguments: [String(trimmed.prefix(160)), String(note.prefix(2000)), id]
+                sql: "UPDATE task SET title = ?, note = ?, estimate = ? WHERE id = ?",
+                arguments: [
+                    String(trimmed.prefix(160)),
+                    String(note.prefix(8000)),
+                    normalizedEstimate,
+                    id
+                ]
             )
             guard let updated = try Row.fetchOne(
                 db,
@@ -604,7 +615,8 @@ extension Task {
             done: row["done"],
             createdAt: row["created_at"],
             completedAt: row["completed_at"],
-            sortOrder: row["sort_order"]
+            sortOrder: row["sort_order"],
+            estimate: row["estimate"]
         )
     }
 }

@@ -22,6 +22,7 @@
 		50DF0432443503B1D224B4E2 /* CompletionPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DE13761BE6BEB3CD41EFA0F /* CompletionPanel.swift */; };
 		52A23BD3CE1C7F2F7DC6CC11 /* FloatingPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0ABF6A9D1C7AB24D1BDC9F2 /* FloatingPanelView.swift */; };
 		5861A4B37B65732741CF75C8 /* CompletionOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01AAF237ABC51D878145362B /* CompletionOverlay.swift */; };
+		5C5BE874E3F1DCCCC8B3D571 /* MarkdownEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 732D701626CFF14648E3B5B1 /* MarkdownEditor.swift */; };
 		6640A7A6D24035C87D88E994 /* SnapshotRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB557493D0233C0F0F8F7769 /* SnapshotRunner.swift */; };
 		7BCF357191B3DEB13320C106 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81B1C4AAD464F2EE7768EFD7 /* MenuBarView.swift */; };
 		7C7649CBBB8B004BE8FCAB69 /* AddTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD2AB5261BB7E8A7F7D03547 /* AddTaskView.swift */; };
@@ -65,6 +66,7 @@
 		5E7406F01D0BA6A7FF9D04FA /* AppServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppServices.swift; sourceTree = "<group>"; };
 		69C109D6B349355695ABB984 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		71C1D692A0AB7C393EE3CCE0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		732D701626CFF14648E3B5B1 /* MarkdownEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownEditor.swift; sourceTree = "<group>"; };
 		7DE13761BE6BEB3CD41EFA0F /* CompletionPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionPanel.swift; sourceTree = "<group>"; };
 		7E13E357DCCBD85D8BA129B9 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
 		81B1C4AAD464F2EE7768EFD7 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
@@ -146,6 +148,7 @@
 			isa = PBXGroup;
 			children = (
 				01AAF237ABC51D878145362B /* CompletionOverlay.swift */,
+				732D701626CFF14648E3B5B1 /* MarkdownEditor.swift */,
 				4BB8767B7A713D102C631EF4 /* TaskCard.swift */,
 			);
 			path = Components;
@@ -407,6 +410,7 @@
 				52A23BD3CE1C7F2F7DC6CC11 /* FloatingPanelView.swift in Sources */,
 				A5465BE37DBAA78A1FB3C1A9 /* JingliApp.swift in Sources */,
 				BFBF0D6A490FBF4989631CA0 /* LaunchAtLogin.swift in Sources */,
+				5C5BE874E3F1DCCCC8B3D571 /* MarkdownEditor.swift in Sources */,
 				7BCF357191B3DEB13320C106 /* MenuBarView.swift in Sources */,
 				AD87D7CBEE663DBFCE120A0D /* PrimaryButtonStyle.swift in Sources */,
 				B862C145333F68C7C2EF3F26 /* ProjectDetailView.swift in Sources */,
@@ -450,7 +454,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 25;
 				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "精力管理";
@@ -461,7 +465,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.6.17;
+				MARKETING_VERSION = 0.6.18;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.freedom-shen.jingli";
 				PRODUCT_NAME = Jingli;
 				SDKROOT = macosx;
@@ -549,7 +553,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 25;
 				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "精力管理";
@@ -560,7 +564,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.6.17;
+				MARKETING_VERSION = 0.6.18;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.freedom-shen.jingli";
 				PRODUCT_NAME = Jingli;
 				SDKROOT = macosx;

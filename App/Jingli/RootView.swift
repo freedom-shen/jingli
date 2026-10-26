@@ -112,6 +112,18 @@ struct RootView: View {
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(Theme.textSecondary)
 
+                if model.dayStarted, model.todayEstimateTotal > 0 {
+                    Text("预计 \(model.todayEstimateTotal) 个番茄")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(Color(red: 0.91, green: 0.70, blue: 0.64))
+                        .padding(.horizontal, 9)
+                        .padding(.vertical, 3)
+                        .background(Capsule().fill(Theme.tomato.opacity(0.12)))
+                        .overlay(Capsule().stroke(Theme.tomato.opacity(0.28), lineWidth: 1))
+                        .accessibilityLabel("今天预计 \(model.todayEstimateTotal) 个番茄")
+                        .accessibilityIdentifier("today-estimate-total")
+                }
+
                 if model.dayStarted {
                     Button("重置") {
                         model.resetDay()

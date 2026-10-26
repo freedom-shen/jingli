@@ -21,4 +21,37 @@ final class WorkspaceStoreTests: XCTestCase {
         XCTAssertThrowsError(try store.createTask(title: "   "))
         XCTAssertThrowsError(try store.createProject(name: ""))
     }
+
+    func testTaskEstimateRoundTrip() throws {
+        let database = try JingliDatabase.inMemory()
+        let store = WorkspaceStore(database: database)
+
+        let task = try store.createTask(title: "排查地图", lane: "temporary", estimate: 3)
+        XCTAssertEqual(task.estimate, 3)
+
+        let updated = try store.updateTask(
+            id: task.id,
+            title: task.title,
+            note: "## 背景\n- [ ] 复现",
+            estimate: 5
+        )
+        XCTAssertEqual(updated?.estimate, 5)
+        XCTAssertEqual(updated?.note, "## 背景\n- [ ] 复现")
+
+        let cleared = try store.updateTask(
+            id: task.id,
+            title: task.title,
+            note: updated?.note ?? "",
+            estimate: nil
+        )
+        XCTAssertNil(cleared?.estimate)
+    }
+
+    func testEstimateIsClamped() throws {
+        let database = try JingliDatabase.inMemory()
+        let store = WorkspaceStore(database: database)
+
+        XCTAssertEqual(try store.createTask(title: "估太小", estimate: 0).estimate, 1)
+        XCTAssertEqual(try store.createTask(title: "估太大", estimate: 99).estimate, 32)
+    }
 }

@@ -121,8 +121,8 @@ public final class BackupService: @unchecked Sendable {
                     sql: """
                     INSERT INTO task
                         (id, title, project_id, lane, planned_date, note, done,
-                         created_at, completed_at, sort_order)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                         created_at, completed_at, sort_order, estimate)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(id) DO UPDATE SET
                         title = excluded.title,
                         project_id = excluded.project_id,
@@ -130,7 +130,8 @@ public final class BackupService: @unchecked Sendable {
                         planned_date = excluded.planned_date,
                         note = excluded.note,
                         done = excluded.done,
-                        completed_at = excluded.completed_at
+                        completed_at = excluded.completed_at,
+                        estimate = excluded.estimate
                     """,
                     arguments: [
                         id,
@@ -142,7 +143,8 @@ public final class BackupService: @unchecked Sendable {
                         task["done"] as? Bool ?? false,
                         task["createdAt"] as? String ?? Self.timestamp(),
                         task["completedAt"] as? String,
-                        task["sortOrder"] as? Int ?? 0
+                        task["sortOrder"] as? Int ?? 0,
+                        task["estimate"] as? Int
                     ]
                 )
             }
@@ -182,6 +184,7 @@ public final class BackupService: @unchecked Sendable {
             if let projectID: String = row["project_id"] { payload["projectId"] = projectID }
             if let planned: String = row["planned_date"] { payload["plannedDate"] = planned }
             if let completed: String = row["completed_at"] { payload["completedAt"] = completed }
+            if let estimate: Int = row["estimate"] { payload["estimate"] = estimate }
             return payload
         }
 

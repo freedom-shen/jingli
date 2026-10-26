@@ -226,7 +226,8 @@ public final class AgentServer: @unchecked Sendable {
                 title: title,
                 projectID: projectID,
                 lane: lane,
-                plannedDate: plannedDate
+                plannedDate: plannedDate,
+                estimate: (params["estimate"] as? NSNumber)?.intValue
             )
             try record("task.create", payload: ["id": task.id], undo: ["kind": "task.delete", "id": task.id])
             changed()
@@ -252,18 +253,24 @@ public final class AgentServer: @unchecked Sendable {
             }
             let title = params["title"] as? String ?? current.title
             let note = params["note"] as? String ?? current.note
-            guard let updated = try store.updateTask(id: id, title: title, note: note) else {
+            let estimate: Int?
+            if let raw = params["estimate"] {
+                estimate = (raw as? NSNumber)?.intValue
+            } else {
+                estimate = current.estimate
+            }
+            guard let updated = try store.updateTask(
+                id: id,
+                title: title,
+                note: note,
+                estimate: estimate
+            ) else {
                 throw AgentError.notFound("task \(id)")
             }
             try record(
                 "task.update",
                 payload: ["id": id],
-                undo: [
-                    "kind": "task.update",
-                    "id": id,
-                    "title": current.title,
-                    "note": current.note
-                ]
+                undo: Self.taskUndoPayload(current)
             )
             changed()
             return taskPayload(updated)
@@ -599,7 +606,12 @@ public final class AgentServer: @unchecked Sendable {
             if let id = object["id"] as? String,
                let title = object["title"] as? String,
                let note = object["note"] as? String {
-                _ = try store.updateTask(id: id, title: title, note: note)
+                _ = try store.updateTask(
+                    id: id,
+                    title: title,
+                    note: note,
+                    estimate: (object["estimate"] as? NSNumber)?.intValue
+                )
             }
         case "task.toggle":
             if let id = object["id"] as? String {
@@ -679,6 +691,20 @@ public final class AgentServer: @unchecked Sendable {
         if let projectID = task.projectID { payload["projectId"] = projectID }
         if let planned = task.plannedDate { payload["plannedDate"] = planned }
         if let completed = task.completedAt { payload["completedAt"] = completed }
+        if let estimate = task.estimate { payload["estimate"] = estimate }
+        return payload
+    }
+
+    private static func taskUndoPayload(_ task: Task) -> [String: Any] {
+        var payload: [String: Any] = [
+            "kind": "task.update",
+            "id": task.id,
+            "title": task.title,
+            "note": task.note
+        ]
+        if let estimate = task.estimate {
+            payload["estimate"] = estimate
+        }
         return payload
     }
 

@@ -117,7 +117,7 @@ func positional(_ args: [String], skipping flags: Set<String>) -> [String] {
 
 let flags: Set<String> = [
     "--project", "--lane", "--date", "--title", "--note",
-    "--description", "--color", "--confirm"
+    "--description", "--color", "--confirm", "--estimate"
 ]
 
 func request(method: String, params: [String: Any] = [:]) -> [String: Any] {
@@ -163,9 +163,9 @@ guard let command = arguments.first else {
     fail("""
     usage:
       jingli today
-      jingli task add <title> [--project 名称] [--lane main|temporary] [--date today] [--undated]
+      jingli task add <title> [--project 名称] [--lane main|temporary] [--date today] [--undated] [--estimate N]
       jingli task list [--all]
-      jingli task update <id> [--title 标题] [--note 备注]
+      jingli task update <id> [--title 标题] [--note 备注] [--estimate N|--clear-estimate]
       jingli task complete|reopen <id>
       jingli task delete <id> --confirm
       jingli project list
@@ -220,6 +220,9 @@ case "task":
         if let lane = option("--lane", in: tail) { params["lane"] = lane }
         if let date = option("--date", in: tail) { params["date"] = date }
         if hasFlag("--undated", in: tail) { params["undated"] = true }
+        if let raw = option("--estimate", in: tail), let estimate = Int(raw) {
+            params["estimate"] = estimate
+        }
         run("task.create", params: params)
     case "list":
         run("task.list", params: ["includeDone": hasFlag("--all", in: tail)])
@@ -230,6 +233,10 @@ case "task":
         var params: [String: Any] = ["id": id]
         if let title = option("--title", in: tail) { params["title"] = title }
         if let note = option("--note", in: tail) { params["note"] = note }
+        if let raw = option("--estimate", in: tail), let estimate = Int(raw) {
+            params["estimate"] = estimate
+        }
+        if hasFlag("--clear-estimate", in: tail) { params["estimate"] = NSNull() }
         run("task.update", params: params)
     case "complete", "done":
         guard let id = words.first else { fail("task complete <id>") }

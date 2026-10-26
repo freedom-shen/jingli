@@ -8,7 +8,7 @@ OUT="$ROOT/artifacts/snapshot"
 BASELINE_DIR="$ROOT/Tests/Snapshots"
 MODE="${1:-compare}"
 
-SCENARIOS=(day-start today-running stats completion projects temporary)
+SCENARIOS=(day-start today-running stats completion projects temporary task-detail)
 export JINGLI_FAKE_NOW_MS="${JINGLI_FAKE_NOW_MS:-1792656000000}"
 PANEL_SCENARIOS=(day-start today-running)
 

@@ -8,6 +8,7 @@ struct TaskEditorView: View {
     @State private var title = ""
     @State private var lane: String
     @State private var projectID = ""
+    @State private var estimate: Int?
     private let fixedLane: String?
 
     init(
@@ -77,6 +78,18 @@ struct TaskEditorView: View {
                 .labelsHidden()
             }
 
+            VStack(alignment: .leading, spacing: 8) {
+                Text("预计番茄")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Theme.textSecondary)
+                HStack(spacing: 10) {
+                    estimateStepper
+                    Text(estimate.map { "≈ \($0 * 25) 分钟" } ?? "不填就是估不出来")
+                        .font(.system(size: 10))
+                        .foregroundStyle(Theme.textSecondary.opacity(0.75))
+                }
+            }
+
             HStack {
                 Spacer()
                 Button("取消") { dismiss() }
@@ -85,13 +98,12 @@ struct TaskEditorView: View {
                     let created = model.createTask(
                         title: title,
                         lane: lane,
-                        projectID: projectID.isEmpty ? nil : projectID
+                        projectID: projectID.isEmpty ? nil : projectID,
+                        estimate: estimate
                     )
                     if created { dismiss() }
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(Theme.textPrimary)
-                .foregroundStyle(Theme.background)
+                .buttonStyle(CompactPrimaryButtonStyle())
                 .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 .accessibilityIdentifier("create-task-button")
             }
@@ -100,5 +112,53 @@ struct TaskEditorView: View {
         .frame(width: 420)
         .background(Theme.background)
         .preferredColorScheme(.dark)
+    }
+
+    private var estimateStepper: some View {
+        HStack(spacing: 0) {
+            Button {
+                step(-1)
+            } label: {
+                Image(systemName: "minus")
+                    .font(.system(size: 9, weight: .semibold))
+                    .frame(width: 24, height: 26)
+            }
+            .buttonStyle(.plain)
+
+            Text(estimate.map(String.init) ?? "—")
+                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .monospacedDigit()
+                .frame(minWidth: 26)
+                .foregroundStyle(estimate == nil ? Theme.textSecondary : Theme.textPrimary)
+
+            Button {
+                step(1)
+            } label: {
+                Image(systemName: "plus")
+                    .font(.system(size: 9, weight: .semibold))
+                    .frame(width: 24, height: 26)
+            }
+            .buttonStyle(.plain)
+        }
+        .foregroundStyle(Theme.textSecondary)
+        .background(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(Theme.card)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .stroke(Color.white.opacity(0.08), lineWidth: 1)
+        )
+        .frame(height: 26)
+        .accessibilityIdentifier("task-estimate-stepper")
+    }
+
+    private func step(_ delta: Int) {
+        guard let current = estimate else {
+            if delta > 0 { estimate = 1 }
+            return
+        }
+        let next = current + delta
+        estimate = next < 1 ? nil : min(32, next)
     }
 }

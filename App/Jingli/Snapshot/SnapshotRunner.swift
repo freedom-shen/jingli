@@ -16,6 +16,12 @@ enum SnapshotRunner {
             switch fixture {
             case "today-running":
                 let task = try seedToday()
+                _ = try AppServices.shared.store.updateTask(
+                    id: task.id,
+                    title: task.title,
+                    note: task.note,
+                    estimate: 3
+                )
                 AppServices.shared.model.reload()
                 AppServices.shared.model.startSnapshotTimer(
                     taskID: task.id,
@@ -40,6 +46,9 @@ enum SnapshotRunner {
                 AppServices.shared.model.reload()
                 AppServices.shared.model.openTemporaryTasks()
                 captureMainAndPanel(mainPath: mainPath, panelPath: nil)
+            case "task-detail":
+                let task = try seedTaskDetail()
+                captureTaskDetail(task: task, to: mainPath)
             default:
                 captureMainAndPanel(mainPath: mainPath, panelPath: panelPath)
             }
@@ -232,6 +241,63 @@ enum SnapshotRunner {
         _ = try store.createTask(title: "回一封邮件", lane: "temporary")
         let finished = try store.createTask(title: "已经做完的事", lane: "temporary")
         _ = try store.toggleTask(id: finished.id)
+    }
+
+    private static func seedTaskDetail() throws -> Task {
+        let task = try AppServices.shared.store.createTask(
+            title: "RN 地图问题排查",
+            lane: "temporary",
+            estimate: 2
+        )
+        let updated = try AppServices.shared.store.updateTask(
+            id: task.id,
+            title: task.title,
+            note: """
+            ## 背景
+            Sven 反馈：在鸿蒙上更新 `mapView.region` 后，地图显示的位置和传入的坐标不一致。
+
+            ## 复现
+            - [x] 拿到 pid `gukgi2aa`，白名单已加
+            - [x] 进入面板 → 右上角搜索 → 地图页
+            - [ ] 抓一份区域更新前后的日志
+
+            > 更新在杭州，显示却是在深圳。
+
+            ```swift
+            mapView.update(region: hangzhou)
+            ```
+            """,
+            estimate: 2
+        )
+        return updated ?? task
+    }
+
+    private static func captureTaskDetail(task: Task, to path: String) {
+        let view = TaskDetailView(model: AppServices.shared.model, task: task)
+            .environment(\.controlActiveState, .inactive)
+            .preferredColorScheme(.dark)
+
+        let window = makeWindow(
+            rootView: AnyView(view),
+            size: NSSize(width: 700, height: 720)
+        )
+        NSApp.activate(ignoringOtherApps: true)
+        window.makeKeyAndOrderFront(nil)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            guard let contentView = window.contentView else {
+                fputs("snapshot failed: no content view\n", stderr)
+                exit(1)
+            }
+            contentView.layoutSubtreeIfNeeded()
+            do {
+                try capture(contentView, to: URL(fileURLWithPath: path))
+            } catch {
+                fputs("snapshot failed: \(error)\n", stderr)
+                exit(1)
+            }
+            exit(0)
+        }
     }
 
     private static func makeWindow(rootView: AnyView, size: NSSize = NSSize(width: 1440, height: 900)) -> NSWindow {

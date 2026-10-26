@@ -213,9 +213,14 @@ final class AppModel: ObservableObject {
     }
 
     @discardableResult
-    func updateTask(id: String, title: String, note: String) -> Bool {
+    func updateTask(id: String, title: String, note: String, estimate: Int?) -> Bool {
         do {
-            try store.updateTask(id: id, title: title, note: note)
+            try store.updateTask(
+                id: id,
+                title: title,
+                note: note,
+                estimate: estimate
+            )
             reload()
             return true
         } catch {
@@ -234,19 +239,30 @@ final class AppModel: ObservableObject {
         creditTotals[task.id] ?? 0
     }
 
+    /// 今天所有任务的预计番茄总数（没估的不计）。
+    var todayEstimateTotal: Int {
+        (snapshot?.todayTasks ?? []).reduce(0) { $0 + ($1.estimate ?? 0) }
+    }
+
     func projectName(for task: Task) -> String {
         guard let id = task.projectID else { return "无项目" }
         return projects.first { $0.id == id }?.name ?? "无项目"
     }
 
     @discardableResult
-    func createTask(title: String, lane: String, projectID: String?) -> Bool {
+    func createTask(
+        title: String,
+        lane: String,
+        projectID: String?,
+        estimate: Int? = nil
+    ) -> Bool {
         do {
             try store.createTask(
                 title: title,
                 projectID: projectID,
                 lane: lane,
-                plannedDate: (dayStarted && lane == "temporary") ? DayKey.make() : nil
+                plannedDate: (dayStarted && lane == "temporary") ? DayKey.make() : nil,
+                estimate: estimate
             )
             reload()
             return true

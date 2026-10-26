@@ -74,7 +74,10 @@ jingli task add "回邮件" --lane temporary            # 临时任务：默认�
 jingli task add "先记下" --lane temporary --undated   # 只记录，不排今天
 jingli task add "临时插单" --lane temporary --date today
 jingli task add "写周报" --project 工作              # 项目主线：先进项目，不自动进今天
+jingli task add "写周报" --project 工作 --estimate 3  # 预计 3 个番茄
 jingli task update <id> --title "写季度周报" --note "重点写复购"
+jingli task update <id> --estimate 2                  # 改预计番茄
+jingli task update <id> --clear-estimate              # 取消预估
 jingli task complete <id>
 jingli task reopen <id>
 jingli task delete <id> --confirm
@@ -84,7 +87,9 @@ jingli task delete <id> --confirm
 - **主线任务**：属于项目，只能在项目里创建。要进今天，走「开启一天」或 `day plan` + `day start`；今天已经开始后不能再加主线（会报 `今天已经开始…`），此时只能加临时任务，或先把主线留在项目里等明天。
 - `--project` 用项目名称，不是 ID；不存在会报错，先 `project list`。
 - `--date today` 只对「今天」有意义。
-- `task update` 只能改标题和备注。
+- `--estimate N` 是预计要花几个番茄（1–32）；不填就是没估，任务卡上只显示已用。
+- `--note` 是 Markdown 富文本详情，支持标题、列表、勾选清单、引用、代码和链接。
+- `task update` 可改标题、Note 和预计番茄（`--clear-estimate` 清空）。
 - `task delete` 必须 `--confirm`，不可撤销；删除后该任务在今日记录里的分摊也会一起消失（番茄总数不变）。
 
 ## 规划今天

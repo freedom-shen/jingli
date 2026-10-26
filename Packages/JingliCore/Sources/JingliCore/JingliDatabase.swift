@@ -123,6 +123,9 @@ public final class JingliDatabase: @unchecked Sendable {
                 """
             )
         }
+        migrator.registerMigration("v3_task_estimate") { db in
+            try db.execute(sql: "ALTER TABLE task ADD COLUMN estimate INTEGER")
+        }
         return migrator
     }
 
