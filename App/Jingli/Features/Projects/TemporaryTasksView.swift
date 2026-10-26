@@ -12,6 +12,8 @@ struct TemporaryTasksView: View {
 
     var body: some View {
         let tasks = model.temporaryTasks
+        let pending = tasks.filter { !$0.done }
+        let done = tasks.filter(\.done)
 
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
@@ -34,8 +36,18 @@ struct TemporaryTasksView: View {
                     emptyState
                 } else {
                     LazyVGrid(columns: columns, spacing: 12) {
-                        ForEach(tasks) { task in
+                        ForEach(pending) { task in
                             card(task)
+                        }
+                    }
+
+                    if !done.isEmpty {
+                        doneDivider(count: done.count)
+
+                        LazyVGrid(columns: columns, spacing: 12) {
+                            ForEach(done) { task in
+                                card(task)
+                            }
                         }
                     }
                 }
@@ -92,6 +104,21 @@ struct TemporaryTasksView: View {
                 deleteTarget = task
             }
         }
+    }
+
+    private func doneDivider(count: Int) -> some View {
+        HStack(spacing: 12) {
+            Text("已完成 · \(count)")
+                .font(.system(size: 10, weight: .semibold))
+                .tracking(1.2)
+                .foregroundStyle(Theme.textSecondary.opacity(0.7))
+
+            Rectangle()
+                .fill(Color.white.opacity(0.06))
+                .frame(height: 1)
+        }
+        .padding(.top, 4)
+        .accessibilityLabel("已完成 \(count) 件")
     }
 
     private var emptyState: some View {

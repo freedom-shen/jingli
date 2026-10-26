@@ -8,7 +8,7 @@ OUT="$ROOT/artifacts/snapshot"
 BASELINE_DIR="$ROOT/Tests/Snapshots"
 MODE="${1:-compare}"
 
-SCENARIOS=(day-start today-running stats completion)
+SCENARIOS=(day-start today-running stats completion projects temporary)
 export JINGLI_FAKE_NOW_MS="${JINGLI_FAKE_NOW_MS:-1792656000000}"
 PANEL_SCENARIOS=(day-start today-running)
 
@@ -41,7 +41,7 @@ has_panel() {
 run_scenario() {
   local dir="$1"
   local fixture="$2"
-  mkdir -p "$dir/support"
+  mkdir -p "$dir/support-$fixture"
   local args=(
     --snapshot
     --snapshot-fixture "$fixture"
@@ -51,7 +51,7 @@ run_scenario() {
     args+=(--snapshot-panel-out "$dir/$fixture-panel.png")
   fi
 
-  JINGLI_SUPPORT_DIR="$dir/support" "$APP/Contents/MacOS/Jingli" "${args[@]}" \
+  JINGLI_SUPPORT_DIR="$dir/support-$fixture" "$APP/Contents/MacOS/Jingli" "${args[@]}" \
     > "$dir/$fixture-run.log" 2>&1 &
   local pid=$!
   for _ in $(seq 1 60); do

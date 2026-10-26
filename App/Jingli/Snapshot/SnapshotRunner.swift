@@ -30,6 +30,16 @@ enum SnapshotRunner {
             case "completion":
                 let tasks = try seedCompletionTasks()
                 captureCompletion(tasks: tasks, to: mainPath)
+            case "projects":
+                try seedProjects()
+                AppServices.shared.model.reload()
+                AppServices.shared.model.openProjects()
+                captureMainAndPanel(mainPath: mainPath, panelPath: nil)
+            case "temporary":
+                try seedTemporary()
+                AppServices.shared.model.reload()
+                AppServices.shared.model.openTemporaryTasks()
+                captureMainAndPanel(mainPath: mainPath, panelPath: nil)
             default:
                 captureMainAndPanel(mainPath: mainPath, panelPath: panelPath)
             }
@@ -188,6 +198,40 @@ enum SnapshotRunner {
             try store.createTask(title: "整理产品需求", projectID: project.id, lane: "main"),
             try store.createTask(title: "回复客户邮件", projectID: project.id, lane: "temporary")
         ]
+    }
+
+    private static func seedProjects() throws {
+        let store = AppServices.shared.store
+
+        let older = try store.createProject(
+            name: "鸿蒙小程序容器性能优化",
+            description: "白屏 · 过渡动画 · 面板跑测",
+            color: "sage"
+        )
+        _ = try store.createTask(title: "增加过渡动画", projectID: older.id, lane: "main")
+        _ = try store.createTask(title: "跑一下前 20 的面板", projectID: older.id, lane: "main")
+
+        let newer = try store.createProject(
+            name: "鸿蒙问题自动化处理指南",
+            description: "提纲 · Skill · 仓库 · demo · 发布",
+            color: "rose"
+        )
+        _ = try store.createTask(title: "确定提纲", projectID: newer.id, lane: "main")
+
+        let middle = try store.createProject(name: "IDE 真机调试支持 Clix", color: "violet")
+        _ = try store.createTask(title: "USB 连接尝试简化", projectID: middle.id, lane: "main")
+
+        _ = try store.createProject(name: "旧版容器迁移收尾", color: "slate")
+
+        _ = try store.createTask(title: "临时：回一封邮件", lane: "temporary")
+    }
+
+    private static func seedTemporary() throws {
+        let store = AppServices.shared.store
+        _ = try store.createTask(title: "整理周会材料", lane: "temporary")
+        _ = try store.createTask(title: "回一封邮件", lane: "temporary")
+        let finished = try store.createTask(title: "已经做完的事", lane: "temporary")
+        _ = try store.toggleTask(id: finished.id)
     }
 
     private static func makeWindow(rootView: AnyView, size: NSSize = NSSize(width: 1440, height: 900)) -> NSWindow {

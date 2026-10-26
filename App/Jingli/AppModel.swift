@@ -21,6 +21,7 @@ final class AppModel: ObservableObject {
     @Published var completion: FocusCompletion?
     @Published private(set) var lastRoundTaskIDs: [String]
     @Published private(set) var creditTotals: [String: Double] = [:]
+    @Published private(set) var projectTaskCounts: [String: Int] = [:]
     @Published var detailTask: Task?
     @Published private(set) var stats: TodayStats?
     @Published var isCommandBarPresented = false
@@ -89,7 +90,12 @@ final class AppModel: ObservableObject {
     }
 
     var projects: [Project] {
-        snapshot?.projects ?? []
+        (snapshot?.projects ?? []).sorted { lhs, rhs in
+            if lhs.createdAt != rhs.createdAt {
+                return lhs.createdAt > rhs.createdAt
+            }
+            return lhs.sortOrder > rhs.sortOrder
+        }
     }
 
     var selectedMainCount: Int {
@@ -113,6 +119,9 @@ final class AppModel: ObservableObject {
             let next = try store.snapshot()
             snapshot = next
             creditTotals = (try? store.creditTotals(today: DayKey.make())) ?? [:]
+            let allTasks = (try? store.listTasks(includeDone: true)) ?? []
+            projectTaskCounts = Dictionary(grouping: allTasks, by: { $0.projectID ?? "" })
+                .mapValues(\.count)
             if next.dayStarted {
                 selected = []
             } else {
@@ -805,7 +814,16 @@ final class AppModel: ObservableObject {
     }
 
     func projectTaskCount(_ id: String) -> Int {
-        projectTasks(id).count
+        projectTaskCounts[id] ?? 0
+    }
+
+    /// 还有任务的项目；没有任务的归入已完结，沉到列表最后。
+    var activeProjects: [Project] {
+        projects.filter { projectTaskCount($0.id) > 0 }
+    }
+
+    var finishedProjects: [Project] {
+        projects.filter { projectTaskCount($0.id) == 0 }
     }
 
     /// 临时任务：不挂在任何项目下，跨天存在，未完成的排在前面。
