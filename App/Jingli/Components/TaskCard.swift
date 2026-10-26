@@ -34,6 +34,14 @@ struct TaskCard: View {
                 }
             }
 
+            if !task.note.isEmpty {
+                Text(task.note.replacingOccurrences(of: "\n", with: " "))
+                    .font(.system(size: 11))
+                    .foregroundStyle(Theme.textSecondary)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+            }
+
             Spacer(minLength: 0)
 
             HStack(spacing: 8) {
@@ -85,14 +93,16 @@ struct TaskCard: View {
                         .buttonStyle(TaskIconButtonStyle(active: task.done))
                         .help(task.done ? "恢复任务" : "完成任务")
 
-                        Button(action: { onDetail?() }) {
-                            Image(systemName: "pencil")
-                                .font(.system(size: 11))
-                                .frame(width: 28, height: 28)
+                        if let onDetail {
+                            Button(action: { onDetail() }) {
+                                Image(systemName: "pencil")
+                                    .font(.system(size: 11))
+                                    .frame(width: 28, height: 28)
+                            }
+                            .buttonStyle(TaskIconButtonStyle())
+                            .help("编辑详情")
+                            .accessibilityLabel("编辑详情")
                         }
-                        .buttonStyle(TaskIconButtonStyle())
-                        .help("编辑详情")
-                        .accessibilityLabel("编辑详情")
                     }
                 }
             }

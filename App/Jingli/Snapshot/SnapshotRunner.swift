@@ -253,19 +253,11 @@ enum SnapshotRunner {
             id: task.id,
             title: task.title,
             note: """
-            ## 背景
             把本季度的进展整理成一页复盘：目标、结果、偏差和下一步。
 
-            ## 待办
-            - [x] 收集三个方向的产出
-            - [x] 对齐时间线
-            - [ ] 补一版数据对比
+            待办：收集三个方向的产出；对齐时间线；补一版数据对比。
 
-            > 先写结论，再补论据。
-
-            ```bash
-            git log --since="3 months ago" --oneline
-            ```
+            参考：https://example.com/quarterly-review
             """,
             estimate: 2
         )
@@ -279,7 +271,7 @@ enum SnapshotRunner {
 
         let window = makeWindow(
             rootView: AnyView(view),
-            size: NSSize(width: 700, height: 720)
+            size: NSSize(width: 800, height: 720)
         )
         NSApp.activate(ignoringOtherApps: true)
         window.makeKeyAndOrderFront(nil)

@@ -227,6 +227,10 @@ extension WorkspaceDayTests {
         XCTAssertEqual(updated?.title, "新标题")
         XCTAssertEqual(updated?.note, "备注内容")
 
+        let longNote = String(repeating: "字", count: 1200)
+        let capped = try store.updateTask(id: task.id, title: "新标题", note: longNote, estimate: nil)
+        XCTAssertEqual(capped?.note.count, 1000)
+
         XCTAssertThrowsError(
             try store.updateTask(id: task.id, title: "   ", note: "", estimate: nil)
         ) { error in

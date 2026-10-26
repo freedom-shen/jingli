@@ -77,8 +77,7 @@ struct TodayView: View {
                             pomodoroCount: model.creditedPomodoros(for: task),
                             projectName: model.assignedProjectName(for: task),
                             onDone: { model.toggleDone(task) },
-                            onPlay: { model.toggleFocus(for: task) },
-                            onDetail: { model.openTaskDetail(task) }
+                            onPlay: { model.toggleFocus(for: task) }
                         )
                     }
                 }

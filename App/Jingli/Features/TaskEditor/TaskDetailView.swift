@@ -166,21 +166,55 @@ struct TaskDetailView: View {
         .accessibilityIdentifier("task-detail-estimate")
     }
 
+    private let noteLimit = 1000
+
     private var detailSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text("详情")
                     .font(.system(size: 11))
                     .foregroundStyle(Theme.textSecondary)
-                Spacer()
+
                 if locked {
                     Text("主线任务在项目中维护")
                         .font(.system(size: 10))
                         .foregroundStyle(Theme.textSecondary.opacity(0.7))
                 }
+
+                Spacer()
+
+                if !locked {
+                    Text("\(note.count)/\(noteLimit)")
+                        .font(.system(size: 10))
+                        .monospacedDigit()
+                        .foregroundStyle(
+                            note.count >= noteLimit
+                                ? Theme.tomato
+                                : Theme.textSecondary.opacity(0.7)
+                        )
+                        .accessibilityIdentifier("task-detail-note-count")
+                }
             }
 
-            MarkdownEditorView(text: $note, editable: !locked)
+            TextEditor(text: $note)
+                .font(.system(size: 13))
+                .foregroundStyle(Theme.textPrimary)
+                .scrollContentBackground(.hidden)
+                .padding(10)
+                .frame(minHeight: 240)
+                .background(
+                    RoundedRectangle(cornerRadius: 9, style: .continuous)
+                        .fill(Theme.background)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 9, style: .continuous)
+                        .stroke(Color.white.opacity(0.07), lineWidth: 1)
+                )
+                .disabled(locked)
+                .onChange(of: note) { _, newValue in
+                    guard newValue.count > noteLimit else { return }
+                    note = String(newValue.prefix(noteLimit))
+                }
                 .accessibilityIdentifier("task-detail-note")
         }
     }

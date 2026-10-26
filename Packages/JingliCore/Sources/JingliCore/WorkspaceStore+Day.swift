@@ -405,6 +405,7 @@ public extension WorkspaceStore {
     ) throws -> Task? {
         let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { throw StoreError.emptyTitle }
+        let normalizedNote = String(note.prefix(1000))
         let normalizedEstimate = estimate.map { max(1, min(32, $0)) }
 
         return try database.queue.write { db in
@@ -412,7 +413,7 @@ public extension WorkspaceStore {
                 sql: "UPDATE task SET title = ?, note = ?, estimate = ? WHERE id = ?",
                 arguments: [
                     String(trimmed.prefix(160)),
-                    String(note.prefix(8000)),
+                    normalizedNote,
                     normalizedEstimate,
                     id
                 ]
