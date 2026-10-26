@@ -9,6 +9,7 @@ struct TaskDetailView: View {
 
     @State private var title: String
     @State private var note: String
+    @State private var confirmDelete = false
 
     init(model: AppModel, task: Task, locked: Bool = false) {
         self.model = model
@@ -101,6 +102,14 @@ struct TaskDetailView: View {
                 .buttonStyle(.bordered)
                 .accessibilityIdentifier("toggle-task-detail-done")
 
+                if task.lane == "temporary", !locked {
+                    Button("删除任务", role: .destructive) {
+                        confirmDelete = true
+                    }
+                    .buttonStyle(.bordered)
+                    .accessibilityIdentifier("delete-temporary-task")
+                }
+
                 Spacer()
 
                 if locked {
@@ -128,6 +137,15 @@ struct TaskDetailView: View {
         .frame(width: 460)
         .background(Theme.background)
         .preferredColorScheme(.dark)
+        .alert("删除临时任务？", isPresented: $confirmDelete) {
+            Button("删除", role: .destructive) {
+                model.deleteTask(task)
+                dismiss()
+            }
+            Button("取消", role: .cancel) {}
+        } message: {
+            Text(task.title)
+        }
     }
 
     private var pomodoroText: String {

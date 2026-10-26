@@ -782,9 +782,13 @@ final class AppModel: ObservableObject {
         page = .project(id)
     }
 
+    func openTemporaryTasks() {
+        page = .temporaryTasks
+    }
+
     func goBack() {
         switch page {
-        case .project:
+        case .project, .temporaryTasks:
             page = .projects
         default:
             page = .day
@@ -802,6 +806,40 @@ final class AppModel: ObservableObject {
 
     func projectTaskCount(_ id: String) -> Int {
         projectTasks(id).count
+    }
+
+    /// 临时任务：不挂在任何项目下，跨天存在，未完成的排在前面。
+    var temporaryTasks: [Task] {
+        let all = (try? store.listTasks(includeDone: true)) ?? []
+        let temporary = all.filter { $0.lane == "temporary" }
+        return temporary.filter { !$0.done } + temporary.filter(\.done)
+    }
+
+    var temporaryTaskCount: Int {
+        temporaryTasks.count
+    }
+
+    func isInToday(_ task: Task) -> Bool {
+        snapshot?.todayTasks.contains { $0.id == task.id } ?? false
+    }
+
+    @discardableResult
+    func deleteTask(_ task: Task) -> Bool {
+        if let timer, timer.isActive, timer.taskIDs.contains(task.id) {
+            errorMessage = "这件任务正在本轮专注里，结束或废弃本轮后再删除。"
+            return false
+        }
+        do {
+            _ = try store.deleteTask(id: task.id)
+            if detailTask?.id == task.id {
+                detailTask = nil
+            }
+            reload()
+            return true
+        } catch {
+            errorMessage = error.localizedDescription
+            return false
+        }
     }
 
     func openProjectEditor(_ project: Project? = nil) {
@@ -856,6 +894,7 @@ enum AppPage: Equatable {
     case day
     case projects
     case project(String)
+    case temporaryTasks
     case stats
     case settings
 }

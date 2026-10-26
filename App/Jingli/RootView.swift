@@ -60,6 +60,8 @@ struct RootView: View {
             ProjectListView(model: model)
         case .project:
             ProjectDetailView(model: model)
+        case .temporaryTasks:
+            TemporaryTasksView(model: model)
         case .stats:
             StatsView(model: model)
         case .settings:
@@ -145,6 +147,10 @@ struct RootView: View {
                 iconButton("pencil", label: "编辑项目", identifier: "edit-project-button") {
                     model.openProjectEditor(model.currentProject())
                 }
+            case .temporaryTasks:
+                iconButton("plus", label: "新建临时任务", identifier: "new-temporary-task-button") {
+                    model.openTaskEditor(lane: "temporary")
+                }
             case .stats, .settings:
                 EmptyView()
             }
@@ -217,6 +223,8 @@ struct RootView: View {
             return "项目"
         case .project:
             return model.currentProject()?.name ?? "项目"
+        case .temporaryTasks:
+            return "临时任务"
         case .stats:
             return "统计"
         case .settings:
