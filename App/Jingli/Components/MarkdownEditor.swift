@@ -1,44 +1,9 @@
 import AppKit
 import SwiftUI
 
-/// 让工具栏按钮能够改写 NSTextView 当前选区。
+/// MarkdownTextEditor 通过它把内部 NSTextView 暴露出来（预留扩展点）。
 final class MarkdownTextController {
     weak var textView: NSTextView?
-
-    func wrap(_ prefix: String, _ suffix: String) {
-        guard let textView else { return }
-        let range = textView.selectedRange()
-        let selected = (textView.string as NSString).substring(with: range)
-        let replacement = prefix + selected + suffix
-        textView.insertText(replacement, replacementRange: range)
-        if selected.isEmpty, range.length == 0 {
-            let caret = range.location + prefix.utf16.count
-            textView.setSelectedRange(NSRange(location: caret, length: 0))
-        }
-    }
-
-    func prefixLine(_ prefix: String) {
-        guard let textView else { return }
-        let ns = textView.string as NSString
-        let range = textView.selectedRange()
-        let lineRange = ns.lineRange(for: NSRange(location: range.location, length: 0))
-        let line = ns.substring(with: lineRange)
-        let existing = String(line.prefix(prefix.count))
-        if existing == prefix {
-            textView.insertText(String(line.dropFirst(prefix.count)), replacementRange: lineRange)
-        } else {
-            textView.insertText(prefix + line, replacementRange: lineRange)
-        }
-    }
-
-    func insertBlock(_ text: String) {
-        guard let textView else { return }
-        let range = textView.selectedRange()
-        let ns = textView.string as NSString
-        let needsBreak = range.location > 0
-            && ns.character(at: range.location - 1) != 10
-        textView.insertText((needsBreak ? "\n" : "") + text, replacementRange: range)
-    }
 }
 
 struct MarkdownTextEditor: NSViewRepresentable {
@@ -213,49 +178,29 @@ enum MarkdownParser {
     }
 }
 
-/// 详情里的 Markdown 编辑区：工具栏 + 编辑 / 预览。
+/// 详情里的 Markdown 编辑区：左边纯文本编辑，右边实时预览。
 struct MarkdownEditorView: View {
     @Binding var text: String
     var editable: Bool = true
-    @State private var mode: Mode
     @State private var controller = MarkdownTextController()
 
-    enum Mode: String, CaseIterable {
-        case edit = "编辑"
-        case preview = "预览"
-    }
-
-    init(text: Binding<String>, editable: Bool = true) {
-        _text = text
-        self.editable = editable
-        _mode = State(initialValue: text.wrappedValue.isEmpty ? .edit : .preview)
-    }
-
     var body: some View {
-        VStack(spacing: 0) {
+        Group {
             if editable {
-                toolbar
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 8)
-                    .overlay(alignment: .bottom) {
-                        Rectangle()
-                            .fill(Color.white.opacity(0.06))
-                            .frame(height: 1)
-                    }
-            }
-
-            Group {
-                if editable, mode == .edit {
+                HStack(spacing: 0) {
                     MarkdownTextEditor(text: $text, controller: controller, editable: true)
-                } else {
-                    ScrollView {
-                        MarkdownPreview(text: text)
-                            .padding(16)
-                    }
+                        .accessibilityIdentifier("task-detail-note-editor")
+
+                    Divider()
+
+                    preview
+                        .accessibilityIdentifier("task-detail-note-preview")
                 }
+            } else {
+                preview
             }
-            .frame(minHeight: 240)
         }
+        .frame(minHeight: 280)
         .background(
             RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .fill(Theme.background)
@@ -266,75 +211,12 @@ struct MarkdownEditorView: View {
         )
     }
 
-    private var toolbar: some View {
-        HStack(spacing: 4) {
-            toolButton("H1") { perform { controller.prefixLine("# ") } }
-            toolButton("H2") { perform { controller.prefixLine("## ") } }
-            separator
-            toolButton("B", weight: .bold) { perform { controller.wrap("**", "**") } }
-            toolButton("I", italic: true) { perform { controller.wrap("*", "*") } }
-            toolButton("`", design: .monospaced) { perform { controller.wrap("`", "`") } }
-            separator
-            toolButton("•") { perform { controller.prefixLine("- ") } }
-            toolButton("1.") { perform { controller.prefixLine("1. ") } }
-            toolButton("☑") { perform { controller.prefixLine("- [ ] ") } }
-            toolButton("❝") { perform { controller.prefixLine("> ") } }
-            separator
-            toolButton("</>") { perform { controller.wrap("```\n", "\n```") } }
-            toolButton("🔗") { perform { controller.wrap("[", "](https://)") } }
-
-            Spacer()
-
-            Picker("", selection: $mode) {
-                ForEach(Mode.allCases, id: \.self) { item in
-                    Text(item.rawValue).tag(item)
-                }
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
-            .controlSize(.small)
-            .frame(width: 110)
+    private var preview: some View {
+        ScrollView {
+            MarkdownPreview(text: text)
+                .padding(16)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
-    }
-
-    /// 预览态点工具栏时先切回编辑，等编辑器挂载后再执行。
-    private func perform(_ action: @escaping () -> Void) {
-        if mode == .preview {
-            mode = .edit
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05, execute: action)
-        } else {
-            action()
-        }
-    }
-
-    private func toolButton(
-        _ label: String,
-        weight: Font.Weight = .medium,
-        italic: Bool = false,
-        design: Font.Design = .default,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            Text(label)
-                .font(.system(size: 11, weight: weight, design: design))
-                .italic(italic)
-                .frame(minWidth: 24, minHeight: 24)
-                .padding(.horizontal, 2)
-        }
-        .buttonStyle(.plain)
-        .foregroundStyle(Theme.textSecondary)
-        .background(
-            RoundedRectangle(cornerRadius: 6, style: .continuous)
-                .fill(Color.white.opacity(0.04))
-        )
-        .help(label)
-    }
-
-    private var separator: some View {
-        Rectangle()
-            .fill(Color.white.opacity(0.08))
-            .frame(width: 1, height: 16)
-            .padding(.horizontal, 4)
     }
 }
 

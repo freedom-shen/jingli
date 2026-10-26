@@ -30,7 +30,7 @@ struct TaskDetailView: View {
             footer
         }
         .padding(24)
-        .frame(width: 700)
+        .frame(width: 780)
         .background(Theme.background)
         .preferredColorScheme(.dark)
         .alert("删除临时任务？", isPresented: $confirmDelete) {
