@@ -506,32 +506,34 @@ final class AppModel: ObservableObject {
         )
     }
 
-    /// 回到清单：关掉完成面板后，把主窗口（今天清单）带到前台并激活。
-    /// 窗口若不在任何一块屏幕的可见区域内（比如被 macOS 挪到已断开的副屏坐标），
-    /// 先挪回主屏幕中央，保证用户真的能看见。
+    /// 回到清单：把主窗口（今天清单）带到前台并激活。
+    /// - 关闭的窗口对象保留着（能唤回）；
+    /// - 若窗口不在光标所在的屏幕（比如在另一块显示器上，用户看不见「已激活」），
+    ///   先挪到光标屏幕中央，保证出现在用户眼前。
     func openMainWindow() {
         NSApp.activate(ignoringOtherApps: true)
-        let window = NSApp.windows
+        guard let window = NSApp.windows
             .first(where: {
                 !($0 is FloatingPanel) && !($0 is CompletionPanel)
             })
-        window?.isReleasedWhenClosed = false
-        if let window, !isOnAnyScreen(window) {
-            centerOnMainScreen(window)
-        }
-        window?.makeKeyAndOrderFront(nil)
+        else { return }
+        window.isReleasedWhenClosed = false
+        bringToCursorScreenIfNeeded(window)
+        window.makeKeyAndOrderFront(nil)
     }
 
-    private func isOnAnyScreen(_ window: NSWindow) -> Bool {
-        NSScreen.screens.contains { $0.visibleFrame.intersects(window.frame) }
-    }
-
-    private func centerOnMainScreen(_ window: NSWindow) {
-        guard let screen = NSScreen.main else { return }
+    private func bringToCursorScreenIfNeeded(_ window: NSWindow) {
+        let location = NSEvent.mouseLocation
+        let cursorScreen = NSScreen.screens.first {
+            NSMouseInRect(location, $0.frame, false)
+        } ?? NSScreen.main
+        guard let target = cursorScreen,
+              !target.visibleFrame.intersects(window.frame)
+        else { return }
         let frame = window.frame
         window.setFrameOrigin(NSPoint(
-            x: screen.visibleFrame.midX - frame.width / 2,
-            y: screen.visibleFrame.midY - frame.height / 2
+            x: target.visibleFrame.midX - frame.width / 2,
+            y: target.visibleFrame.midY - frame.height / 2
         ))
     }
 

@@ -71,10 +71,7 @@ struct MenuBarPanel: View {
 
             Button("快速添加任务") {
                 NSApp.keyWindow?.orderOut(nil)
-                NSApp.activate(ignoringOtherApps: true)
-                NSApp.windows
-                    .first(where: { !($0 is FloatingPanel) })?
-                    .makeKeyAndOrderFront(nil)
+                model.openMainWindow()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     model.openAddTask()
                 }
@@ -82,10 +79,7 @@ struct MenuBarPanel: View {
 
             Button("打开精力管理") {
                 NSApp.keyWindow?.orderOut(nil)
-                NSApp.activate(ignoringOtherApps: true)
-                NSApp.windows
-                    .first(where: { !($0 is FloatingPanel) })?
-                    .makeKeyAndOrderFront(nil)
+                model.openMainWindow()
             }
 
             Button("退出") {
