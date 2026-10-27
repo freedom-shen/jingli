@@ -164,7 +164,7 @@ enum SnapshotRunner {
         )
         let temporary = try store.createTask(
             title: "回复客户邮件",
-            projectID: project.id,
+            projectID: nil,
             lane: "temporary"
         )
         try store.startDay(taskIDs: [main.id, temporary.id], today: today)
@@ -182,7 +182,7 @@ enum SnapshotRunner {
         )
         let second = try store.createTask(
             title: "回复客户邮件",
-            projectID: project.id,
+            projectID: nil,
             lane: "temporary"
         )
         try store.startDay(taskIDs: [first.id, second.id], today: today)
@@ -205,7 +205,7 @@ enum SnapshotRunner {
         let project = try store.createProject(name: "工作")
         return [
             try store.createTask(title: "整理产品需求", projectID: project.id, lane: "main"),
-            try store.createTask(title: "回复客户邮件", projectID: project.id, lane: "temporary")
+            try store.createTask(title: "回复客户邮件", projectID: nil, lane: "temporary")
         ]
     }
 

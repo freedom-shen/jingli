@@ -63,7 +63,7 @@ final class FocusTimerStoreTests: XCTestCase {
         let project = try workspace.createProject(name: "工作")
         let tasks = try [
             workspace.createTask(title: "A", projectID: project.id, lane: "main"),
-            workspace.createTask(title: "B", projectID: project.id, lane: "temporary")
+            workspace.createTask(title: "B", projectID: nil, lane: "temporary")
         ]
         return (database, tasks)
     }

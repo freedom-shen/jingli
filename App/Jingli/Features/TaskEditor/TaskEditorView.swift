@@ -62,20 +62,35 @@ struct TaskEditorView: View {
                     }
                     .pickerStyle(.segmented)
                     .labelsHidden()
+                    .onChange(of: lane) { _, newValue in
+                        if newValue == "temporary" { projectID = "" }
+                    }
                 }
             }
 
-            VStack(alignment: .leading, spacing: 8) {
-                Text("所属项目")
-                    .font(.system(size: 11))
-                    .foregroundStyle(Theme.textSecondary)
-                Picker("所属项目", selection: $projectID) {
-                    Text("无项目").tag("")
-                    ForEach(model.projects) { project in
-                        Text(project.name).tag(project.id)
+            if lane == "main" {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("所属项目")
+                        .font(.system(size: 11))
+                        .foregroundStyle(Theme.textSecondary)
+                    Picker("所属项目", selection: $projectID) {
+                        Text("无项目").tag("")
+                        ForEach(model.projects) { project in
+                            Text(project.name).tag(project.id)
+                        }
+                    }
+                    .labelsHidden()
+
+                    if projectID.isEmpty {
+                        Text("选了项目就是项目任务（主线）；不挂项目的临时任务请切到「临时任务」。")
+                            .font(.system(size: 10))
+                            .foregroundStyle(Theme.textSecondary.opacity(0.75))
                     }
                 }
-                .labelsHidden()
+            } else {
+                Text("临时任务不挂项目，直接进今天，不占 4 件主线名额。")
+                    .font(.system(size: 10))
+                    .foregroundStyle(Theme.textSecondary.opacity(0.75))
             }
 
             VStack(alignment: .leading, spacing: 8) {

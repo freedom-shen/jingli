@@ -117,6 +117,10 @@ public final class BackupService: @unchecked Sendable {
             for task in tasks {
                 guard let id = task["id"] as? String,
                       let title = task["title"] as? String else { continue }
+                let projectID = task["projectId"] as? String
+                let lane = projectID == nil
+                    ? (task["lane"] as? String ?? "main")
+                    : "main"
                 try db.execute(
                     sql: """
                     INSERT INTO task
@@ -136,8 +140,8 @@ public final class BackupService: @unchecked Sendable {
                     arguments: [
                         id,
                         title,
-                        task["projectId"] as? String,
-                        task["lane"] as? String ?? "main",
+                        projectID,
+                        lane,
                         task["plannedDate"] as? String,
                         task["note"] as? String ?? "",
                         task["done"] as? Bool ?? false,

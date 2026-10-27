@@ -7,7 +7,8 @@ final class WorkspaceDayTests: XCTestCase {
         let (store, _, t1, t2) = try makeStore()
         let groups = try store.dayStartGroups()
         XCTAssertEqual(groups.count, 2)
-        XCTAssertEqual(groups.first?.tasks.count, 2)
+        XCTAssertEqual(groups.first?.tasks.count, 1)
+        XCTAssertEqual(groups.last?.tasks.count, 2)
 
         try store.saveDaySelection(taskIDs: [t1.id, t2.id], today: "2026-10-22")
         let snapshot = try store.snapshot(today: "2026-10-22")
@@ -135,7 +136,7 @@ final class WorkspaceDayTests: XCTestCase {
         let store = WorkspaceStore(database: database)
         let project = try store.createProject(name: "工作")
         let t1 = try store.createTask(title: "主线", projectID: project.id, lane: "main")
-        let t2 = try store.createTask(title: "临时", projectID: project.id, lane: "temporary")
+        let t2 = try store.createTask(title: "临时", projectID: nil, lane: "temporary")
         _ = try store.createTask(title: "未分类", projectID: nil, lane: "main")
         return (store, project, t1, t2)
     }

@@ -76,6 +76,9 @@ public final class WorkspaceStore: @unchecked Sendable {
         let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { throw StoreError.emptyTitle }
         let normalizedLane = lane == "temporary" ? "temporary" : "main"
+        if normalizedLane == "temporary", projectID != nil {
+            throw StoreError.projectTaskMustBeMain
+        }
         let normalizedEstimate = estimate.map { max(1, min(32, $0)) }
         if normalizedLane == "main", let plannedDate,
            try isDayStarted(plannedDate) {
@@ -140,10 +143,12 @@ public final class WorkspaceStore: @unchecked Sendable {
 
 public enum StoreError: Error, LocalizedError {
     case emptyTitle
+    case projectTaskMustBeMain
 
     public var errorDescription: String? {
         switch self {
         case .emptyTitle: return "title must not be empty"
+        case .projectTaskMustBeMain: return "项目里的任务只能是主线；临时任务不能挂项目"
         }
     }
 }

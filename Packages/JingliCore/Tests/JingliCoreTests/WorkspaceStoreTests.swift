@@ -22,6 +22,22 @@ final class WorkspaceStoreTests: XCTestCase {
         XCTAssertThrowsError(try store.createProject(name: ""))
     }
 
+    func testProjectTasksCannotBeTemporary() throws {
+        let database = try JingliDatabase.inMemory()
+        let store = WorkspaceStore(database: database)
+        let project = try store.createProject(name: "工作")
+
+        XCTAssertThrowsError(
+            try store.createTask(title: "插单", projectID: project.id, lane: "temporary")
+        ) { error in
+            XCTAssertEqual(
+                error.localizedDescription,
+                "项目里的任务只能是主线；临时任务不能挂项目"
+            )
+        }
+        XCTAssertEqual(try store.taskCount(), 0)
+    }
+
     func testTaskEstimateRoundTrip() throws {
         let database = try JingliDatabase.inMemory()
         let store = WorkspaceStore(database: database)

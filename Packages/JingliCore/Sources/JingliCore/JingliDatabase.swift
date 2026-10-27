@@ -126,6 +126,17 @@ public final class JingliDatabase: @unchecked Sendable {
         migrator.registerMigration("v3_task_estimate") { db in
             try db.execute(sql: "ALTER TABLE task ADD COLUMN estimate INTEGER")
         }
+        migrator.registerMigration("v4_project_tasks_are_main") { db in
+            try db.execute(
+                sql: "UPDATE task SET lane = 'main' WHERE project_id IS NOT NULL AND lane = 'temporary'"
+            )
+            try db.execute(
+                sql: """
+                UPDATE day_plan_task SET lane = 'main'
+                WHERE task_id IN (SELECT id FROM task WHERE project_id IS NOT NULL)
+                """
+            )
+        }
         return migrator
     }
 
