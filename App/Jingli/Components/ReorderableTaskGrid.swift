@@ -55,7 +55,7 @@ struct ReorderableTaskGrid<Card: View>: View {
                             )
                         }
                     )
-                    .gesture(dragGesture(for: task))
+                    .simultaneousGesture(dragGesture(for: task))
             }
         }
         .coordinateSpace(name: gridSpace)
