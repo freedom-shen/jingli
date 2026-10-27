@@ -17,12 +17,14 @@ struct TodayView: View {
                     title: "主线任务",
                     countText: "\(mainTasks.count) / 4",
                     tasks: mainTasks,
+                    scope: "today:\(DayKey.make()):main",
                     emptyText: "今天还没有主线任务"
                 )
                 section(
                     title: "临时任务",
                     countText: "\(temporaryTasks.count) 件",
                     tasks: temporaryTasks,
+                    scope: "today:\(DayKey.make()):temporary",
                     emptyText: "今天还没有临时任务"
                 )
             }
@@ -33,17 +35,26 @@ struct TodayView: View {
     }
 
     private var mainTasks: [Task] {
-        snapshot.todayTasks.filter { $0.lane != "temporary" }
+        let fallback = snapshot.todayTasks.filter { $0.lane != "temporary" }
+        return model.orderedTasks(
+            scope: "today:\(DayKey.make()):main",
+            fallback: fallback
+        )
     }
 
     private var temporaryTasks: [Task] {
-        snapshot.todayTasks.filter { $0.lane == "temporary" }
+        let fallback = snapshot.todayTasks.filter { $0.lane == "temporary" }
+        return model.orderedTasks(
+            scope: "today:\(DayKey.make()):temporary",
+            fallback: fallback
+        )
     }
 
     private func section(
         title: String,
         countText: String,
         tasks: [Task],
+        scope: String,
         emptyText: String
     ) -> some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -68,18 +79,21 @@ struct TodayView: View {
                             .fill(Theme.card)
                     )
             } else {
-                LazyVGrid(columns: columns, spacing: 12) {
-                    ForEach(tasks) { task in
-                        TaskCard(
-                            task: task,
-                            focusState: model.focusState(for: task),
-                            addsToRound: model.canAddToRound(task),
-                            pomodoroCount: model.creditedPomodoros(for: task),
-                            projectName: model.assignedProjectName(for: task),
-                            onDone: { model.toggleDone(task) },
-                            onPlay: { model.toggleFocus(for: task) }
-                        )
-                    }
+                ReorderableTaskGrid(
+                    model: model,
+                    scope: scope,
+                    columns: columns,
+                    tasks: tasks
+                ) { task in
+                    TaskCard(
+                        task: task,
+                        focusState: model.focusState(for: task),
+                        addsToRound: model.canAddToRound(task),
+                        pomodoroCount: model.creditedPomodoros(for: task),
+                        projectName: model.assignedProjectName(for: task),
+                        onDone: { model.toggleDone(task) },
+                        onPlay: { model.toggleFocus(for: task) }
+                    )
                 }
             }
         }

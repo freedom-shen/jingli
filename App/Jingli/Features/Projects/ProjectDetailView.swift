@@ -25,7 +25,13 @@ struct ProjectDetailView: View {
     }
 
     private func content(_ project: Project) -> some View {
-        let tasks = model.projectTasks(project.id)
+        let allTasks = model.projectTasks(project.id)
+        let openTasks = model.orderedTasks(
+            scope: "project:\(project.id)",
+            fallback: allTasks.filter { !$0.done }
+        )
+        let doneTasks = allTasks.filter { $0.done }
+        let tasks = openTasks + doneTasks
 
         return ScrollView {
             VStack(alignment: .leading, spacing: 18) {
@@ -66,17 +72,36 @@ struct ProjectDetailView: View {
                             .fill(Theme.card)
                     )
                 } else {
-                    LazyVGrid(columns: columns, spacing: 12) {
-                        ForEach(tasks) { task in
-                            TaskCard(
-                                task: task,
-                                focusState: model.focusState(for: task),
-                                addsToRound: model.canAddToRound(task),
-                                pomodoroCount: model.creditedPomodoros(for: task),
-                                onDone: { model.toggleDone(task) },
-                                onPlay: { model.toggleFocus(for: task) },
-                                onDetail: { model.openTaskDetail(task) }
-                            )
+                    ReorderableTaskGrid(
+                        model: model,
+                        scope: "project:\(project.id)",
+                        columns: columns,
+                        tasks: openTasks
+                    ) { task in
+                        TaskCard(
+                            task: task,
+                            focusState: model.focusState(for: task),
+                            addsToRound: model.canAddToRound(task),
+                            pomodoroCount: model.creditedPomodoros(for: task),
+                            onDone: { model.toggleDone(task) },
+                            onPlay: { model.toggleFocus(for: task) },
+                            onDetail: { model.openTaskDetail(task) }
+                        )
+                    }
+
+                    if !doneTasks.isEmpty {
+                        LazyVGrid(columns: columns, spacing: 12) {
+                            ForEach(doneTasks) { task in
+                                TaskCard(
+                                    task: task,
+                                    focusState: model.focusState(for: task),
+                                    addsToRound: model.canAddToRound(task),
+                                    pomodoroCount: model.creditedPomodoros(for: task),
+                                    onDone: { model.toggleDone(task) },
+                                    onPlay: { model.toggleFocus(for: task) },
+                                    onDetail: { model.openTaskDetail(task) }
+                                )
+                            }
                         }
                     }
                 }

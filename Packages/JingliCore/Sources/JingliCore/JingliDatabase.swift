@@ -137,6 +137,18 @@ public final class JingliDatabase: @unchecked Sendable {
                 """
             )
         }
+        migrator.registerMigration("v5_task_order") { db in
+            try db.execute(
+                sql: """
+                CREATE TABLE IF NOT EXISTS task_order (
+                    scope TEXT NOT NULL,
+                    task_id TEXT NOT NULL REFERENCES task(id) ON DELETE CASCADE,
+                    position INTEGER NOT NULL,
+                    PRIMARY KEY (scope, task_id)
+                )
+                """
+            )
+        }
         return migrator
     }
 

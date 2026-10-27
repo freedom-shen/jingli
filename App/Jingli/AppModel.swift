@@ -848,6 +848,20 @@ final class AppModel: ObservableObject {
         (try? store.tasks(projectID: id)) ?? []
     }
 
+    /// scope 内展示顺序：优先手动排序（拖拽），其次调用方给的原顺序。
+    func orderedTasks(scope: String, fallback: [Task]) -> [Task] {
+        (try? store.orderedTasks(scope: scope, fallback: fallback)) ?? fallback
+    }
+
+    func saveTaskOrder(scope: String, orderedIDs: [String]) {
+        do {
+            try store.saveTaskOrder(scope: scope, orderedIDs: orderedIDs)
+            reload()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
     func projectTaskCount(_ id: String) -> Int {
         projectTaskCounts[id] ?? 0
     }
