@@ -507,6 +507,8 @@ final class AppModel: ObservableObject {
     }
 
     /// 回到清单：关掉完成面板后，把主窗口（今天清单）带到前台并激活。
+    /// 窗口若不在任何一块屏幕的可见区域内（比如被 macOS 挪到已断开的副屏坐标），
+    /// 先挪回主屏幕中央，保证用户真的能看见。
     func openMainWindow() {
         NSApp.activate(ignoringOtherApps: true)
         let window = NSApp.windows
@@ -514,7 +516,23 @@ final class AppModel: ObservableObject {
                 !($0 is FloatingPanel) && !($0 is CompletionPanel)
             })
         window?.isReleasedWhenClosed = false
+        if let window, !isOnAnyScreen(window) {
+            centerOnMainScreen(window)
+        }
         window?.makeKeyAndOrderFront(nil)
+    }
+
+    private func isOnAnyScreen(_ window: NSWindow) -> Bool {
+        NSScreen.screens.contains { $0.visibleFrame.intersects(window.frame) }
+    }
+
+    private func centerOnMainScreen(_ window: NSWindow) {
+        guard let screen = NSScreen.main else { return }
+        let frame = window.frame
+        window.setFrameOrigin(NSPoint(
+            x: screen.visibleFrame.midX - frame.width / 2,
+            y: screen.visibleFrame.midY - frame.height / 2
+        ))
     }
 
     func dismissCompletion() {
