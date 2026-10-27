@@ -76,3 +76,30 @@ final class FocusTimerTests: XCTestCase {
         XCTAssertFalse(timer.focusModeOwned)
     }
 }
+
+@MainActor
+final class FocusStandbyTests: XCTestCase {
+    func testStandbyNeedsAtLeastOnePomodoro() {
+        XCTAssertFalse(
+            FocusStandby.isStandby(timerActive: false, onBreak: false, todayPomodoros: 0)
+        )
+    }
+
+    func testStandbyAfterFinishedPomodoro() {
+        XCTAssertTrue(
+            FocusStandby.isStandby(timerActive: false, onBreak: false, todayPomodoros: 3)
+        )
+    }
+
+    func testRunningTimerIsNotStandby() {
+        XCTAssertFalse(
+            FocusStandby.isStandby(timerActive: true, onBreak: false, todayPomodoros: 3)
+        )
+    }
+
+    func testBreakIsNotStandby() {
+        XCTAssertFalse(
+            FocusStandby.isStandby(timerActive: false, onBreak: true, todayPomodoros: 3)
+        )
+    }
+}

@@ -46,6 +46,10 @@ enum SnapshotRunner {
                 AppServices.shared.model.reload()
                 AppServices.shared.model.openTemporaryTasks()
                 captureMainAndPanel(mainPath: mainPath, panelPath: nil)
+            case "standby":
+                try seedStandby()
+                AppServices.shared.model.reload()
+                captureMainAndPanel(mainPath: mainPath, panelPath: panelPath)
             case "task-detail":
                 let task = try seedTaskDetail()
                 captureTaskDetail(task: task, to: mainPath)
@@ -196,6 +200,24 @@ enum SnapshotRunner {
             durationMs: 25 * 60 * 1000
         ) else { return }
         timer.start(now: startedMs, sessionID: "stats-snapshot")
+        timer.tick(now: startedMs + Int64(timer.durationMs))
+        _ = try FocusTimerStore(database: store.database).complete(timer, now: startedAt)
+    }
+
+    private static func seedStandby() throws {
+        let store = AppServices.shared.store
+        let today = DayKey.make()
+        let task = try store.createTask(title: "整理产品需求", lane: "temporary")
+        try store.startDay(taskIDs: [task.id], today: today)
+
+        let startedAt = ISO8601DateFormatter().date(from: "2026-10-21T23:30:00Z") ?? Date()
+        let startedMs = Int64(startedAt.timeIntervalSince1970 * 1000)
+        guard var timer = FocusTimer(
+            taskIDs: [task.id],
+            sessionDate: today,
+            durationMs: 25 * 60 * 1000
+        ) else { return }
+        timer.start(now: startedMs, sessionID: "standby-snapshot")
         timer.tick(now: startedMs + Int64(timer.durationMs))
         _ = try FocusTimerStore(database: store.database).complete(timer, now: startedAt)
     }

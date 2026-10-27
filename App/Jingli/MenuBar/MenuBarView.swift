@@ -19,7 +19,7 @@ struct MenuBarPanel: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline) {
-                Text(model.displayText)
+                Text(model.isStandby ? "待机" : model.displayText)
                     .font(.system(size: 24, weight: .semibold, design: .rounded))
                     .foregroundStyle(model.isOnBreak ? Theme.breakGreen : Theme.textPrimary)
                     .monospacedDigit()
@@ -95,12 +95,17 @@ struct MenuBarPanel: View {
 
     private var statusText: String {
         if model.isOnBreak { return "休息中" }
+        if model.isStandby { return "今日 \(model.todayPomodoroCount) 个番茄 · 已完成" }
         guard model.timerIsActive else { return "未开始" }
         return model.timerIsPaused ? "已暂停" : "专注中"
     }
 
     private var participantsText: String {
         if model.isOnBreak { return "休息 \(model.breakMinutes) 分钟" }
+        if model.isStandby {
+            let count = model.lastRoundTasks.count
+            return count > 0 ? "上一轮 \(count) 件任务" : "从今日页开始一件任务"
+        }
         guard let timer = model.timer, model.timerIsActive else {
             return "从今日页开始一件任务"
         }

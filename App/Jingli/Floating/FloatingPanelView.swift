@@ -8,6 +8,8 @@ struct FloatingPanelView: View {
     let onExpand: () -> Void
     let onClose: () -> Void
 
+    @State private var standbySpin = false
+
     var body: some View {
         if mode == .mini {
             miniPanel
@@ -18,35 +20,39 @@ struct FloatingPanelView: View {
 
     private var miniPanel: some View {
         ZStack {
-            Circle()
-                .fill(
-                    LinearGradient(
-                        colors: model.isOnBreak
-                            ? [Theme.breakGreenLight, Theme.breakGreenDark]
-                            : [
-                                Color(red: 0.84, green: 0.42, blue: 0.29),
-                                Color(red: 0.62, green: 0.24, blue: 0.16)
-                            ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+            Circle().fill(panelGradient)
 
-            Circle()
-                .trim(from: 0, to: model.panelProgress)
-                .stroke(arcColor, style: StrokeStyle(lineWidth: 3, lineCap: .round))
-                .rotationEffect(.degrees(-90))
-                .padding(7)
-
-            VStack(spacing: 3) {
-                Text(model.displayText)
-                    .font(.system(size: 21, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white.opacity(model.timerIsPaused ? 0.72 : 1))
-                    .monospacedDigit()
-
+            if model.isStandby {
+                standbyRing
+            } else {
                 Circle()
-                    .fill(dotColor)
-                    .frame(width: 4, height: 4)
+                    .trim(from: 0, to: model.panelProgress)
+                    .stroke(arcColor, style: StrokeStyle(lineWidth: 3, lineCap: .round))
+                    .rotationEffect(.degrees(-90))
+                    .padding(7)
+            }
+
+            if model.isStandby {
+                VStack(spacing: 1) {
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(.white)
+
+                    Text("\(model.todayPomodoroCount) 个番茄")
+                        .font(.system(size: 9))
+                        .foregroundStyle(.white.opacity(0.82))
+                }
+            } else {
+                VStack(spacing: 3) {
+                    Text(model.displayText)
+                        .font(.system(size: 21, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white.opacity(model.timerIsPaused ? 0.72 : 1))
+                        .monospacedDigit()
+
+                    Circle()
+                        .fill(dotColor)
+                        .frame(width: 4, height: 4)
+                }
             }
         }
         .opacity(model.timerIsPaused ? 0.88 : 1)
@@ -54,8 +60,44 @@ struct FloatingPanelView: View {
         .contentShape(Circle())
         .onTapGesture { onExpand() }
         .help("点击放大")
-        .accessibilityLabel("浮窗倒计时，点击放大")
+        .accessibilityLabel(
+            model.isStandby
+                ? "待机中，今日已完成 \(model.todayPomodoroCount) 个番茄，点击放大"
+                : "浮窗倒计时，点击放大"
+        )
         .accessibilityIdentifier("floating-panel-mini")
+    }
+
+    private var panelGradient: LinearGradient {
+        LinearGradient(
+            colors: model.isOnBreak
+                ? [Theme.breakGreenLight, Theme.breakGreenDark]
+                : [
+                    Color(red: 0.84, green: 0.42, blue: 0.29),
+                    Color(red: 0.62, green: 0.24, blue: 0.16)
+                ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
+    /// 待机态的虚线环：6 秒转一圈，表示没在计时但还在等着下一轮。
+    private var standbyRing: some View {
+        Circle()
+            .stroke(
+                Color.white.opacity(0.45),
+                style: StrokeStyle(lineWidth: 2, dash: [3, 5])
+            )
+            .padding(6)
+            .rotationEffect(.degrees(standbySpin ? 360 : 0))
+            .onAppear {
+                standbySpin = false
+                DispatchQueue.main.async {
+                    withAnimation(.linear(duration: 6).repeatForever(autoreverses: false)) {
+                        standbySpin = true
+                    }
+                }
+            }
     }
 
     private var standardPanel: some View {
@@ -104,15 +146,31 @@ struct FloatingPanelView: View {
                         y: 10
                     )
 
-                VStack(spacing: 2) {
-                    Text(model.displayText)
-                        .font(.system(size: 28, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.white)
-                        .monospacedDigit()
+                if model.isStandby {
+                    VStack(spacing: 3) {
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 30, weight: .semibold))
+                            .foregroundStyle(.white)
 
-                    Text(statusText)
-                        .font(.system(size: 10))
-                        .foregroundStyle(.white.opacity(0.7))
+                        Text("本轮完成")
+                            .font(.system(size: 11))
+                            .foregroundStyle(.white.opacity(0.85))
+
+                        Text("今日 \(model.todayPomodoroCount) 个番茄")
+                            .font(.system(size: 10))
+                            .foregroundStyle(.white.opacity(0.65))
+                    }
+                } else {
+                    VStack(spacing: 2) {
+                        Text(model.displayText)
+                            .font(.system(size: 28, weight: .semibold, design: .rounded))
+                            .foregroundStyle(.white)
+                            .monospacedDigit()
+
+                        Text(statusText)
+                            .font(.system(size: 10))
+                            .foregroundStyle(.white.opacity(0.7))
+                    }
                 }
             }
 
@@ -195,6 +253,7 @@ struct FloatingPanelView: View {
 
     private var statusText: String {
         if model.isOnBreak { return "休息中" }
+        if model.isStandby { return "待机中" }
         guard model.timerIsActive else { return "25 分钟专注" }
         return model.timerIsPaused ? "已暂停" : "专注中"
     }
@@ -205,6 +264,8 @@ struct FloatingPanelView: View {
             Text("休息 \(model.breakMinutes) 分钟")
                 .font(.system(size: 11))
                 .foregroundStyle(Theme.textSecondary)
+        } else if model.isStandby, model.lastRoundTasks.isEmpty {
+            EmptyView()
         } else if !model.timerIsActive, !model.lastRoundTasks.isEmpty {
             VStack(alignment: .leading, spacing: 6) {
                 HStack {

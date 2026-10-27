@@ -22,6 +22,8 @@ final class AppModel: ObservableObject {
     @Published private(set) var lastRoundTaskIDs: [String]
     @Published private(set) var creditTotals: [String: Double] = [:]
     @Published private(set) var projectTaskCounts: [String: Int] = [:]
+    /// 今天已完成（收工）的番茄数，浮窗待机态用。
+    @Published private(set) var todayPomodoroCount = 0
     @Published var detailTask: Task?
     @Published private(set) var stats: TodayStats?
     @Published var isCommandBarPresented = false
@@ -66,6 +68,15 @@ final class AppModel: ObservableObject {
 
     var isBusy: Bool {
         timerIsActive || isOnBreak
+    }
+
+    /// 待机：今天已经收过番茄，但当前没在计时、也不在休息。
+    var isStandby: Bool {
+        FocusStandby.isStandby(
+            timerActive: timerIsActive,
+            onBreak: isOnBreak,
+            todayPomodoros: todayPomodoroCount
+        )
     }
 
     var displayText: String {
@@ -119,6 +130,7 @@ final class AppModel: ObservableObject {
             let next = try store.snapshot()
             snapshot = next
             creditTotals = (try? store.creditTotals(today: DayKey.make())) ?? [:]
+            todayPomodoroCount = (try? store.todayStats().pomodoros) ?? 0
             let allTasks = (try? store.listTasks(includeDone: true)) ?? []
             projectTaskCounts = Dictionary(grouping: allTasks, by: { $0.projectID ?? "" })
                 .mapValues(\.count)

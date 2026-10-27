@@ -125,3 +125,14 @@ public struct FocusTimer: Codable, Equatable, Sendable {
         }
     }
 }
+
+public enum FocusStandby {
+    /// 待机：今天已经收过番茄，但当前既没在计时，也不在休息。
+    public static func isStandby(
+        timerActive: Bool,
+        onBreak: Bool,
+        todayPomodoros: Int
+    ) -> Bool {
+        !timerActive && !onBreak && todayPomodoros > 0
+    }
+}
