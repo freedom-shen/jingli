@@ -14,6 +14,7 @@
 
 - 改完代码必须跑 `scripts/self-test.sh --fast`；提交前跑 `--full`。
 - 每个阶段结束 `commit` + `push` 到 `main`；不要只本地提交。
+- 每个打包版本必须有 tag：`scripts/package.sh` 会在打包成功后自动创建并推送 `v<版本号>` tag。手工打包也要补 tag（`git tag -a vX.Y.Z -m "Jingli X.Y.Z" && git push origin vX.Y.Z`）。
 - UI 文案改动后先 `scripts/snapshot.sh --update`，基线图随 commit 一起提交。
 - 不提交数据库、备份、真实任务数据、token。
 - 不改动用户系统设置：勿扰只走用户创建的 Shortcuts，不碰私有 API、不做 Control Center UI 脚本。

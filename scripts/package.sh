@@ -143,3 +143,17 @@ echo "  app:    $INSTALL_DIR/$APP_NAME"
 echo "  version: $VERSION"
 [ -n "$ZIP" ] && echo "  zip:    $ZIP"
 echo "  验证:   plutil -p \"$INSTALL_DIR/$APP_NAME/Contents/Info.plist\" | grep -E 'CFBundleShortVersionString|CFBundleIdentifier'"
+
+# 每个打包版本必须有一个 tag（见 AGENTS.md）。
+if git -C "$ROOT" rev-parse --git-dir >/dev/null 2>&1; then
+  TAG="v$VERSION"
+  if git -C "$ROOT" rev-parse "$TAG" >/dev/null 2>&1; then
+    echo "tag:    $TAG 已存在，跳过"
+  else
+    git -C "$ROOT" tag -a "$TAG" -m "Jingli $VERSION" || { echo "创建 tag $TAG 失败" >&2; exit 1; }
+    echo "tag:    $TAG"
+    if ! git -C "$ROOT" push origin "$TAG" >/dev/null 2>&1; then
+      echo "警告: tag $TAG 推送失败（本地已创建，稍后手动 git push origin $TAG）" >&2
+    fi
+  fi
+fi
