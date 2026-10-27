@@ -129,12 +129,15 @@ struct TaskCard: View {
     }
 
     private var badgeText: String {
+        if task.lane == "temporary" { return "临时" }
         if let projectName, !projectName.isEmpty { return projectName }
-        return task.lane == "temporary" ? "临时" : "主线"
+        return "主线"
     }
 
     private var badgeHelp: String {
-        task.lane == "temporary" ? "临时任务" : "主线任务"
+        if task.lane == "temporary" { return "临时任务" }
+        if let projectName, !projectName.isEmpty { return "主线任务 · \(projectName)" }
+        return "主线任务"
     }
 
     private func formatPomodoros(_ value: Double) -> String {
