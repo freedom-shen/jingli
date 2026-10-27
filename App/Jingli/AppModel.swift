@@ -56,6 +56,7 @@ final class AppModel: ObservableObject {
         self.streak = FocusStreak(count: persistedStreak)
         self.consecutiveCompletions = streak.count
         self.timer = try? timerStore.loadActive()
+        restoreBreakState()
         restoreFocusMode()
         updateTimerText()
         reload()
@@ -469,6 +470,7 @@ final class AppModel: ObservableObject {
         isOnBreak = true
         breakEndsAt = nowMilliseconds() + Int64(breakDurationMs)
         breakText = FocusTimer.format(breakDurationMs)
+        persistBreakState()
     }
 
     func skipBreak() {
@@ -476,6 +478,37 @@ final class AppModel: ObservableObject {
         isOnBreak = false
         breakEndsAt = 0
         breakText = FocusTimer.format(breakDurationMs)
+        clearBreakState()
+    }
+
+    // MARK: - 休息状态持久化（重启后按 endsAt 恢复）
+
+    private static let breakEndsAtSettingKey = "break_ends_at"
+
+    private func restoreBreakState() {
+        guard timer == nil,
+              let raw = try? store.settingValue(Self.breakEndsAtSettingKey),
+              let endsAt = Int64(raw),
+              endsAt > nowMilliseconds()
+        else {
+            clearBreakState()
+            return
+        }
+        isOnBreak = true
+        breakEndsAt = endsAt
+        breakText = FocusTimer.format(Int(endsAt - nowMilliseconds()))
+    }
+
+    private func persistBreakState() {
+        try? store.setSettingValue(
+            Self.breakEndsAtSettingKey,
+            breakEndsAt > 0 ? String(breakEndsAt) : nil
+        )
+    }
+
+    private func clearBreakState() {
+        breakEndsAt = 0
+        try? store.setSettingValue(Self.breakEndsAtSettingKey, nil)
     }
 
     /// 计时期间持有活动断言，避免 App Nap 在后台节流定时器。
@@ -498,8 +531,8 @@ final class AppModel: ObservableObject {
         guard remaining == 0 else { return }
         longBreakPending = false
         isOnBreak = false
-        breakEndsAt = 0
         breakText = FocusTimer.format(breakDurationMs)
+        clearBreakState()
         CompletionNotifier.shared.notify(
             title: "休息结束",
             body: "可以开始下一轮了"
