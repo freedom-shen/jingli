@@ -130,47 +130,49 @@ struct FloatingPanelView: View {
 
             Spacer()
 
-            ZStack {
-                Circle()
-                    .fill(isIdleGreen ? Theme.breakGreen : Theme.tomato)
-                    .frame(width: 140, height: 140)
-                    .shadow(
-                        color: (isIdleGreen ? Theme.breakGreen : Theme.tomato).opacity(0.35),
-                        radius: 24,
-                        y: 10
-                    )
+            Button {
+                model.openMainWindow()
+            } label: {
+                ZStack {
+                    Circle()
+                        .fill(isIdleGreen ? Theme.breakGreen : Theme.tomato)
+                        .frame(width: 140, height: 140)
+                        .shadow(
+                            color: (isIdleGreen ? Theme.breakGreen : Theme.tomato).opacity(0.35),
+                            radius: 24,
+                            y: 10
+                        )
 
-                if model.isStandby {
-                    VStack(spacing: 3) {
-                        Image(systemName: "checkmark")
-                            .font(.system(size: 30, weight: .semibold))
-                            .foregroundStyle(.white)
+                    if model.isStandby {
+                        VStack(spacing: 3) {
+                            Image(systemName: "checkmark")
+                                .font(.system(size: 30, weight: .semibold))
+                                .foregroundStyle(.white)
 
-                        Text("本轮完成")
-                            .font(.system(size: 11))
-                            .foregroundStyle(.white.opacity(0.85))
+                            Text("本轮完成")
+                                .font(.system(size: 11))
+                                .foregroundStyle(.white.opacity(0.85))
 
-                        Text("今日 \(model.todayPomodoroCount) 个番茄")
-                            .font(.system(size: 10))
-                            .foregroundStyle(.white.opacity(0.65))
-                    }
-                } else {
-                    VStack(spacing: 2) {
-                        Text(model.displayText)
-                            .font(.system(size: 28, weight: .semibold, design: .rounded))
-                            .foregroundStyle(.white)
-                            .monospacedDigit()
+                            Text("今日 \(model.todayPomodoroCount) 个番茄")
+                                .font(.system(size: 10))
+                                .foregroundStyle(.white.opacity(0.65))
+                        }
+                    } else {
+                        VStack(spacing: 2) {
+                            Text(model.displayText)
+                                .font(.system(size: 28, weight: .semibold, design: .rounded))
+                                .foregroundStyle(.white)
+                                .monospacedDigit()
 
-                        Text(statusText)
-                            .font(.system(size: 10))
-                            .foregroundStyle(.white.opacity(0.7))
+                            Text(statusText)
+                                .font(.system(size: 10))
+                                .foregroundStyle(.white.opacity(0.7))
+                        }
                     }
                 }
+                .contentShape(Circle())
             }
-            .contentShape(Circle())
-            .onTapGesture {
-                model.openMainWindow()
-            }
+            .buttonStyle(.plain)
             .help("回到今日清单")
             .accessibilityLabel("回到主页面")
             .accessibilityIdentifier("floating-panel-open-main")
