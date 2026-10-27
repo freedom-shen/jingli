@@ -526,6 +526,7 @@ final class AppModel: ObservableObject {
     private func finish(_ finished: FocusTimer) {
         lastRoundTaskIDs = finished.taskIDs
         persistLastRound()
+        FloatingPanelController.shared.expandIfVisible()
         let outcome = streak.completed()
         streak = outcome.streak
         persistStreak()

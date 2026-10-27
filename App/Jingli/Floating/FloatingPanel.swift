@@ -200,6 +200,12 @@ final class FloatingPanelController {
         setMode(.standard)
     }
 
+    /// 一轮完成时调用：浮窗可见则自动展开为标准态，方便处理上一轮任务。
+    func expandIfVisible() {
+        guard panel != nil else { return }
+        expand()
+    }
+
     private func makeContent() -> FirstMouseHostingView<FloatingPanelView> {
         FirstMouseHostingView(
             rootView: FloatingPanelView(

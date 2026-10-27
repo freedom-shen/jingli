@@ -280,32 +280,7 @@ struct FloatingPanelView: View {
                 }
 
                 ForEach(Array(model.lastRoundTasks.prefix(3))) { task in
-                    HStack(spacing: 7) {
-                        Circle()
-                            .fill(Theme.tomato.opacity(0.5))
-                            .frame(width: 5, height: 5)
-
-                        Text(task.title)
-                            .font(.system(size: 11))
-                            .foregroundStyle(Theme.textPrimary)
-                            .lineLimit(1)
-                            .truncationMode(.tail)
-
-                        Spacer(minLength: 4)
-
-                        Button {
-                            model.removeFromLastRound(task.id)
-                        } label: {
-                            Image(systemName: "xmark")
-                                .font(.system(size: 8, weight: .semibold))
-                                .frame(width: 16, height: 16)
-                        }
-                        .buttonStyle(.plain)
-                        .foregroundStyle(Theme.textSecondary)
-                        .help("从这一轮移除")
-                        .accessibilityLabel("从上一轮移除 \(task.title)")
-                        .accessibilityIdentifier("remove-last-round-\(task.id)")
-                    }
+                    LastRoundTaskRow(model: model, task: task)
                 }
 
                 if model.lastRoundTasks.count > 3 {
@@ -375,5 +350,63 @@ struct FloatingPanelView: View {
 
     private func shareText(total: Int) -> String {
         total > 1 ? "1/\(total)" : "1"
+    }
+}
+
+/// 上一轮任务行：行首圆形勾选框 = 完成该任务；行尾 × = 只从这一轮移除。
+private struct LastRoundTaskRow: View {
+    @ObservedObject var model: AppModel
+    let task: Task
+    @State private var hovering = false
+
+    var body: some View {
+        HStack(spacing: 7) {
+            Button {
+                model.toggleDone(task)
+            } label: {
+                Image(systemName: "checkmark")
+                    .font(.system(size: 8, weight: .semibold))
+                    .foregroundStyle(.white.opacity(hovering ? 0.95 : 0))
+                    .frame(width: 14, height: 14)
+                    .background(
+                        Circle()
+                            .fill(Color.white.opacity(hovering ? 0.12 : 0))
+                            .overlay(
+                                Circle()
+                                    .strokeBorder(
+                                        Color.white.opacity(hovering ? 0.6 : 0.38),
+                                        lineWidth: 1.5
+                                    )
+                            )
+                    )
+                    .contentShape(Circle())
+            }
+            .buttonStyle(.plain)
+            .onHover { hovering = $0 }
+            .help("完成任务")
+            .accessibilityLabel("完成 \(task.title)")
+            .accessibilityIdentifier("complete-last-round-\(task.id)")
+
+            Text(task.title)
+                .font(.system(size: 11))
+                .foregroundStyle(Theme.textPrimary)
+                .lineLimit(1)
+                .truncationMode(.tail)
+
+            Spacer(minLength: 4)
+
+            Button {
+                model.removeFromLastRound(task.id)
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.system(size: 8, weight: .semibold))
+                    .frame(width: 16, height: 16)
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(Theme.textSecondary)
+            .help("从这一轮移除")
+            .accessibilityLabel("从上一轮移除 \(task.title)")
+            .accessibilityIdentifier("remove-last-round-\(task.id)")
+        }
     }
 }
