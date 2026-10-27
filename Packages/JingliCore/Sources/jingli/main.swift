@@ -174,6 +174,7 @@ guard let command = arguments.first else {
       jingli project delete <id> --confirm
       jingli day plan <id...> [--dry-run]
       jingli day start
+      jingli day add <id...>       # 今天已开始也能追加已有任务（主线占 4 件空位）
       jingli day reset --confirm
       jingli focus start <id...>
       jingli focus status|pause|resume
@@ -281,7 +282,7 @@ case "project":
         fail("unknown project command: \(sub)")
     }
 case "day":
-    guard let sub = rest.first else { fail("day plan|start|reset") }
+    guard let sub = rest.first else { fail("day plan|start|add|reset") }
     let tail = Array(rest.dropFirst())
     switch sub {
     case "plan":
@@ -293,6 +294,10 @@ case "day":
         ])
     case "start":
         run("day.start")
+    case "add":
+        let ids = positional(tail, skipping: flags)
+        guard !ids.isEmpty else { fail("day add <id...>") }
+        run("day.add", params: ["taskIds": ids])
     case "reset":
         run("day.reset", params: ["confirm": hasFlag("--confirm", in: tail)])
     default:

@@ -118,6 +118,73 @@ final class AgentServerTests: XCTestCase {
         let tasks = (listed["result"] as? [String: Any])?["tasks"] as? [[String: Any]]
         XCTAssertEqual(tasks?.first?["done"] as? Bool, false)
     }
+
+    func testDayAddAppendsToStartedDayAndUndoRemoves() throws {
+        let database = try JingliDatabase.inMemory()
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let socketURL = directory.appendingPathComponent("agent.sock")
+        let server = AgentServer(database: database)
+        try server.start(socketURL: socketURL)
+        defer {
+            server.stop()
+            try? FileManager.default.removeItem(at: directory)
+        }
+
+        func call(_ object: [String: Any]) throws -> [String: Any] {
+            try TestClient(path: socketURL.path).send(object)
+        }
+
+        let first = try call([
+            "jsonrpc": "2.0", "id": 1,
+            "method": "task.create", "params": ["title": "主线A", "lane": "main"]
+        ])
+        let firstID = (first["result"] as? [String: Any])?["id"] as? String
+        _ = try call([
+            "jsonrpc": "2.0", "id": 2,
+            "method": "day.plan", "params": ["taskIds": [firstID ?? ""]]
+        ])
+        let started = try call(["jsonrpc": "2.0", "id": 3, "method": "day.start"])
+        XCTAssertNotNil((started["result"] as? [String: Any])?["dayStarted"])
+
+        let second = try call([
+            "jsonrpc": "2.0", "id": 4,
+            "method": "task.create", "params": ["title": "主线B", "lane": "main"]
+        ])
+        let secondID = (second["result"] as? [String: Any])?["id"] as? String
+
+        let added = try call([
+            "jsonrpc": "2.0", "id": 5,
+            "method": "day.add", "params": ["taskIds": [secondID ?? ""]]
+        ])
+        let addedList = (added["result"] as? [String: Any])?["added"] as? [[String: Any]]
+        XCTAssertEqual(addedList?.first?["id"] as? String, secondID)
+
+        let today = try call(["jsonrpc": "2.0", "id": 6, "method": "today"])
+        let todayTasks = (today["result"] as? [String: Any])?["tasks"] as? [[String: Any]]
+        XCTAssertEqual(todayTasks?.count, 2)
+
+        _ = try call([
+            "jsonrpc": "2.0", "id": 7,
+            "method": "agent.undo", "params": ["confirm": true]
+        ])
+        let afterUndo = try call(["jsonrpc": "2.0", "id": 8, "method": "today"])
+        let undoTasks = (afterUndo["result"] as? [String: Any])?["tasks"] as? [[String: Any]]
+        XCTAssertEqual(undoTasks?.count, 1)
+
+        let extras = try (0..<4).map { index -> String in
+            let created = try call([
+                "jsonrpc": "2.0", "id": 10 + index,
+                "method": "task.create", "params": ["title": "主线-\(index)", "lane": "main"]
+            ])
+            return (created["result"] as? [String: Any])?["id"] as? String ?? ""
+        }
+        let overflow = try call([
+            "jsonrpc": "2.0", "id": 20,
+            "method": "day.add", "params": ["taskIds": extras]
+        ])
+        XCTAssertNotNil(overflow["error"])
+    }
 }
 
 private final class TestClient {

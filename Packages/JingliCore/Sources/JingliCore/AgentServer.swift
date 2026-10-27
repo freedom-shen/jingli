@@ -398,6 +398,23 @@ public final class AgentServer: @unchecked Sendable {
             changed()
             return ["dayStarted": true, "taskCount": snapshot.selection.count]
 
+        /// 今天（含已开始）追加已有任务：项目主线占 4 件空位，临时任务直接进。
+        case "day.add":
+            let ids = try stringArray(params, "taskIds")
+            guard !ids.isEmpty else { throw AgentError.invalidParams("day add 需要至少一个任务 id") }
+            let added = try store.addToToday(taskIDs: ids)
+            let addedIDs = added.map(\.id)
+            try record(
+                "day.add",
+                payload: ["taskIds": addedIDs],
+                undo: addedIDs.isEmpty ? nil : ["kind": "day.add", "taskIds": addedIDs]
+            )
+            changed()
+            return [
+                "added": added.map { ["id": $0.id, "title": $0.title, "lane": $0.lane] },
+                "mainRemaining": max(0, 4 - (try store.plannedMainCount()))
+            ]
+
         case "day.reset":
             try requireConfirm(params)
             let before = try store.snapshot().todayTasks.map(\.id)
@@ -639,6 +656,22 @@ public final class AgentServer: @unchecked Sendable {
                     try store.resetDay()
                 } else {
                     try store.saveDaySelection(taskIDs: ids)
+                }
+            }
+        case "day.add":
+            if let ids = object["taskIds"] as? [String] {
+                let today = DayKey.make()
+                try store.database.queue.write { db in
+                    for id in ids {
+                        try db.execute(
+                            sql: "UPDATE task SET planned_date = NULL WHERE id = ? AND planned_date = ?",
+                            arguments: [id, today]
+                        )
+                        try db.execute(
+                            sql: "DELETE FROM day_plan_task WHERE date = ? AND task_id = ?",
+                            arguments: [today, id]
+                        )
+                    }
                 }
             }
         default:

@@ -14,7 +14,7 @@ description: 管理「精力管理」Mac App 的项目、任务、今日计划�
 | 查看今天 | `jingli today` |
 | 项目：列表 / 新建 / 修改 / 删除 | `jingli project list` / `add` / `update` / `delete` |
 | 任务：列表 / 新建 / 修改 / 完成 / 恢复 / 删除 | `jingli task list` / `add` / `update` / `complete` / `reopen` / `delete` |
-| 今日计划：预演 / 保存 / 开始 / 重置 | `jingli day plan` / `day start` / `day reset` |
+| 今日计划：预演 / 保存 / 开始 / 追加 / 重置 | `jingli day plan` / `day start` / `day add` / `day reset` |
 | 番茄钟：开始 / 状态 / 暂停 / 继续 / 加任务 / 移任务 / 停止 | `jingli focus …` |
 | 休息 | `jingli focus break` / `skip-break` |
 | 今日统计 | `jingli stats` |
@@ -32,6 +32,7 @@ jingli task list                 # 拿到 task id
 jingli day plan <task-id> --dry-run
 jingli day plan <task-id>
 jingli day start
+jingli day add <另一个-task-id>   # 今天已开始也能补任务：主线占 4 件空位，临时任务直接进
 jingli focus start <task-id>     # 开始 25 分钟；status 可查剩余时间
 ```
 
@@ -88,7 +89,7 @@ jingli task delete <id> --confirm
 ```
 
 - **临时任务**：不限量，随时可加；加完立刻出现在「今日任务 · 临时任务」，不占 4 件主线名额。不传 `--date` 时默认排到今天；只想记下来不排期，就加 `--undated`。**硬性规则：项目里的任务没有临时任务**——`--lane temporary` 不能和 `--project` 一起用，否则会报「项目里的任务只能是主线」。
-- **主线任务**：属于项目，只能在项目里创建。要进今天，走「开启一天」或 `day plan` + `day start`；今天已经开始后不能再加主线（会报 `今天已经开始…`），此时只能加不挂项目的临时任务，或把主线留在项目里等明天。
+- **主线任务**：属于项目，只能在项目里创建（`--lane` 默认 main）。要进今天，走「开启一天」或 `day plan` + `day start`；今天开始后再 `task add --date today` 建主线会被拒（会报 `今天已经开始…`），但已存在的任务可以随时用 `day add <id>` 补进今天——项目主线占 1 个空位（满 4 件报错），临时任务不限。
 - `--project` 用项目名称，不是 ID；不存在会报错，先 `project list`。
 - `--date today` 只对「今天」有意义。
 - `--estimate N` 是预计要花几个番茄（1–32）；不填就是没估，任务卡上只显示已用。**不要替用户猜预估**，用户没说就留空；预估只影响展示和当天总量提示，不占主线名额、不限制进度。
@@ -212,7 +213,7 @@ jingli undo <event-id> --confirm
 | `破坏性操作需要 --confirm` | 向用户确认后加 `--confirm` |
 | `主线任务最多 4 个` | 减少主线，或把其中一件改为临时 |
 | `项目里的任务只能是主线；临时任务不能挂项目` | 临时任务不要带 `--project`；要挂项目就用主线（`--lane main`，默认） |
-| `今天已经开始，主线任务只能在项目里维护` | 在项目里建一条不排日期的主线（留到明天）；今天要加就用**不挂项目**的临时任务，不要把项目任务改成临时 |
+| `今天已经开始，主线任务只能在项目里维护` | 已存在的任务用 `day add <id>` 补进今天；新建主线先留在项目里，明天再排 |
 | `找不到：project X` | 先 `jingli project list`，或用 `project add` 创建 |
 | `已有进行中的番茄钟` | 先 `focus stop --confirm`，或用 `focus add` 加入 |
 | `本轮尚未结束` | `focus break` 需要先等本轮完成 |
