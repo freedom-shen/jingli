@@ -8,8 +8,6 @@ struct FloatingPanelView: View {
     let onExpand: () -> Void
     let onClose: () -> Void
 
-    @State private var standbySpin = false
-
     var body: some View {
         if mode == .mini {
             miniPanel
@@ -86,7 +84,7 @@ struct FloatingPanelView: View {
         model.isOnBreak || model.isStandby
     }
 
-    /// 待机态的虚线环：6 秒转一圈，表示没在计时但还在等着下一轮。
+    /// 待机态的虚线环：静态虚线，表示没在计时、处于收工状态。
     private var standbyRing: some View {
         Circle()
             .stroke(
@@ -94,15 +92,6 @@ struct FloatingPanelView: View {
                 style: StrokeStyle(lineWidth: 2, dash: [3, 5])
             )
             .padding(6)
-            .rotationEffect(.degrees(standbySpin ? 360 : 0))
-            .onAppear {
-                standbySpin = false
-                DispatchQueue.main.async {
-                    withAnimation(.linear(duration: 6).repeatForever(autoreverses: false)) {
-                        standbySpin = true
-                    }
-                }
-            }
     }
 
     private var standardPanel: some View {
