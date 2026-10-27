@@ -509,11 +509,12 @@ final class AppModel: ObservableObject {
     /// 回到清单：关掉完成面板后，把主窗口（今天清单）带到前台并激活。
     func openMainWindow() {
         NSApp.activate(ignoringOtherApps: true)
-        NSApp.windows
+        let window = NSApp.windows
             .first(where: {
                 !($0 is FloatingPanel) && !($0 is CompletionPanel)
-            })?
-            .makeKeyAndOrderFront(nil)
+            })
+        window?.isReleasedWhenClosed = false
+        window?.makeKeyAndOrderFront(nil)
     }
 
     func dismissCompletion() {

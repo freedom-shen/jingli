@@ -21,6 +21,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
+        // 主窗口关闭后保留对象，浮窗点大圆 / 菜单栏「打开精力管理」才能把它唤回；
+        // SwiftUI WindowGroup 默认关闭即释放，会导致这些入口静默无效。
+        keepMainWindowAlive()
+
         if let failure = AppServices.shared.startupFailure {
             presentStartupFailure(failure)
             return
@@ -36,6 +40,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             DispatchQueue.main.async {
                 FloatingPanelController.shared.show()
             }
+        }
+    }
+
+    /// SwiftUI 的主窗口在这个时点已存在；标记不随关闭释放，
+    /// 浮窗点大圆 / 菜单栏「打开精力管理」才能把关闭的主窗口唤回。
+    private func keepMainWindowAlive() {
+        for window in NSApp.windows
+            where !(window is FloatingPanel) && !(window is CompletionPanel) {
+            window.isReleasedWhenClosed = false
         }
     }
 
