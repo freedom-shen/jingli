@@ -70,7 +70,7 @@ struct FloatingPanelView: View {
 
     private var panelGradient: LinearGradient {
         LinearGradient(
-            colors: model.isOnBreak
+            colors: isIdleGreen
                 ? [Theme.breakGreenLight, Theme.breakGreenDark]
                 : [
                     Color(red: 0.84, green: 0.42, blue: 0.29),
@@ -79,6 +79,11 @@ struct FloatingPanelView: View {
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
+    }
+
+    /// 绿色 = 空闲：休息中和待机（收工）都用它，红色只留给计时。
+    private var isIdleGreen: Bool {
+        model.isOnBreak || model.isStandby
     }
 
     /// 待机态的虚线环：6 秒转一圈，表示没在计时但还在等着下一轮。
@@ -138,10 +143,10 @@ struct FloatingPanelView: View {
 
             ZStack {
                 Circle()
-                    .fill(model.isOnBreak ? Theme.breakGreen : Theme.tomato)
+                    .fill(isIdleGreen ? Theme.breakGreen : Theme.tomato)
                     .frame(width: 140, height: 140)
                     .shadow(
-                        color: (model.isOnBreak ? Theme.breakGreen : Theme.tomato).opacity(0.35),
+                        color: (isIdleGreen ? Theme.breakGreen : Theme.tomato).opacity(0.35),
                         radius: 24,
                         y: 10
                     )

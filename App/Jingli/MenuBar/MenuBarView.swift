@@ -21,7 +21,11 @@ struct MenuBarPanel: View {
             HStack(alignment: .firstTextBaseline) {
                 Text(model.isStandby ? "待机" : model.displayText)
                     .font(.system(size: 24, weight: .semibold, design: .rounded))
-                    .foregroundStyle(model.isOnBreak ? Theme.breakGreen : Theme.textPrimary)
+                    .foregroundStyle(
+                        (model.isOnBreak || model.isStandby)
+                            ? Theme.breakGreen
+                            : Theme.textPrimary
+                    )
                     .monospacedDigit()
 
                 Spacer()
