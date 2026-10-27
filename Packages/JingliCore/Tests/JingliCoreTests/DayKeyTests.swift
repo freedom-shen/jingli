@@ -20,4 +20,28 @@ final class DayKeyTests: XCTestCase {
         let yesterdayKey = DayKey.make(from: yesterday, calendar: calendar)
         XCTAssertFalse(DayKey.isToday(yesterdayKey, calendar: calendar))
     }
+
+    func testStartHourShiftsDayBoundary() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "Asia/Shanghai")!
+        let previous = DayKey.startHour
+        defer { DayKey.startHour = previous }
+
+        DayKey.startHour = 8
+        let twoAM = calendar.date(
+            from: DateComponents(year: 2026, month: 10, day: 23, hour: 2)
+        )!
+        XCTAssertEqual(DayKey.make(from: twoAM, calendar: calendar), "2026-10-22")
+
+        let eightAM = calendar.date(
+            from: DateComponents(year: 2026, month: 10, day: 23, hour: 8)
+        )!
+        XCTAssertEqual(DayKey.make(from: eightAM, calendar: calendar), "2026-10-23")
+
+        DayKey.startHour = 0
+        let midnightish = calendar.date(
+            from: DateComponents(year: 2026, month: 10, day: 23, hour: 0, minute: 30)
+        )!
+        XCTAssertEqual(DayKey.make(from: midnightish, calendar: calendar), "2026-10-23")
+    }
 }

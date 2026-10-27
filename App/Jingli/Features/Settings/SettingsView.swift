@@ -9,6 +9,7 @@ struct SettingsView: View {
     @State private var missingShortcuts: [String] = []
     @State private var launchAtLogin = LaunchAtLogin.isEnabled
     @AppStorage("jingli.autoDND") private var autoDND = true
+    @AppStorage("jingli.dayStartHour") private var dayStartHour = 8 { didSet { DayKey.startHour = dayStartHour } }
     @State private var backupMessage: String?
     @State private var errorMessage: String?
 
@@ -63,6 +64,31 @@ struct SettingsView: View {
                     Text("计时固定 25 分钟；每轮后休息 5 分钟，连续完成 4 个钟长休 25 分钟；休息可跳过，不计入统计。")
                         .font(.system(size: 11))
                         .foregroundStyle(Theme.textSecondary)
+                }
+
+                section("新的一天") {
+                    HStack {
+                        Text("每天开始时间")
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(Theme.textPrimary)
+                        Spacer()
+                        Stepper(
+                            value: $dayStartHour,
+                            in: 0...23
+                        ) {
+                            Text(String(format: "%02d:00", dayStartHour))
+                                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                                .monospacedDigit()
+                                .foregroundStyle(Theme.textPrimary)
+                                .frame(minWidth: 52)
+                        }
+                        .accessibilityIdentifier("day-start-hour-stepper")
+                    }
+
+                    Text("起点之前的时间仍算前一天：默认 08:00，表示凌晨 0–8 点还是昨天，熬夜工作不会被切走；统计、跨天清空和「今天」都按这个边界算。")
+                        .font(.system(size: 11))
+                        .foregroundStyle(Theme.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
 
                 section("通知") {

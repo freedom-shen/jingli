@@ -359,7 +359,6 @@
 				};
 			};
 			buildConfigurationList = DCFA703EEA55213148D3F7C3 /* Build configuration list for PBXProject "Jingli" */;
-			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -372,6 +371,7 @@
 				5142151ACA68B8A33EF9E354 /* XCLocalSwiftPackageReference "../Packages/JingliCore" */,
 			);
 			preferredProjectObjectVersion = 77;
+			productRefGroup = E57D9291E9C9FC423B254D6A /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -465,7 +465,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.6.36;
+				MARKETING_VERSION = 0.6.37;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.freedom-shen.jingli";
 				PRODUCT_NAME = Jingli;
 				SDKROOT = macosx;
@@ -564,7 +564,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.6.36;
+				MARKETING_VERSION = 0.6.37;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.freedom-shen.jingli";
 				PRODUCT_NAME = Jingli;
 				SDKROOT = macosx;

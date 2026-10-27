@@ -12,6 +12,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var agentServer: AgentServer?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // 「新的一天」的起点来自设置，DayKey 全局使用。
+        DayKey.startHour = AppDefaults.current.object(forKey: "jingli.dayStartHour") as? Int ?? 8
+
         if CommandLine.arguments.contains("--snapshot") {
             SnapshotRunner.runIfRequested()
             return

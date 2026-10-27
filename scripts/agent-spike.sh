@@ -101,7 +101,10 @@ python3 - "$TMP/temp.json" <<'PY'
 import datetime, json, sys
 task = json.load(open(sys.argv[1]))["result"]
 assert task["lane"] == "temporary", task
-assert task["plannedDate"] == datetime.date.today().isoformat(), task
+# 「新的一天」默认 8 点起：8 点前仍算前一天，口径与 App 内 DayKey 一致
+now = datetime.datetime.now()
+expected = (now if now.hour >= 8 else now - datetime.timedelta(days=1)).date().isoformat()
+assert task["plannedDate"] == expected, task
 PY
 
 "$CLI" today > "$TMP/today-temp.json"
