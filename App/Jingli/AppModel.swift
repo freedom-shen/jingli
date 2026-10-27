@@ -49,7 +49,7 @@ final class AppModel: ObservableObject {
     init(store: WorkspaceStore = AppServices.shared.store) {
         self.store = store
         self.timerStore = FocusTimerStore(database: store.database)
-        self.lastRoundTaskIDs = UserDefaults.standard
+        self.lastRoundTaskIDs = AppDefaults.current
             .stringArray(forKey: Self.lastRoundDefaultsKey) ?? []
         let persistedStreak = (try? store.settingValue(Self.streakSettingKey))
             .flatMap(Int.init) ?? 0
@@ -377,7 +377,7 @@ final class AppModel: ObservableObject {
     }
 
     private func persistLastRound() {
-        UserDefaults.standard.set(lastRoundTaskIDs, forKey: Self.lastRoundDefaultsKey)
+        AppDefaults.current.set(lastRoundTaskIDs, forKey: Self.lastRoundDefaultsKey)
     }
 
     func canAddToRound(_ task: Task) -> Bool {
@@ -562,7 +562,7 @@ final class AppModel: ObservableObject {
     }
 
     private var autoDNDEnabled: Bool {
-        UserDefaults.standard.object(forKey: "jingli.autoDND") as? Bool ?? true
+        AppDefaults.current.object(forKey: "jingli.autoDND") as? Bool ?? true
     }
 
     private func beginFocusMode() -> FocusStartOutcome {

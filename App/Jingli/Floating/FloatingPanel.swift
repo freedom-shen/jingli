@@ -1,5 +1,6 @@
 import AppKit
 import SwiftUI
+import JingliCore
 
 enum FloatingPanelMode: String {
     case standard
@@ -72,21 +73,21 @@ final class FloatingPanelController {
     private(set) var mode: FloatingPanelMode
 
     private init() {
-        let raw = UserDefaults.standard.string(forKey: FloatingPanelConfiguration.modeDefaultsKey)
+        let raw = AppDefaults.current.string(forKey: FloatingPanelConfiguration.modeDefaultsKey)
         mode = raw.flatMap(FloatingPanelMode.init(rawValue:)) ?? .standard
     }
 
     var wasVisible: Bool {
-        UserDefaults.standard.bool(forKey: FloatingPanelConfiguration.visibleDefaultsKey)
+        AppDefaults.current.bool(forKey: FloatingPanelConfiguration.visibleDefaultsKey)
     }
 
     var hasEverOpened: Bool {
-        UserDefaults.standard.bool(forKey: FloatingPanelConfiguration.everOpenedDefaultsKey)
+        AppDefaults.current.bool(forKey: FloatingPanelConfiguration.everOpenedDefaultsKey)
     }
 
     func show() {
-        UserDefaults.standard.set(true, forKey: FloatingPanelConfiguration.visibleDefaultsKey)
-        UserDefaults.standard.set(true, forKey: FloatingPanelConfiguration.everOpenedDefaultsKey)
+        AppDefaults.current.set(true, forKey: FloatingPanelConfiguration.visibleDefaultsKey)
+        AppDefaults.current.set(true, forKey: FloatingPanelConfiguration.everOpenedDefaultsKey)
 
         if let panel {
             panel.orderFrontRegardless()
@@ -163,7 +164,7 @@ final class FloatingPanelController {
     }
 
     func hide() {
-        UserDefaults.standard.set(false, forKey: FloatingPanelConfiguration.visibleDefaultsKey)
+        AppDefaults.current.set(false, forKey: FloatingPanelConfiguration.visibleDefaultsKey)
         if let moveObserver {
             NotificationCenter.default.removeObserver(moveObserver)
             self.moveObserver = nil
@@ -176,7 +177,7 @@ final class FloatingPanelController {
     func setMode(_ next: FloatingPanelMode) {
         guard next != mode else { return }
         mode = next
-        UserDefaults.standard.set(next.rawValue, forKey: FloatingPanelConfiguration.modeDefaultsKey)
+        AppDefaults.current.set(next.rawValue, forKey: FloatingPanelConfiguration.modeDefaultsKey)
 
         guard let panel else { return }
         panel.contentView = makeContent()
@@ -247,7 +248,7 @@ final class FloatingPanelController {
 
         for key in keys {
             guard
-                let saved = UserDefaults.standard.array(forKey: key),
+                let saved = AppDefaults.current.array(forKey: key),
                 saved.count == 2,
                 let x = (saved[0] as? NSNumber)?.doubleValue,
                 let y = (saved[1] as? NSNumber)?.doubleValue
@@ -284,7 +285,7 @@ final class FloatingPanelController {
     }
 
     private func persist(origin: NSPoint) {
-        UserDefaults.standard.set(
+        AppDefaults.current.set(
             [origin.x, origin.y],
             forKey: FloatingPanelConfiguration.originKey(for: mode)
         )

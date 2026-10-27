@@ -23,3 +23,16 @@ public enum AppPaths {
         supportDirectory.appendingPathComponent("Backups", isDirectory: true)
     }
 }
+
+public enum AppDefaults {
+    /// 偏好设置入口。设置了 JINGLI_SUPPORT_DIR（测试隔离数据目录）的进程
+    /// 使用独立 suite，避免测试（dogfood / 快照 / agent spike）污染真实偏好，
+    /// 比如把「上一轮任务」写成临时任务 ID。
+    public static var current: UserDefaults {
+        if ProcessInfo.processInfo.environment["JINGLI_SUPPORT_DIR"] != nil {
+            return UserDefaults(suiteName: "com.freedom-shen.jingli.isolated")
+                ?? .standard
+        }
+        return .standard
+    }
+}
