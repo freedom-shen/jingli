@@ -167,6 +167,13 @@ struct FloatingPanelView: View {
                     }
                 }
             }
+            .contentShape(Circle())
+            .onTapGesture {
+                model.openMainWindow()
+            }
+            .help("回到今日清单")
+            .accessibilityLabel("回到主页面")
+            .accessibilityIdentifier("floating-panel-open-main")
 
             roundTasks
 
