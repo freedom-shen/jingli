@@ -206,6 +206,13 @@ final class FloatingPanelController {
         expand()
     }
 
+    /// 一轮专注开始时调用：浮窗可见则自动缩成迷你圆盘；
+    /// 大窗只由用户点小圆盘放大，不跟随启动状态。
+    func shrinkIfVisible() {
+        guard panel != nil else { return }
+        shrink()
+    }
+
     private func makeContent() -> FirstMouseHostingView<FloatingPanelView> {
         FirstMouseHostingView(
             rootView: FloatingPanelView(

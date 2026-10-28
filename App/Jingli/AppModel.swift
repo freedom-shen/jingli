@@ -355,6 +355,8 @@ final class AppModel: ObservableObject {
         persistTimer()
         persistFocusOwnership()
         updateTimerText()
+        // 任何入口开启专注，浮窗都先缩成迷你圆盘；大窗只由用户点开。
+        FloatingPanelController.shared.shrinkIfVisible()
         CompletionNotifier.shared.requestAuthorization()
     }
 
