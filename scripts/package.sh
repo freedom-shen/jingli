@@ -153,7 +153,7 @@ if git -C "$ROOT" rev-parse --git-dir >/dev/null 2>&1; then
     git -C "$ROOT" tag -a "$TAG" -m "Jingli $VERSION" || { echo "创建 tag $TAG 失败" >&2; exit 1; }
     echo "tag:    $TAG"
     if ! git -C "$ROOT" push origin "$TAG" >/dev/null 2>&1; then
-      echo "警告: tag $TAG 推送失败（本地已创建，稍后手动 git push origin $TAG）" >&2
+      echo "警告: tag $TAG 推送失败（本地已创建，稍后手动 git push origin ${TAG}）" >&2
     fi
   fi
 fi
