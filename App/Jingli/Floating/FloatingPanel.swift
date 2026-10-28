@@ -200,14 +200,9 @@ final class FloatingPanelController {
         setMode(.standard)
     }
 
-    /// 一轮完成时调用：浮窗可见则自动展开为标准态，方便处理上一轮任务。
-    func expandIfVisible() {
-        guard panel != nil else { return }
-        expand()
-    }
-
     /// 一轮专注开始时调用：浮窗可见则自动缩成迷你圆盘；
     /// 大窗只由用户点小圆盘放大，不跟随启动状态。
+    /// 开始 / 完成 / 休息三个时机都调用 shrinkIfVisible。
     func shrinkIfVisible() {
         guard panel != nil else { return }
         shrink()

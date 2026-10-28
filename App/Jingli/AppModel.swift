@@ -472,6 +472,7 @@ final class AppModel: ObservableObject {
         isOnBreak = true
         breakEndsAt = nowMilliseconds() + Int64(breakDurationMs)
         breakText = FocusTimer.format(breakDurationMs)
+        FloatingPanelController.shared.shrinkIfVisible()
         persistBreakState()
     }
 
@@ -582,7 +583,8 @@ final class AppModel: ObservableObject {
     private func finish(_ finished: FocusTimer) {
         lastRoundTaskIDs = finished.taskIDs
         persistLastRound()
-        FloatingPanelController.shared.expandIfVisible()
+        // 开始 / 完成 / 休息一律回到迷你圆盘，大窗只由用户点开。
+        FloatingPanelController.shared.shrinkIfVisible()
         let outcome = streak.completed()
         streak = outcome.streak
         persistStreak()
