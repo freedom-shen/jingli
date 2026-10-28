@@ -29,6 +29,16 @@ public extension WorkspaceStore {
         }
     }
 
+    /// 测试 / 快照夹具用：直接钉任务的 created_at，绕过业务写入的默认时间。
+    func setTaskCreatedAt(id: String, createdAt: String) throws {
+        try database.queue.write { db in
+            try db.execute(
+                sql: "UPDATE task SET created_at = ? WHERE id = ?",
+                arguments: [createdAt, id]
+            )
+        }
+    }
+
     /// 保存 scope 的顺序（orderedIDs 全量重写）。今天 scope 写入时顺带清掉其它日期的排序，避免堆积。
     func saveTaskOrder(scope: String, orderedIDs: [String]) throws {
         try database.queue.write { db in

@@ -271,6 +271,11 @@ enum SnapshotRunner {
             lane: "temporary",
             estimate: 2
         )
+        // created_at 默认取真实时间，「创建于」会随跨天漂移打挂快照；钉到假当前时间的日期上。
+        try AppServices.shared.store.setTaskCreatedAt(
+            id: task.id,
+            createdAt: "2026-10-22T01:00:00Z"
+        )
         let updated = try AppServices.shared.store.updateTask(
             id: task.id,
             title: task.title,
