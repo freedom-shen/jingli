@@ -72,21 +72,18 @@ struct ProjectDetailView: View {
                             .fill(Theme.card)
                     )
                 } else {
-                    ReorderableTaskGrid(
-                        model: model,
-                        scope: "project:\(project.id)",
-                        columns: columns,
-                        tasks: openTasks
-                    ) { task in
-                        TaskCard(
-                            task: task,
-                            focusState: model.focusState(for: task),
-                            addsToRound: model.canAddToRound(task),
-                            pomodoroCount: model.creditedPomodoros(for: task),
-                            onDone: { model.toggleDone(task) },
-                            onPlay: { model.toggleFocus(for: task) },
-                            onDetail: { model.openTaskDetail(task) }
-                        )
+                    LazyVGrid(columns: columns, spacing: 12) {
+                        ForEach(openTasks) { task in
+                            TaskCard(
+                                task: task,
+                                focusState: model.focusState(for: task),
+                                addsToRound: model.canAddToRound(task),
+                                pomodoroCount: model.creditedPomodoros(for: task),
+                                onDone: { model.toggleDone(task) },
+                                onPlay: { model.toggleFocus(for: task) },
+                                onDetail: { model.openTaskDetail(task) }
+                            )
+                        }
                     }
 
                     if !doneTasks.isEmpty {
