@@ -252,7 +252,10 @@ enum SnapshotRunner {
         let middle = try store.createProject(name: "IDE 真机调试支持 Clix", color: "violet")
         _ = try store.createTask(title: "USB 连接尝试简化", projectID: middle.id, lane: "main")
 
-        _ = try store.createProject(name: "旧版容器迁移收尾", color: "slate")
+        let finished = try store.createProject(name: "旧版容器迁移收尾", color: "slate")
+        let migrated = try store.createTask(title: "完成迁移", projectID: finished.id, lane: "main")
+        _ = try store.toggleTask(id: migrated.id)
+        _ = try store.createProject(name: "尚未添加任务", color: "blue")
 
         _ = try store.createTask(title: "临时：回一封邮件", lane: "temporary")
     }

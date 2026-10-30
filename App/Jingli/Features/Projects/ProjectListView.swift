@@ -35,7 +35,7 @@ struct ProjectListView: View {
                     sectionHeader(
                         "已完结",
                         count: finished.count,
-                        hint: "没有任务的项目自动沉到这里"
+                        hint: "所有任务均已完成"
                     )
                     .padding(.top, 26)
 
@@ -140,7 +140,6 @@ struct ProjectListView: View {
         .buttonStyle(.plain)
     }
 
-    /// 已完结：没有任务的项目，降权排在最后。
     private func finishedCard(_ project: Project) -> some View {
         Button {
             model.openProject(project.id)
@@ -171,11 +170,11 @@ struct ProjectListView: View {
 
                     Text(project.name)
                         .font(.system(size: 15, weight: .medium))
-                        .foregroundStyle(Theme.textPrimary)
+                        .foregroundStyle(Theme.textSecondary)
 
                     Spacer(minLength: 0)
 
-                    Text("0 个任务")
+                    Text("\(model.projectTaskCount(project.id)) 个任务 · 全部完成")
                         .font(.system(size: 10))
                         .foregroundStyle(Theme.textSecondary)
                 }

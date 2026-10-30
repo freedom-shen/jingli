@@ -922,13 +922,16 @@ final class AppModel: ObservableObject {
         projectTaskCounts[id] ?? 0
     }
 
-    /// 还有任务的项目；没有任务的归入已完结，沉到列表最后。
+    func isProjectFinished(_ id: String) -> Bool {
+        projectTaskCount(id) > 0 && !(snapshot?.groups.contains { $0.project?.id == id } ?? true)
+    }
+
     var activeProjects: [Project] {
-        projects.filter { projectTaskCount($0.id) > 0 }
+        projects.filter { !isProjectFinished($0.id) }
     }
 
     var finishedProjects: [Project] {
-        projects.filter { projectTaskCount($0.id) == 0 }
+        projects.filter { isProjectFinished($0.id) }
     }
 
     /// 临时任务：不挂在任何项目下，跨天存在，未完成的排在前面。
