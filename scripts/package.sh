@@ -61,6 +61,7 @@ xcodebuild \
   -configuration Release \
   -destination 'platform=macOS' \
   -derivedDataPath "$BUILD_DIR" \
+  -skipPackageUpdates \
   build > "$BUILD_DIR-build.log" 2>&1 || {
     tail -60 "$BUILD_DIR-build.log" >&2
     exit 1

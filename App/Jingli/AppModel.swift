@@ -355,8 +355,6 @@ final class AppModel: ObservableObject {
         persistTimer()
         persistFocusOwnership()
         updateTimerText()
-        // 任何入口开启专注，浮窗都先缩成迷你圆盘；大窗只由用户点开。
-        FloatingPanelController.shared.shrinkIfVisible()
         CompletionNotifier.shared.requestAuthorization()
     }
 
@@ -582,7 +580,6 @@ final class AppModel: ObservableObject {
     private func finish(_ finished: FocusTimer) {
         lastRoundTaskIDs = finished.taskIDs
         persistLastRound()
-        FloatingPanelController.shared.expandIfVisible()
         let outcome = streak.completed()
         streak = outcome.streak
         persistStreak()
