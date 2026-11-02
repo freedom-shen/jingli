@@ -47,6 +47,49 @@ final class WorkspaceProjectTests: XCTestCase {
 }
 
 extension WorkspaceProjectTests {
+    func testCompletedTasksAreOrderedByLatestCompletion() throws {
+        let database = try JingliDatabase.inMemory()
+        let store = WorkspaceStore(database: database)
+        let project = try store.createProject(name: "工作")
+        let first = try store.createTask(title: "先创建", projectID: project.id)
+        let second = try store.createTask(title: "后创建", projectID: project.id)
+        let pending = try store.createTask(title: "未完成", projectID: project.id)
+        _ = try store.toggleTask(id: second.id)
+        _ = try store.toggleTask(id: first.id)
+        try database.queue.write { db in
+            try db.execute(sql: "UPDATE task SET completed_at = ? WHERE done = 1",
+                           arguments: ["2026-11-02T10:00:00Z"])
+        }
+        XCTAssertEqual(try store.tasks(projectID: project.id).filter(\.done).map(\.id),
+                       [first.id, second.id])
+        XCTAssertEqual(try store.listTasks(includeDone: true).filter(\.done).map(\.id),
+                       [first.id, second.id])
+
+        try database.queue.write { db in
+            try db.execute(sql: "UPDATE task SET completed_at = ? WHERE id = ?",
+                           arguments: ["2026-11-02T10:00:00Z", second.id])
+            try db.execute(sql: "UPDATE task SET completed_at = ? WHERE id = ?",
+                           arguments: ["2026-11-02T11:00:00Z", first.id])
+        }
+
+        XCTAssertEqual(try store.tasks(projectID: project.id).map(\.id),
+                       [pending.id, first.id, second.id])
+        XCTAssertEqual(try store.listTasks(includeDone: true).filter(\.done).map(\.id),
+                       [first.id, second.id])
+
+        _ = try store.toggleTask(id: second.id)
+        XCTAssertNil(try store.listTasks().first { $0.id == second.id }?.completedAt)
+        _ = try store.toggleTask(id: second.id)
+        try database.queue.write { db in
+            try db.execute(sql: "UPDATE task SET completed_at = ? WHERE id = ?",
+                           arguments: ["2026-11-02T12:00:00Z", second.id])
+        }
+        XCTAssertEqual(try store.tasks(projectID: project.id).filter(\.done).map(\.id),
+                       [second.id, first.id])
+        XCTAssertEqual(try store.listTasks(includeDone: true).filter(\.done).map(\.id),
+                       [second.id, first.id])
+    }
+
     func testTasksAreOrderedNewestFirst() throws {
         let database = try JingliDatabase.inMemory()
         let store = WorkspaceStore(database: database)
