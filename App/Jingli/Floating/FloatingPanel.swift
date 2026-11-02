@@ -21,6 +21,10 @@ enum FloatingPanelConfiguration {
         .fullScreenAuxiliary,
         .ignoresCycle
     ]
+    static func shouldCollapse(mode: FloatingPanelMode, clickInside: Bool) -> Bool {
+        mode == .standard && !clickInside
+    }
+
     static let margin: CGFloat = 24
     static let originDefaultsKey = "jingli.floatingPanel.origin"
     static let visibleDefaultsKey = "jingli.floatingPanel.visible"
@@ -69,13 +73,11 @@ final class FloatingPanelController {
     private var panel: FloatingPanel?
     private var moveObserver: NSObjectProtocol?
     private var dragEndMonitors: [Any] = []
+    private var outsideClickMonitors: [Any] = []
     private var isSettling = false
-    private(set) var mode: FloatingPanelMode
+    private(set) var mode: FloatingPanelMode = .mini
 
-    private init() {
-        let raw = AppDefaults.current.string(forKey: FloatingPanelConfiguration.modeDefaultsKey)
-        mode = raw.flatMap(FloatingPanelMode.init(rawValue:)) ?? .standard
-    }
+    private init() {}
 
     var wasVisible: Bool {
         AppDefaults.current.bool(forKey: FloatingPanelConfiguration.visibleDefaultsKey)
@@ -117,6 +119,31 @@ final class FloatingPanelController {
         }
 
         watchDragEnd(for: panel)
+        watchOutsideClicks()
+    }
+
+    private func watchOutsideClicks() {
+        let mask: NSEvent.EventTypeMask = [.leftMouseDown, .rightMouseDown, .otherMouseDown]
+        if let global = NSEvent.addGlobalMonitorForEvents(matching: mask, handler: { [weak self] _ in
+            self?.collapseIfOutside(clickInside: false)
+        }) {
+            outsideClickMonitors.append(global)
+        }
+        if let local = NSEvent.addLocalMonitorForEvents(matching: mask, handler: { [weak self] event in
+            if let self {
+                self.collapseIfOutside(clickInside: event.window === self.panel)
+            }
+            return event
+        }) {
+            outsideClickMonitors.append(local)
+        }
+    }
+
+    private func collapseIfOutside(clickInside: Bool) {
+        guard panel?.isVisible == true,
+              FloatingPanelConfiguration.shouldCollapse(mode: mode, clickInside: clickInside)
+        else { return }
+        shrink()
     }
 
     private func watchDragEnd(for panel: FloatingPanel) {
@@ -170,8 +197,13 @@ final class FloatingPanelController {
             self.moveObserver = nil
         }
         stopWatchingDragEnd()
+        for monitor in outsideClickMonitors {
+            NSEvent.removeMonitor(monitor)
+        }
+        outsideClickMonitors.removeAll()
         panel?.orderOut(nil)
         panel = nil
+        mode = .mini
     }
 
     func setMode(_ next: FloatingPanelMode) {

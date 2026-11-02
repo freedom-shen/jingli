@@ -6,6 +6,13 @@ import JingliCore
 
 @MainActor
 final class JingliTests: XCTestCase {
+    func testFloatingPanelCollapsesOnlyForOutsideClicksWhileExpanded() {
+        XCTAssertTrue(FloatingPanelConfiguration.shouldCollapse(mode: .standard, clickInside: false))
+        XCTAssertFalse(FloatingPanelConfiguration.shouldCollapse(mode: .standard, clickInside: true))
+        XCTAssertFalse(FloatingPanelConfiguration.shouldCollapse(mode: .mini, clickInside: false))
+        XCTAssertFalse(FloatingPanelConfiguration.shouldCollapse(mode: .mini, clickInside: true))
+    }
+
     func testProjectCompletionTracksTasksAndPreservesGroupOrder() throws {
         let store = WorkspaceStore(database: try JingliDatabase.inMemory())
         let empty = try store.createProject(name: "Empty")
