@@ -56,7 +56,36 @@ public extension WorkspaceStore {
     func history(days: Int = 7, endingOn: String = DayKey.make()) throws -> [DayHistory] {
         let count = max(1, min(days, 3650))
         let keys = try historyDateKeys(endingOn: endingOn, days: count)
-        guard let start = keys.last, let end = keys.first else { return [] }
+        return try history(startingOn: keys.last!, endingOn: endingOn)
+    }
+
+    func history(startingOn: String?, endingOn: String = DayKey.make()) throws -> [DayHistory] {
+        let endDate = try historyDate(endingOn)
+        let start: String
+        if let startingOn {
+            _ = try historyDate(startingOn)
+            guard startingOn <= endingOn else { throw HistoryError.invalidDate(startingOn) }
+            start = startingOn
+        } else {
+            let earliestSession = try database.queue.read { db in
+                try String.fetchOne(db, sql: "SELECT MIN(session_date) FROM focus_session WHERE status = 'completed' AND session_date <= ?", arguments: [endingOn])
+            }
+            let completions = try database.queue.read { db in
+                try String.fetchAll(db, sql: "SELECT completed_at FROM task_completion")
+            }
+            let iso = ISO8601DateFormatter()
+            let fractional = ISO8601DateFormatter()
+            fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            let earliestCompletion = completions.compactMap { iso.date(from: $0) ?? fractional.date(from: $0) }
+                .map { DayKey.make(from: $0) }.filter { $0 <= endingOn }.min()
+            start = [earliestSession, earliestCompletion].compactMap { $0 }.min() ?? endingOn
+        }
+        let startDate = try historyDate(start)
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = .current
+        let count = (calendar.dateComponents([.day], from: startDate, to: endDate).day ?? 0) + 1
+        let keys = try historyDateKeys(endingOn: endingOn, days: count)
+        let end = endingOn
         let dateSet = Set(keys)
 
         let recordsByDate: [String: [FocusRecord]] = try database.queue.read { db in
@@ -150,6 +179,19 @@ public extension WorkspaceStore {
                 records: records
             )
         }
+    }
+
+    private func historyDate(_ key: String) throws -> Date {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = .current
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.isLenient = false
+        guard key.range(of: #"^\d{4}-\d{2}-\d{2}$"#, options: .regularExpression) != nil,
+              let date = formatter.date(from: key), formatter.string(from: date) == key else {
+            throw HistoryError.invalidDate(key)
+        }
+        return date
     }
 
     private func historyDateKeys(endingOn: String, days: Int) throws -> [String] {

@@ -84,6 +84,31 @@ final class HistoryTests: XCTestCase {
         XCTAssertEqual(yesterday.completedTasks.map(\.title), ["任务一"])
     }
 
+    func testExplicitAndAllHistoryRanges() throws {
+        let database = try JingliDatabase.inMemory()
+        let store = WorkspaceStore(database: database)
+        try database.queue.write { db in
+            try db.execute(sql: "INSERT INTO focus_session (id, session_date, started_at, duration_sec, status, credited) VALUES ('old', '2010-01-01', '2010-01-01T10:00:00Z', 1500, 'completed', 1)")
+        }
+        let all = try store.history(startingOn: nil, endingOn: "2026-11-03")
+        XCTAssertEqual(all.last?.date, "2010-01-01")
+        XCTAssertEqual(all.reduce(0) { $0 + $1.pomodoros }, 1)
+        XCTAssertEqual(try store.history(startingOn: "2026-11-01", endingOn: "2026-11-03").count, 3)
+        XCTAssertThrowsError(try store.history(startingOn: "2026-11-04", endingOn: "2026-11-03"))
+        XCTAssertThrowsError(try store.history(startingOn: "2026-02-30", endingOn: "2026-11-03"))
+    }
+
+    func testDistributionSplitsTimeAndKeepsDeletedTaskRemainder() throws {
+        let record = FocusRecord(id: "r", startedAt: "2026-11-03T10:00:00Z", durationSec: 1500,
+                                 tasks: [FocusRecordTask(id: "a", title: "A", share: 0.5)])
+        let day = DayHistory(date: "2026-11-03", pomodoros: 1, focusSeconds: 1500, completedTasks: [], records: [record])
+        let summary = HistorySummary(days: [day], tasks: [], projects: [])
+        XCTAssertEqual(summary.tasks.first?.seconds, 750)
+        XCTAssertEqual(summary.tasks.first?.pomodoros, 0.5)
+        XCTAssertEqual(summary.projects.reduce(0) { $0 + $1.seconds }, 1500)
+        XCTAssertTrue(summary.projects.contains { $0.id == "unassigned" && $0.seconds == 750 })
+    }
+
     func testHistoryRejectsInvalidDate() throws {
         let database = try JingliDatabase.inMemory()
         let store = WorkspaceStore(database: database)

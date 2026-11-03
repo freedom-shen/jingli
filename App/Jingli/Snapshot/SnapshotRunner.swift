@@ -33,6 +33,25 @@ enum SnapshotRunner {
                 AppServices.shared.model.reload()
                 AppServices.shared.model.openStats()
                 captureMainAndPanel(mainPath: mainPath, panelPath: nil)
+            case "stats-detail":
+                try seedStats()
+                AppServices.shared.model.reload()
+                let window = makeWindow(rootView: AnyView(
+                    DetailedStatsView(model: AppServices.shared.model, onBack: {})
+                        .padding(.top, 24)
+                        .frame(width: 1200, height: 1050)
+                        .preferredColorScheme(.dark)
+                        .background(Theme.background)
+                ), size: NSSize(width: 1200, height: 1050))
+                window.makeKeyAndOrderFront(nil)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    do {
+                        guard let content = window.contentView else { exit(1) }
+                        content.layoutSubtreeIfNeeded()
+                        try capture(content, to: URL(fileURLWithPath: mainPath))
+                        exit(0)
+                    } catch { exit(1) }
+                }
             case "completion":
                 let tasks = try seedCompletionTasks()
                 captureCompletion(tasks: tasks, to: mainPath)

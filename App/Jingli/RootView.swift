@@ -4,6 +4,7 @@ import JingliCore
 
 struct RootView: View {
     @ObservedObject private var model = AppServices.shared.model
+    @ObservedObject private var floatingPanel = FloatingPanelController.shared
 
     var body: some View {
         ZStack {
@@ -167,8 +168,8 @@ struct RootView: View {
                 EmptyView()
             }
 
-            Button("浮窗") {
-                FloatingPanelController.shared.show()
+            Button(floatingPanel.isVisible ? "隐藏浮窗" : "显示浮窗") {
+                floatingPanel.toggleVisibility()
             }
             .buttonStyle(.bordered)
             .controlSize(.small)

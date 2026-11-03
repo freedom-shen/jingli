@@ -3,14 +3,29 @@ import JingliCore
 
 struct StatsView: View {
     @ObservedObject var model: AppModel
+    @State private var showsDetail = false
 
     private var stats: TodayStats {
         model.stats ?? TodayStats(pomodoros: 0, focusSeconds: 0, completedTasks: 0, records: [])
     }
 
     var body: some View {
+        if showsDetail {
+            DetailedStatsView(model: model, onBack: { showsDetail = false })
+        } else {
+            todayContent
+        }
+    }
+
+    private var todayContent: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
+                HStack {
+                    Spacer()
+                    Button("详细统计", systemImage: "chart.bar.xaxis") { showsDetail = true }
+                        .buttonStyle(.bordered)
+                        .accessibilityIdentifier("stats-detail-open")
+                }
                 HStack(spacing: 14) {
                     kpiCard(
                         value: "\(stats.pomodoros)",

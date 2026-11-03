@@ -67,8 +67,18 @@ final class FirstMouseHostingView<Content: View>: NSHostingView<Content> {
 }
 
 @MainActor
-final class FloatingPanelController {
+final class FloatingPanelController: ObservableObject {
     static let shared = FloatingPanelController()
+
+    @Published private(set) var isVisible = false
+
+    func toggleVisibility() {
+        if isVisible {
+            hide()
+        } else {
+            show()
+        }
+    }
 
     private var panel: FloatingPanel?
     private var moveObserver: NSObjectProtocol?
@@ -88,6 +98,7 @@ final class FloatingPanelController {
     }
 
     func show() {
+        isVisible = true
         AppDefaults.current.set(true, forKey: FloatingPanelConfiguration.visibleDefaultsKey)
         AppDefaults.current.set(true, forKey: FloatingPanelConfiguration.everOpenedDefaultsKey)
 
@@ -191,6 +202,7 @@ final class FloatingPanelController {
     }
 
     func hide() {
+        isVisible = false
         AppDefaults.current.set(false, forKey: FloatingPanelConfiguration.visibleDefaultsKey)
         if let moveObserver {
             NotificationCenter.default.removeObserver(moveObserver)

@@ -6,6 +6,30 @@ import JingliCore
 
 @MainActor
 final class JingliTests: XCTestCase {
+    func testFloatingPanelVisibilityToggleInBothModes() {
+        let controller = FloatingPanelController.shared
+        controller.hide()
+        defer { controller.hide() }
+
+        XCTAssertFalse(controller.isVisible)
+        controller.toggleVisibility()
+        XCTAssertTrue(controller.isVisible)
+        XCTAssertEqual(controller.mode, .mini)
+        controller.toggleVisibility()
+        XCTAssertFalse(controller.isVisible)
+
+        controller.toggleVisibility()
+        controller.setMode(.standard)
+        XCTAssertTrue(controller.isVisible)
+        controller.toggleVisibility()
+        XCTAssertFalse(controller.isVisible)
+        controller.toggleVisibility()
+        XCTAssertTrue(controller.isVisible)
+        XCTAssertEqual(controller.mode, .mini)
+        controller.hide()
+        XCTAssertFalse(controller.isVisible)
+    }
+
     func testFloatingPanelCollapsesOnlyForOutsideClicksWhileExpanded() {
         XCTAssertTrue(FloatingPanelConfiguration.shouldCollapse(mode: .standard, clickInside: false))
         XCTAssertFalse(FloatingPanelConfiguration.shouldCollapse(mode: .standard, clickInside: true))

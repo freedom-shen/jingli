@@ -897,6 +897,11 @@ final class AppModel: ObservableObject {
         return projects.first { $0.id == id }
     }
 
+    func historySummary(start: String?, end: String) throws -> HistorySummary {
+        try HistorySummary(days: store.history(startingOn: start, endingOn: end),
+                           tasks: store.listTasks(includeDone: true), projects: store.listProjects())
+    }
+
     func projectTasks(_ id: String) -> [Task] {
         (try? store.tasks(projectID: id)) ?? []
     }
