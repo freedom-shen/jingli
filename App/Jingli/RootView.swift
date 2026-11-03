@@ -85,13 +85,13 @@ struct RootView: View {
 
     private var navigationBar: some View {
         HStack(spacing: 8) {
-            navigationButton("今日任务", icon: nil, selected: model.page == .day, identifier: "today-navigation") {
+            navigationButton("今日任务", icon: "checklist", selected: model.page == .day, identifier: "today-navigation") {
                 model.page = .day
             }
-            navigationButton("项目", icon: nil, selected: isProjectPage, identifier: "projects-button") {
+            navigationButton("项目", icon: "folder", selected: isProjectPage, identifier: "projects-button") {
                 model.openProjects()
             }
-            navigationButton("临时任务", icon: nil, selected: model.page == .temporaryTasks, identifier: "temporary-navigation") {
+            navigationButton("临时任务", icon: "bolt", selected: model.page == .temporaryTasks, identifier: "temporary-navigation") {
                 model.openTemporaryTasks()
             }
             Spacer()
@@ -99,7 +99,7 @@ struct RootView: View {
                 model.openStats()
             }
             Rectangle().fill(Color.white.opacity(0.1)).frame(width: 1, height: 18).padding(.horizontal, 6)
-            navigationButton("设置", icon: "gearshape", selected: model.page == .settings, identifier: "settings-button", iconOnly: true) {
+            navigationButton("设置", icon: "gearshape", selected: model.page == .settings, identifier: "settings-button") {
                 model.openSettings()
             }
         }
@@ -116,15 +116,13 @@ struct RootView: View {
         }
     }
 
-    private func navigationButton(_ title: String, icon: String?, selected: Bool, identifier: String,
-                                  iconOnly: Bool = false, action: @escaping () -> Void) -> some View {
+    private func navigationButton(_ title: String, icon: String, selected: Bool, identifier: String,
+                                  action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            HStack(spacing: 6) {
-                if let icon { Image(systemName: icon) }
-                if !iconOnly { Text(title) }
-            }
-            .font(.system(size: 12, weight: .medium))
-            .padding(.horizontal, 12).padding(.vertical, 8)
+            Image(systemName: icon)
+            .font(.system(size: 16, weight: .medium))
+            .frame(width: 36, height: 34)
+            .contentShape(Rectangle())
             .foregroundStyle(selected ? Theme.accent : Theme.textSecondary)
             .background(selected ? Theme.accent.opacity(0.12) : Color.clear, in: RoundedRectangle(cornerRadius: 7))
         }
