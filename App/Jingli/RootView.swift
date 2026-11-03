@@ -177,20 +177,14 @@ struct RootView: View {
                 }
 
                 if model.dayStarted {
-                    Button("重置") {
+                    iconButton("arrow.counterclockwise", label: "重置今日计划", identifier: "reset-day-button") {
                         model.resetDay()
                     }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
-                    .accessibilityIdentifier("reset-day-button")
                 }
 
-                Button("添加任务", systemImage: "plus") {
+                iconButton("plus", label: "添加任务", identifier: "new-task-button") {
                     model.openAddTask()
                 }
-                .buttonStyle(.bordered)
-                .controlSize(.small)
-                .accessibilityIdentifier("new-task-button")
             case .projects:
                 iconButton("plus", label: "新建项目", identifier: "new-project-button") {
                     model.openProjectEditor(nil)
@@ -210,12 +204,11 @@ struct RootView: View {
                 EmptyView()
             }
 
-            Button(floatingPanel.isVisible ? "隐藏浮窗" : "显示浮窗") {
+            iconButton("pip", label: floatingPanel.isVisible ? "隐藏浮窗" : "显示浮窗", identifier: "show-floating-panel") {
                 floatingPanel.toggleVisibility()
             }
-            .buttonStyle(.bordered)
-            .controlSize(.small)
-            .accessibilityIdentifier("show-floating-panel")
+            .tint(floatingPanel.isVisible ? Theme.accent : Theme.textSecondary)
+            .accessibilityValue(floatingPanel.isVisible ? "已显示" : "已隐藏")
         }
         .padding(.horizontal, 40)
         .padding(.top, 28)
@@ -268,6 +261,7 @@ struct RootView: View {
         }
         .buttonStyle(.bordered)
         .controlSize(.small)
+        .help(label)
         .accessibilityLabel(label)
         .accessibilityIdentifier(identifier)
     }
