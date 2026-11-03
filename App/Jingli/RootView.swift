@@ -11,6 +11,7 @@ struct RootView: View {
             Theme.background.ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 0) {
+                navigationBar
                 topBar
                 content
             }
@@ -82,6 +83,58 @@ struct RootView: View {
         }
     }
 
+    private var navigationBar: some View {
+        HStack(spacing: 8) {
+            navigationButton("今日任务", icon: nil, selected: model.page == .day, identifier: "today-navigation") {
+                model.page = .day
+            }
+            navigationButton("项目", icon: nil, selected: isProjectPage, identifier: "projects-button") {
+                model.openProjects()
+            }
+            navigationButton("临时任务", icon: nil, selected: model.page == .temporaryTasks, identifier: "temporary-navigation") {
+                model.openTemporaryTasks()
+            }
+            Spacer()
+            navigationButton("统计", icon: "chart.bar", selected: model.page == .stats, identifier: "stats-button") {
+                model.openStats()
+            }
+            Rectangle().fill(Color.white.opacity(0.1)).frame(width: 1, height: 18).padding(.horizontal, 6)
+            navigationButton("设置", icon: "gearshape", selected: model.page == .settings, identifier: "settings-button", iconOnly: true) {
+                model.openSettings()
+            }
+        }
+        .padding(.horizontal, 40)
+        .padding(.vertical, 12)
+        .background(Theme.card.opacity(0.45))
+        .overlay(alignment: .bottom) { Divider().overlay(Color.white.opacity(0.04)) }
+    }
+
+    private var isProjectPage: Bool {
+        switch model.page {
+        case .projects, .project: return true
+        default: return false
+        }
+    }
+
+    private func navigationButton(_ title: String, icon: String?, selected: Bool, identifier: String,
+                                  iconOnly: Bool = false, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 6) {
+                if let icon { Image(systemName: icon) }
+                if !iconOnly { Text(title) }
+            }
+            .font(.system(size: 12, weight: .medium))
+            .padding(.horizontal, 12).padding(.vertical, 8)
+            .foregroundStyle(selected ? Theme.accent : Theme.textSecondary)
+            .background(selected ? Theme.accent.opacity(0.12) : Color.clear, in: RoundedRectangle(cornerRadius: 7))
+        }
+        .buttonStyle(.plain)
+        .help(title)
+        .accessibilityLabel(title)
+        .accessibilityAddTraits(selected ? .isSelected : [])
+        .accessibilityIdentifier(identifier)
+    }
+
     private var topBar: some View {
         HStack(alignment: .firstTextBaseline, spacing: 12) {
             if model.page != .day {
@@ -134,21 +187,12 @@ struct RootView: View {
                     .accessibilityIdentifier("reset-day-button")
                 }
 
-                iconButton("chart.bar", label: "统计", identifier: "stats-button") {
-                    model.openStats()
-                }
-
-                iconButton("gearshape", label: "设置", identifier: "settings-button") {
-                    model.openSettings()
-                }
-
-                iconButton("plus", label: "添加今日任务", identifier: "new-task-button") {
+                Button("添加任务", systemImage: "plus") {
                     model.openAddTask()
                 }
-
-                iconButton("folder", label: "项目", identifier: "projects-button") {
-                    model.openProjects()
-                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+                .accessibilityIdentifier("new-task-button")
             case .projects:
                 iconButton("plus", label: "新建项目", identifier: "new-project-button") {
                     model.openProjectEditor(nil)
