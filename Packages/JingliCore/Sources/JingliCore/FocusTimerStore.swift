@@ -80,10 +80,19 @@ public final class FocusTimerStore: @unchecked Sendable {
         try database.queue.write { db in
             try db.execute(
                 sql: """
-                INSERT OR REPLACE INTO focus_session
+                INSERT INTO focus_session
                 (id, session_date, started_at, ended_at, duration_sec, status,
                  credited, focus_mode_on, focus_mode_owned)
                 VALUES (?, ?, ?, ?, ?, 'completed', 1, ?, ?)
+                ON CONFLICT(id) DO UPDATE SET
+                    session_date = excluded.session_date,
+                    started_at = excluded.started_at,
+                    ended_at = excluded.ended_at,
+                    duration_sec = excluded.duration_sec,
+                    status = excluded.status,
+                    credited = excluded.credited,
+                    focus_mode_on = excluded.focus_mode_on,
+                    focus_mode_owned = excluded.focus_mode_owned
                 """,
                 arguments: [
                     sessionID, timer.sessionDate, startedAt, endedAt,
