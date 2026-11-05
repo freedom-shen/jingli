@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.6.49 — 2026-11-05
+
+- 同步基础设施落地：新增 `SyncSchema`（数据库迁移 v6，变更日志表 + 业务表增删改触发器）与 `SyncStore`（本地变更日志 + 字段级合并）。
+- 架构调整：LeanCloud 改存 append-only 的 `JingliChange` 变更日志，云端不做合并；每个端按 `(entity, entityId, field)` 取最大 `rev` 归并，物化回本地 SQLite。
+- 字段级合并取代整行 LWW：多端同时改备注、勾完成等不再互相覆盖。
+- 不同步设备本地状态（`setting` / `task_order` / `agent_event`），排序按 `created_at` 等本地派生。
+- 业务写入通过 SQLite trigger 自动进入变更日志，无需改动各写入点；新增 `SyncTests` 覆盖日志与合并。
+
 ## v0.6.48 — 2026-11-03
 
 - 标题行的添加任务、浮窗显隐和重置改为加号、画中画和逆时针箭头图标，保留悬停提示及无障碍名称。
