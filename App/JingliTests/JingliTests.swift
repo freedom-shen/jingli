@@ -27,6 +27,27 @@ final class JingliTests: XCTestCase {
         XCTAssertEqual(try store.tasks(projectID: project.id).count, 5)
     }
 
+    func testResumingUnplannedTaskAddsItToTodayWithoutReplacingSession() throws {
+        let store = WorkspaceStore(database: try JingliDatabase.inMemory())
+        let task = try store.createTask(title: "未排期临时任务", lane: "temporary")
+        var timer = try XCTUnwrap(FocusTimer(taskIDs: [task.id], sessionDate: DayKey.make(), durationMs: 1_500_000))
+        let now = Int64(Date().timeIntervalSince1970 * 1000)
+        timer.start(now: now - 60_000, sessionID: "existing-round")
+        timer.pause(now: now)
+        try FocusTimerStore(database: store.database).saveActive(timer)
+        let model = AppModel(store: store)
+        XCTAssertFalse(model.isInToday(task))
+        XCTAssertTrue(model.timerIsPaused)
+
+        model.toggleFocus(for: task)
+
+        XCTAssertTrue(model.isInToday(task))
+        XCTAssertEqual(model.timer?.sessionID, "existing-round")
+        XCTAssertEqual(model.timer?.taskIDs, [task.id])
+        XCTAssertEqual(model.timer?.phase, .running)
+        XCTAssertEqual(try store.todayTasks().filter { $0.id == task.id }.count, 1)
+    }
+
     func testFloatingPanelVisibilityToggleInBothModes() {
         let controller = FloatingPanelController.shared
         controller.hide()

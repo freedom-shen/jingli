@@ -420,6 +420,13 @@ final class AppModel: ObservableObject {
 
     func resumeFocus() {
         guard var current = timer, current.phase == .paused else { return }
+        do {
+            _ = try store.addToToday(taskIDs: current.taskIDs)
+            reload()
+        } catch {
+            errorMessage = error.localizedDescription
+            return
+        }
         current.resume(now: nowMilliseconds())
         timer = current
         persistTimer()
