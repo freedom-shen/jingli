@@ -5,6 +5,7 @@ import JingliCore
 struct DetailedStatsView: View {
     @ObservedObject var model: AppModel
     let onBack: () -> Void
+    var referenceDay: String? = nil
     @State private var range = "最近 7 天"
     @State private var start = Calendar.current.date(byAdding: .day, value: -6, to: Date())!
     @State private var end = Date()
@@ -68,7 +69,7 @@ struct DetailedStatsView: View {
 
     private func load() {
         do {
-            let today = DayKey.make()
+            let today = referenceDay ?? DayKey.make()
             let finish = range == "自定义" ? key(end) : today
             let begin: String?
             if range == "全部时间" {

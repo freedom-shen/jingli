@@ -34,10 +34,10 @@ enum SnapshotRunner {
                 AppServices.shared.model.openStats()
                 captureMainAndPanel(mainPath: mainPath, panelPath: nil)
             case "stats-detail":
-                try seedStats()
+                try seedStats(referenceDay: "2026-10-22", completeTask: false)
                 AppServices.shared.model.reload()
                 let window = makeWindow(rootView: AnyView(
-                    DetailedStatsView(model: AppServices.shared.model, onBack: {})
+                    DetailedStatsView(model: AppServices.shared.model, onBack: {}, referenceDay: "2026-10-22")
                         .padding(.top, 24)
                         .frame(width: 1200, height: 1050)
                         .preferredColorScheme(.dark)
@@ -194,9 +194,9 @@ enum SnapshotRunner {
         return main
     }
 
-    private static func seedStats() throws {
+    private static func seedStats(referenceDay: String? = nil, completeTask: Bool = true) throws {
         let store = AppServices.shared.store
-        let today = DayKey.make()
+        let today = referenceDay ?? DayKey.make()
         let project = try store.createProject(name: "工作")
         let first = try store.createTask(
             title: "整理产品需求",
@@ -209,7 +209,7 @@ enum SnapshotRunner {
             lane: "temporary"
         )
         try store.startDay(taskIDs: [first.id, second.id], today: today)
-        _ = try store.toggleTask(id: second.id)
+        if completeTask { _ = try store.toggleTask(id: second.id) }
 
         let startedAt = ISO8601DateFormatter().date(from: "2026-10-22T01:30:00Z") ?? Date()
         let startedMs = Int64(startedAt.timeIntervalSince1970 * 1000)

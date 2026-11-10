@@ -6,6 +6,27 @@ import JingliCore
 
 @MainActor
 final class JingliTests: XCTestCase {
+    func testPreparingFocusAddsToTodayAndEnforcesMainLimit() throws {
+        let store = WorkspaceStore(database: try JingliDatabase.inMemory())
+        let project = try store.createProject(name: "工作")
+        let tasks = try (0..<5).map { try store.createTask(title: "主线\($0)", projectID: project.id) }
+        try store.startDay(taskIDs: Array(tasks.prefix(3)).map(\.id))
+        let temporary = try store.createTask(title: "临时", lane: "temporary")
+        let model = AppModel(store: store)
+
+        XCTAssertTrue(model.prepareTaskForFocus(tasks[3]))
+        XCTAssertEqual(model.snapshot?.todayTasks.filter { $0.lane == "main" }.count, 4)
+        XCTAssertTrue(model.prepareTaskForFocus(tasks[3]))
+        XCTAssertEqual(model.snapshot?.todayTasks.filter { $0.id == tasks[3].id }.count, 1)
+        model.startFocus(tasks[4])
+        XCTAssertNotNil(model.errorMessage)
+        XCTAssertFalse(model.timerIsActive)
+        XCTAssertFalse(model.isInToday(tasks[4]))
+        XCTAssertTrue(model.prepareTaskForFocus(temporary))
+        XCTAssertTrue(model.isInToday(temporary))
+        XCTAssertEqual(try store.tasks(projectID: project.id).count, 5)
+    }
+
     func testFloatingPanelVisibilityToggleInBothModes() {
         let controller = FloatingPanelController.shared
         controller.hide()

@@ -308,7 +308,20 @@ final class AppModel: ObservableObject {
         Set(timer?.taskIDs ?? [])
     }
 
+    @discardableResult
+    func prepareTaskForFocus(_ task: Task) -> Bool {
+        do {
+            _ = try store.addToToday(taskIDs: [task.id])
+            reload()
+            return true
+        } catch {
+            errorMessage = error.localizedDescription
+            return false
+        }
+    }
+
     func startFocus(_ task: Task) {
+        guard prepareTaskForFocus(task) else { return }
         if isOnBreak {
             skipBreak()
         }
