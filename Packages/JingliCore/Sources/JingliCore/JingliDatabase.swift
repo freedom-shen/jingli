@@ -149,20 +149,28 @@ public final class JingliDatabase: @unchecked Sendable {
                 """
             )
         }
+        migrator.registerMigration("v6_sync") { db in
+            try SyncSchema.migrate(db)
+        }
         return migrator
     }
 
     /// 跨天：未完成任务回未安排。番茄记录和日计划保留，供 CLI / Skill 查询历史。
+    ///
+    /// 这是本地派生写入，不产生同步变更：离线几天的机器不会把“清空昨日计划”推送上去，
+    /// 从而覆盖另一台今天刚排好的计划。同步端会丢弃“过去的 planned_date”远端变更。
     public func rollover(to today: String) throws {
         try queue.write { db in
-            try db.execute(
-                sql: """
-                UPDATE task
-                SET planned_date = NULL
-                WHERE done = 0 AND planned_date IS NOT NULL AND planned_date < ?
-                """,
-                arguments: [today]
-            )
+            try SyncSchema.withSuppressed(db) {
+                try db.execute(
+                    sql: """
+                    UPDATE task
+                    SET planned_date = NULL
+                    WHERE done = 0 AND planned_date IS NOT NULL AND planned_date < ?
+                    """,
+                    arguments: [today]
+                )
+            }
         }
     }
 }

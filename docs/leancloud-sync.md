@@ -1,6 +1,8 @@
 # LeanCloud 同步方案
 
-状态：设计稿（v1，2026-11-02）。对应任务：「JingLi 工具小程序化 · 数据库建立、数据库同步」。
+状态：v2 设计稿（2026-11-05）。P1 本地变更层已实现；P2 起开始接云端。
+
+对应任务：「JingLi 工具小程序化 · 数据库建立、数据库同步」。
 
 ## 1. 背景与目标
 
@@ -9,113 +11,209 @@
 - 目标：
   1. 把现有本地数据**一次性迁移**到远端；
   2. 日常**双向同步**：任何一端的改动最终一致地出现在其他端；
-  3. 远端选型已定 **LeanCloud 开发版**（免费额度约 1GB 存储 / 每日数万次请求）；
-  4. 仓库**保持可开源**：任何 AppID / Key / 密码不进仓库。
+  3. 远端用 **LeanCloud 开发版**（3 万请求/天、1GB、3 并发，个人用量足够）；
+  4. 仓库保持可开源：AppID / Key / 密码不进仓库。
+
+非目标（v1）：
+
+- 不做实时推送（定时 + 事件触发即可）；
+- 不在小程序里跑番茄计时（小程序切后台会被挂起）；
+- 不同步 `setting`、`task_order`、`agent_event` 等设备本地状态；
+- 不做按设备/项目的选择性同步（v1 所有设备共享一份数据）。
 
 ## 2. 总体架构
 
 ```
-Mac A (SQLite, 本地为主) ─┐
-Mac B (SQLite)          ─┼─► LeanCloud（单一数据源 hub）◄─ 微信小程序（SDK 直连）
-Mac C (SQLite)          ─┘
+Mac A (SQLite) ─┐
+Mac B (SQLite) ─┼─► LeanCloud（append-only 变更日志）◄─ 微信小程序
+Mac C (SQLite) ─┘
 ```
 
-- **本地 SQLite 仍是主工作区**：App 的所有功能照旧读写本地库，不依赖网络。
-- **LeanCloud 是同步 hub**：不承载业务查询，只存记录与变更。
-- 小程序端直接读写 LeanCloud（官方 `leancloud-storage` SDK），天然与 Mac 端一致。
-- 同步引擎是独立模块（`JingliSync`），对现有代码的侵入仅限于「记录本地变更时间戳」。
+- **本地 SQLite 仍是主工作区**：所有功能照旧读写本地库，不依赖网络。
+- **LeanCloud 只存变更，不做合并**：云端是 append-only 的 `JingliChange`，谁都不覆盖谁。
+- **每个端自己归并**：按 `(entity, entityId, field)` 取 `rev` 最大的值，物化到 SQLite / 小程序 storage。
+- 同步引擎是独立模块（`SyncStore`），业务写入通过 SQLite trigger 自动进入变更日志，不需要改 30 多个写入点。
+
+为什么不用“云端当前行 + 整行 LWW”：
+
+- 整行 LWW 会让 A 改备注、B 勾完成时丢掉一边；
+- 多端同时写云端同一行需要 read-modify-write，没有事务时仍会丢更新；
+- append-only 日志天然幂等、可重放，冲突只在客户端按字段解决。
 
 ## 3. 同步范围
 
-| 本地表 | 是否同步 | 说明 |
+| 本地表 | 是否同步 | 合并方式 |
 |---|---|---|
-| `project` | ✅ | 项目 |
-| `task` | ✅ | 任务（含 plannedDate，即「今天」的来源） |
-| `day_plan` / `day_plan_task` | ✅ | 开一天状态与当日选择 |
-| `focus_session` / `focus_session_task` | ✅ | 番茄记录（append-only，天然无冲突） |
-| `task_order` | ✅ | 手动排序 |
-| `setting` | 部分 | 只同步 `day_start_hour` 等用户偏好 |
-| `agent_event` | ❌ | 本地审计日志，不同步 |
+| `project` | ✅ | 字段级 LWW；删除墓碑 |
+| `task` | ✅ | 字段级 LWW；删除墓碑 |
+| `day_plan` | ✅ | 字段级 LWW；删除后更高 rev 可重建 |
+| `day_plan_task` | ✅ | 按 `(date, taskId)` 成员合并；`__present` 加/删 |
+| `focus_session` | ✅ | append-only，按 id 合并 |
+| `focus_session_task` | ✅ | `__present` + share |
+| `task_completion` | ✅ | 按 id 合并；撤销用 `__deleted` |
+| `setting` | ❌ | 计时器、`last_seen_day`、`focus_streak` 等设备本地状态 |
+| `task_order` | ❌ | v1 手动排序保持设备本地 |
+| `agent_event` | ❌ | 本地审计日志 |
 
-不做实时推送，**定时 + 事件触发**的批量同步即可（个人工具，秒级延迟无意义）。
+补充：
 
-## 4. 云端数据模型
+- `task.sort_order` / `project.sort_order` 不同步，排序按 `created_at` 等本地派生。
+- `task.created_at` 同步；`task.planned_date` 同步，但**过去的日期会被接收端丢弃**（见 5.4）。
+- `focus_session` 的完成用 UPSERT 写入，不再 `INSERT OR REPLACE`，避免产生“先删后建”的日志。
 
-每个本地表对应一个 LeanCloud class（`Project` / `Task` / `PomodoroRecord` / `DayPlan` / `TaskOrder`），字段要点：
+## 4. 本地数据模型（已实现）
 
-| 字段 | 用途 |
+迁移 `v6_sync` 新增：
+
+### 4.1 `sync_change`
+
+```sql
+seq INTEGER PRIMARY KEY AUTOINCREMENT,
+entity TEXT, entity_id TEXT, field TEXT,
+value TEXT,          -- JSON 标量/对象
+ms INTEGER,          -- 物理毫秒
+device_id TEXT,
+created_at TEXT,     -- ISO8601
+pushed_at TEXT,      -- NULL = 待推送
+rev TEXT GENERATED AS printf('%016llx-%s-%016llx', ms, device_id, seq)
+```
+
+- `rev` 是 HLC：毫秒 + 设备 + 本地序号，字符串比较即顺序。
+- 每条记录只描述一个字段；`value='null'` 表示清空。
+- `__deleted`：实体删除墓碑；`__present`：成员是否存在（今日计划 / 番茄任务关联）。
+
+### 4.2 其他表
+
+| 表 | 用途 |
 |---|---|
-| `localId` | 本地 UUID，**业务主键**。本地库结构不变，跨端引用（如 task.projectId）都存 localId |
-| `rev` | 自定义毫秒时间戳，每次写入 = 当前本地毫秒。同步游标与冲突判定都基于它 |
-| `deleted` | 软删除墓碑（true = 已删除） |
-| `ACL` | 行级权限：仅同步账号可读写 |
+| `sync_field_rev` | `(entity, entity_id, field) -> rev`，字段级 LWW 的当前版本 |
+| `sync_tombstone` | `(entity, entity_id) -> rev`，删除终态，防止旧变更复活 |
+| `sync_meta` | `device_id`、`suppress` 等运行标记 |
+| `sync_clock` | `max_ms`，本地写入的 HLC 下界 |
 
-为什么用 `rev` 而不是 LeanCloud 自带 `updatedAt`：其日期精度为**秒**，同秒内多次写无法排序；`rev` 是毫秒整数，可比较、可做增量游标。
+### 4.3 Trigger
+
+- 对 `project` / `task` / `day_plan` / `day_plan_task` / `focus_session` / `focus_session_task` / `task_completion` 安装 INSERT / UPDATE / DELETE trigger。
+- INSERT 逐字段写一条变更；UPDATE 只写真正变化的字段；DELETE 写 `__deleted` 或 `__present=false`。
+- `setting` / `task_order` / `agent_event` 不装 trigger。
+- `sync_change` 的 AFTER INSERT trigger 负责更新 `sync_field_rev`、`sync_tombstone`、`sync_clock`。
+- `suppress` 标记用于两类写入：`rollover`（本地派生，不产生变更）和 apply 远端变更（不回写）。
+
+### 4.4 今日计划的 diff 写入
+
+`saveDaySelection` / `startDay` 不再“删光当天 + 全量重插”，而是只删除真正移除的、只插入真正新增的、只更新 lane 变化的行。
+
+否则同步层无法表达“谁删了哪一条”，并集会把它加回来。
+
+### 4.5 已实现的测试
+
+`Packages/JingliCore/Tests/JingliCoreTests/SyncTests.swift`：
+
+- 创建 / 更新 / 删除的变更捕获；
+- rollover 不产生变更；
+- 今日计划只发新增 / 移除；
+- `setting` / `task_order` 不被捕获；
+- 番茄完成不产生“先删后建”；
+- 双端不同字段并发合并；
+- 删除胜过离线旧编辑；
+- 删项目后任务回到未分类；
+- 今日计划并集 + 移除传播；
+- rollover 不覆盖另一台今天的计划；
+- 过去的 `planned_date` 被丢弃。
 
 ## 5. 同步协议
 
-### 5.1 首次迁移（存量数据上云）
-
-- 本地全量读取 → 逐条转 `localId + rev + deleted=false` 推到 LeanCloud。
-- **幂等**：推送前按 `localId` 查询，已存在则比较 `rev`，云端更新才覆盖。
-- 迁移完成的判定：本地所有表推完且拉回校验条数一致。迁移脚本做成 App 内「立即同步」的首跑，不单独写一次性代码。
-
-### 5.2 增量同步（每个客户端循环执行）
+### 5.1 推送
 
 ```
-pull:  GET classes/Task?where={"rev":{"$gt":lastPulledRev}}&limit=100&order=rev
-       → 应用到本地（见 5.3 合并规则）
-push:  本地 rev > lastPushedRev 的行 → POST /1.1/batch 批量写云端
-       → 成功后更新 lastPushedRev
+pending = SELECT * FROM sync_change WHERE pushed_at IS NULL ORDER BY seq
+POST /1.1/batch  (每批 ≤ 100 条 JingliChange)
+→ 成功后 UPDATE sync_change SET pushed_at = now()
 ```
 
-- 每表各自有 `lastPulledRev` / `lastPushedRev`，存本地 `sync_state` 表。
-- 触发时机：App 启动、手动「立即同步」、有本地写操作后延迟 30 秒、每 5 分钟兜底。
-- 失败静默重试（下次触发自然重做），同步状态在设置页展示。
+- 云端对象字段：`changeID`（`deviceID:seq`）、`entity`、`localId`、`field`、`value`、`rev`、`ms`、`deviceID`、`createdAt`（服务端生成）。
+- 重试可能产生重复行；客户端按 `changeID` 去重，重复是幂等的。
+- 只有本地变更需要推送；远端 apply 不写 `sync_change`。
 
-### 5.3 合并与冲突（多 Mac 语义）
+### 5.2 拉取
 
-- **插入类数据**（focus_session / task 的创建）：无冲突，localId 相同即同一条。
-- **可变字段**（task.title / note / estimate / done、project.name）：整行 LWW（last-write-wins），`rev` 大者胜。个人多端场景下同秒改同一条的概率极低，LWW 足够；被覆盖方在设置页同步日志里留一行提示。
-- **删除**：墓碑传播。`deleted=true` 的行以更高优先级胜过未删除行（删除是明确意图）。本地收到墓碑后标记并保留 30 天再物理清理，防止离线端漏拉导致「复活」。
-- **day_plan_task**（当日选择）：按 `(date, taskId)` 合并，两侧并集去重——白天在 A 加了一件、晚上 B 加另一件，第二天两件都在。
-- **task_order**：不合并，整表 LWW（最后拖动的人说了算）。
+```
+GET /1.1/classes/JingliChange
+    ?where={"createdAt":{"$gt": cursor - 2min}}
+    &order=createdAt&limit=1000
+→ 按 changeID 去重 → SyncStore.apply(changes)
+→ cursor = max(createdAt)
+```
 
-### 5.4 小程序端
+- **游标用 LeanCloud 服务端 `createdAt`**，不用本地毫秒。
+- 2 分钟重叠覆盖分页/同秒写入；`changeID` 幂等去重。
+- `rev` 只用于字段冲突排序。
 
-- 直接读写 LeanCloud（SDK 或 REST），不经过任何 Mac。
-- 与 Mac 的合并规则同上；小程序不做本地持久层，离线不缓存写操作。
+### 5.3 新设备 / 小程序首屏
 
-## 6. Key 与安全（开源前提）
+- Mac 定期上传 `JingliSnapshot`：当前任务、项目、今日计划、最近番茄，以及 `snapshotRev`（已包含的最大 rev）。
+- 新设备先拉最新快照，再拉 `rev > snapshotRev` 的变更；不需要重放全部历史。
+- 小程序本地用 `wx.setStorageSync` 缓存物化状态；`onShow` 增量拉取。
+
+### 5.4 合并规则
+
+- **字段级 LWW**：同一个字段取 `rev` 最大者；不同字段互不覆盖。
+- **删除**：
+  - `task` / `project` / `focusSession` / `taskCompletion`：`__deleted` 是终态，旧字段变更不能复活；要恢复请新建。
+  - `day_plan`：`__deleted` 参与 rev 比较，之后更高 rev 的字段可以重建。
+  - `day_plan_task` / `focus_session_task`：用 `__present=false` 移除，之后更高 rev 的 `__present=true` 可以重新加入。
+- **今日计划**：按成员合并。A 加 t1、B 加 t2 → 并集；A 移除 t1 → `__present=false` 传播，B 不会再加回来。
+- **rollover**：本地派生，不产生同步变更；接收端丢弃 `planned_date < 今天` 的远端变更。这样离线几天的机器既不会清掉别人的今天，也不会被旧计划拉回。
+- **引用完整性**：删除 project 时，把任务的 `project_id` 置空并作为 task 的字段变更传播；不能只依赖 SQLite 外键。
+
+## 6. 首次迁移（必须先拍板）
+
+两台 Mac 上各自创建的同名任务 UUID 不同，任何同步算法都无法判断它们“是同一件事”。首次迁移前必须选一条路：
+
+1. **canonical source（推荐）**：选一台 Mac 作为基准；其他机器整库备份（复制 `jingli.sqlite`，不要用 JSON 备份，JSON 不含番茄历史）→ 清空数据库 → 全量拉取。
+2. **一次性去重合并**：保留两边数据，按标题 / 项目 / 日期列出疑似重复，人工合并 ID 后再上云。工作量大一截，只在两边都有大量独有数据时做。
+
+注意：
+
+- 不要在已同步的设备上随意导入旧 JSON 备份：`BackupService.importJSON` 会按 id 覆盖 `planned_date/done/note`，会再次制造“数据混”。
+- 迁移完成后，云端应能按 `localId` 查到与本地一致的条数；先在两台机器的测试库跑，再切真实数据。
+
+## 7. 账号、配对与安全
 
 **原则：仓库里只有代码，没有凭证。**
 
-1. AppID / AppKey / 账号密码存放在**仓库外**的本地配置：
-   - `~/Library/Application Support/Jingli/sync.plist`（该目录整体被 `.gitignore` 排除，且本就不在仓库内）；
-   - 密码优先存 macOS Keychain。
-2. 代码里通过 `SyncConfig.load()` 读取；配置缺失时同步功能整体禁用并在设置页提示，App 其余功能不受影响。
-3. **文档与提交里只允许出现占位符**（`<APP_ID>` / `<APP_KEY>`），本方案即示范。
-4. 纵深防御（即使 Key 泄露也不丢数据）：
-   - 所有数据行挂 ACL，仅同步账号（LeanCloud `_User`）可读写；客户端启动时账号密码登录（密码在 Keychain）；
-   - AppKey 泄露最多消耗免费配额，读不到 ACL 保护的行；
-   - LeanCloud 控制台可随时重置 Key。
+- 不需要微信登录 / openid。v1 使用**一个同步账号 + 一次性配对**：
+  1. Mac A 生成随机强密码的 LeanCloud `_User`；
+  2. 所有 `JingliChange` / `JingliSnapshot` 行 ACL 只给这个用户读写；
+  3. 设置页显示一次性配对串/二维码（`appId` + `appKey` + `serverURL` + 同步账号 + 密码）；
+  4. Mac B / 小程序扫一次或粘一次，之后存 Keychain / `wx.setStorageSync`，每次启动静默登录，没有登录界面。
+- AppKey 放在小程序包里是正常的（它本来就是客户端 key）；真正的秘密是同步账号密码和 ACL。AppSecret 不进仓库、不进小程序。
+- 想吊销设备：改同步账号密码，并在 LeanCloud 控制台清理旧 `_Session`。以后要按设备吊销，再上 LeanCloud Role + 微信 openid。
 
-## 7. 实施步骤
+## 8. LeanCloud / 微信小程序的现实约束
 
-1. **Phase 1 – 配置与骨架**：注册 LeanCloud、建应用；`SyncConfig` / `sync.plist`；`JingliSync` 模块骨架与设置页「同步」区块（状态 + 立即同步按钮）。
-2. **Phase 2 – 首次迁移**：全量推送本地数据（幂等），云控制台核对条数。
-3. **Phase 3 – 增量同步**：pull/push 循环、sync_state、墓碑与 LWW 合并、单测（合并规则与墓碑传播）。
-4. **Phase 4 – 多端验证**：两台 Mac 对照测试（A 改标题 / B 改备注 / C 删除），确认最终一致。
-5. **Phase 5 – 小程序**：接 SDK，读同一套 class；同步规则复用。
-6. **Phase 6 – 打磨**：同步日志、失败重试提示、墓碑清理任务。
+- **免费额度**：开发版 3 万 API 请求/天、1GB 存储、3 并发；2–3 台 Mac + 一个小程序日常用远低于限额。需要实名认证。
+- **域名**：LeanCloud 国内版数据存储要求绑定**已备案域名**；测试/共享域名可用，但官方明确说可能回收、无可用性保证。体验版自用可以先跑测试域名；长期日用建议买域名做备案（几十元/年 + 1–3 周）。
+- **小程序合法域名**：小程序后台要把该域名加入 `request 合法域名`；体验版可以开开发调试绕过校验，但不适合长期日用。
+- **小程序备案**：体验版一般可以先跑；正式发布前要完成小程序备案（以公众平台提示为准）。个人主体做工具类、只自己用没有问题。
+- **小程序能力边界**：只做“看今天 / 快速加任务 / 勾完成 / 改备注 / 看最近专注记录”；不跑计时器。
 
-## 8. 风险与对策
+## 9. 实施步骤
+
+1. **P1 – 本地变更层（已完成）**：v6 迁移、trigger、`sync_field_rev`、`sync_tombstone`、`SyncStore.apply`、rollover 静默、今日计划 diff、双端单测；`swift test` 95/95。
+2. **P2 – Mac 同步引擎**：`SyncConfig`（Keychain + 仓库外配置）、LeanCloud REST（URLSession，不引 SDK）、登录、pull/push、`JingliSnapshot`、设置页状态/“立即同步”。
+3. **P3 – 迁移与双机验证**：canonical Mac、全量推送、两台 Mac 对照（改标题 / 改备注 / 删除 / 离线跨天 / 同时排今天）。
+4. **P4 – 小程序 MVP**：今日列表、加临时任务、勾完成、备注；一次配对后静默同步；首屏快照。
+5. **P5 – 打磨**：同步日志/冲突提示、墓碑清理、快照压缩（可选）、多设备吊销。
+
+## 10. 风险与对策
 
 | 风险 | 对策 |
 |---|---|
-| LeanCloud 免费版 30 天无请求归档 | 多端日常使用不会触发；仍可在设置页显示「上次同步时间」引起注意 |
-| 免费版 QPS / 日请求限额 | 批量 batch 写 + 同步节流；单人远低于限额 |
-| 双端同一秒内互改（LWW 丢一侧） | 概率极低；同步日志留痕，重要字段（note）未来可升级为字段级合并 |
-| 体验版小程序的合法域名限制 | 体验版开启调试模式（不校验域名）即可；正式上线再走 LeanCloud 商用版域名绑定 |
-| 第三方服务不可用 | 本地 SQLite 离线完整可用，云端只是副本；恢复后增量同步自然追平 |
-| Key 泄露 | ACL + 账号体系兜底（见第 6 节）；Key 可随时重置 |
+| LeanCloud 免费版配额/可用性 | 本地优先；批量写 + 增量拉；设置页显示上次同步时间 |
+| 测试域名被回收 | `serverURL` 可配置；长期日用绑定已备案域名 |
+| 双端时钟偏差 | HLC + 服务端 `createdAt` 游标；重叠拉取 |
+| 删除 vs 离线编辑 | task/project 删除终态；要恢复新建 |
+| 首次迁移产生重复任务 | 先选 canonical Mac，其他机器备份后重置；或一次性去重 |
+| 旧备份导入覆盖新数据 | 已同步设备上禁止直接导入旧 JSON；只用于迁移/灾难恢复 |
+| AppKey/密码泄露 | ACL 只授权同步账号；AppKey 可公开，密码存 Keychain/微信 storage；可改密 |

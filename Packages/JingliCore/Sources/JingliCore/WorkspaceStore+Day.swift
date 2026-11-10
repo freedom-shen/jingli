@@ -135,23 +135,10 @@ public extension WorkspaceStore {
         let tasks = taskIDs.isEmpty
             ? []
             : try validateSelection(taskIDs, today: today, checkCompletedSlots: false)
-        let unique = tasks.map(\.id)
 
         try database.queue.write { db in
-            try db.execute(
-                sql: "DELETE FROM day_plan_task WHERE date = ?",
-                arguments: [today]
-            )
             let now = Self.timestamp()
-            for task in tasks {
-                try db.execute(
-                    sql: """
-                    INSERT INTO day_plan_task (date, task_id, lane, selected_at)
-                    VALUES (?, ?, ?, ?)
-                    """,
-                    arguments: [today, task.id, task.lane, now]
-                )
-            }
+            try replaceDayPlanTasks(db, date: today, tasks: tasks, now: now)
             try db.execute(
                 sql: """
                 INSERT INTO day_plan (date, started, started_at)
@@ -160,7 +147,6 @@ public extension WorkspaceStore {
                 """,
                 arguments: [today]
             )
-            _ = unique
         }
     }
 
@@ -185,20 +171,8 @@ public extension WorkspaceStore {
                 arguments: StatementArguments([today] + unique)
             )
 
-            try db.execute(
-                sql: "DELETE FROM day_plan_task WHERE date = ?",
-                arguments: [today]
-            )
             let now = Self.timestamp()
-            for task in tasks {
-                try db.execute(
-                    sql: """
-                    INSERT INTO day_plan_task (date, task_id, lane, selected_at)
-                    VALUES (?, ?, ?, ?)
-                    """,
-                    arguments: [today, task.id, task.lane, now]
-                )
-            }
+            try replaceDayPlanTasks(db, date: today, tasks: tasks, now: now)
             try db.execute(
                 sql: """
                 INSERT INTO day_plan (date, started, started_at)
@@ -549,6 +523,55 @@ public extension WorkspaceStore {
             )
         }
         return true
+    }
+
+    /// 只写真正变化的今日计划成员：新增 / 移除 / lane 变化。
+    /// 这样同步层能拿到“谁被加进来、谁被移除”，而不是一次 delete-all + insert-all。
+    private func replaceDayPlanTasks(
+        _ db: Database,
+        date: String,
+        tasks: [Task],
+        now: String
+    ) throws {
+        let existing = Set(
+            try String.fetchAll(
+                db,
+                sql: "SELECT task_id FROM day_plan_task WHERE date = ?",
+                arguments: [date]
+            )
+        )
+        let desired = Set(tasks.map(\.id))
+
+        for taskID in existing.subtracting(desired) {
+            try db.execute(
+                sql: "DELETE FROM day_plan_task WHERE date = ? AND task_id = ?",
+                arguments: [date, taskID]
+            )
+        }
+
+        for task in tasks where !existing.contains(task.id) {
+            try db.execute(
+                sql: """
+                INSERT INTO day_plan_task (date, task_id, lane, selected_at)
+                VALUES (?, ?, ?, ?)
+                """,
+                arguments: [date, task.id, task.lane, now]
+            )
+        }
+
+        for task in tasks where existing.contains(task.id) {
+            let currentLane = try String.fetchOne(
+                db,
+                sql: "SELECT lane FROM day_plan_task WHERE date = ? AND task_id = ?",
+                arguments: [date, task.id]
+            )
+            if currentLane != task.lane {
+                try db.execute(
+                    sql: "UPDATE day_plan_task SET lane = ? WHERE date = ? AND task_id = ?",
+                    arguments: [task.lane, date, task.id]
+                )
+            }
+        }
     }
 
     private func validateSelection(
