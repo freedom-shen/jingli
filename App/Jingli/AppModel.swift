@@ -30,6 +30,9 @@ final class AppModel: ObservableObject {
     @Published var commandText = ""
     @Published var commandMessage: String?
 
+    /// 手机网页（远程加任务）。
+    let remoteWeb: RemoteWebController
+
     private static let lastRoundDefaultsKey = "jingli.lastRoundTaskIDs"
     private static let streakSettingKey = "focus_streak"
     static let longBreakMinutes = 25
@@ -49,6 +52,7 @@ final class AppModel: ObservableObject {
     init(store: WorkspaceStore = AppServices.shared.store) {
         self.store = store
         self.timerStore = FocusTimerStore(database: store.database)
+        self.remoteWeb = RemoteWebController(store: store)
         self.lastRoundTaskIDs = AppDefaults.current
             .stringArray(forKey: Self.lastRoundDefaultsKey) ?? []
         let persistedStreak = (try? store.settingValue(Self.streakSettingKey))

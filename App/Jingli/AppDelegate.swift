@@ -35,6 +35,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         CompletionNotifier.shared.configure()
         startAgentServer()
+        configureRemoteWeb()
         runDailyBackup()
         AppServices.shared.model.startTicking()
 
@@ -57,6 +58,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         agentServer?.stop()
+        AppServices.shared.model.remoteWeb.stop()
         FocusModeCoordinator.shared.endAndWait()
         try? AppServices.shared.store.setSettingValue("focus_owned", nil)
     }
@@ -91,6 +93,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             NSWorkspace.shared.open(failure.supportDirectory)
         }
         NSApp.terminate(nil)
+    }
+
+    private func configureRemoteWeb() {
+        // 网页改完数据后让主界面重新读库；回调来自 HTTP 服务线程，切回主线程。
+        AppServices.shared.model.remoteWeb.setChangeHandler {
+            DispatchQueue.main.async {
+                AppServices.shared.model.reload()
+            }
+        }
+        AppServices.shared.model.remoteWeb.startIfEnabled()
     }
 
     private func startAgentServer() {

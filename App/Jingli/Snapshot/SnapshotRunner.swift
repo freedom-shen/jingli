@@ -43,14 +43,17 @@ enum SnapshotRunner {
                         .preferredColorScheme(.dark)
                         .background(Theme.background)
                 ), size: NSSize(width: 1200, height: 1050))
+                NSApp.activate(ignoringOtherApps: true)
                 window.makeKeyAndOrderFront(nil)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    do {
-                        guard let content = window.contentView else { exit(1) }
-                        content.layoutSubtreeIfNeeded()
-                        try capture(content, to: URL(fileURLWithPath: mainPath))
-                        exit(0)
-                    } catch { exit(1) }
+                whenActive {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        do {
+                            guard let content = window.contentView else { exit(1) }
+                            content.layoutSubtreeIfNeeded()
+                            try capture(content, to: URL(fileURLWithPath: mainPath))
+                            exit(0)
+                        } catch { exit(1) }
+                    }
                 }
             case "completion":
                 let tasks = try seedCompletionTasks()
@@ -338,6 +341,18 @@ enum SnapshotRunner {
                 exit(1)
             }
             exit(0)
+        }
+    }
+
+    /// 等 App 真正成为前台再截图：NSSegmentedControl 这类 AppKit 控件在非激活窗口里会画成灰色，
+    /// 否则基线会随机器是否抢到焦点而漂移。
+    private static func whenActive(attempt: Int = 0, _ body: @escaping () -> Void) {
+        if NSApp.isActive || attempt >= 30 {
+            body()
+            return
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            whenActive(attempt: attempt + 1, body)
         }
     }
 

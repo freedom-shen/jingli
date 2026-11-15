@@ -153,6 +153,10 @@ struct SettingsView: View {
                         .foregroundStyle(Theme.textSecondary.opacity(0.8))
                 }
 
+                section("手机网页（远程加任务）") {
+                    RemoteWebSettingsContent(controller: model.remoteWeb)
+                }
+
                 section("启动") {
                     Toggle("开机自动启动", isOn: $launchAtLogin)
                         .toggleStyle(.switch)
