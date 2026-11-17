@@ -346,12 +346,23 @@ enum SnapshotRunner {
 
     /// 等 App 真正成为前台再截图：NSSegmentedControl 这类 AppKit 控件在非激活窗口里会画成灰色，
     /// 否则基线会随机器是否抢到焦点而漂移。
+    /// 等到 App 激活**并且**窗口成为 key window 再截图。
+    ///
+    /// 分段控件（如详细统计的时间范围）在 key / 非 key 两种状态下选中色不同，
+    /// 只等 App 激活不够 —— 抢不到焦点时窗口仍是非 key，截图就会闪。
     private static func whenActive(attempt: Int = 0, _ body: @escaping () -> Void) {
-        if NSApp.isActive || attempt >= 30 {
+        let keyWindow = NSApp.windows.first { $0.isVisible && !($0 is NSPanel) }
+        let ready = NSApp.isActive && (keyWindow?.isKeyWindow ?? false)
+        if ready || attempt >= 30 {
             body()
             return
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            // 重试期间持续请求焦点，避免 App 激活了但窗口不是 key
+            if attempt % 5 == 0 {
+                NSApp.activate(ignoringOtherApps: true)
+                keyWindow?.makeKeyAndOrderFront(nil)
+            }
             whenActive(attempt: attempt + 1, body)
         }
     }
