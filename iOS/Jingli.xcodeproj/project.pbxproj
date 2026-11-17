@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		272F9FAE80A662AF8FC4CD1C /* JingliCore in Frameworks */ = {isa = PBXBuildFile; productRef = 00854301257684596A8AE39D /* JingliCore */; };
 		2E29B1746F39E1025D19C0F8 /* DayStartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7212BA70871C2AD4EA5768C /* DayStartView.swift */; };
+		390A0715593B0CD34313D61C /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92BC65678CFBDB340EB288 /* StatsView.swift */; };
 		8CD57953E872AF7A6FAF691D /* IOSAppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7725BAEB1AECAA6F13EF9E9D /* IOSAppModel.swift */; };
 		A5465BE37DBAA78A1FB3C1A9 /* JingliApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC9618A2DBBE55DDF8631873 /* JingliApp.swift */; };
 		AE5E95FED3D3F8CFB42AA741 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E13E357DCCBD85D8BA129B9 /* TodayView.swift */; };
@@ -24,6 +25,7 @@
 		83D70C90B6CB19BF9F0720D9 /* Jingli.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Jingli.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8ECA132F9266F52FDF28D189 /* JingliCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = JingliCore; path = ../Packages/JingliCore; sourceTree = SOURCE_ROOT; };
 		94DA84C0289342098B879CF7 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		9F92BC65678CFBDB340EB288 /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
 		A7D8943A027AE96346006510 /* FocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusView.swift; sourceTree = "<group>"; };
 		CC9618A2DBBE55DDF8631873 /* JingliApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JingliApp.swift; sourceTree = "<group>"; };
 		E7212BA70871C2AD4EA5768C /* DayStartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayStartView.swift; sourceTree = "<group>"; };
@@ -41,6 +43,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		04808A9719535D36A0BC07E3 /* Stats */ = {
+			isa = PBXGroup;
+			children = (
+				9F92BC65678CFBDB340EB288 /* StatsView.swift */,
+			);
+			path = Stats;
+			sourceTree = "<group>";
+		};
 		55E4ADA9813DD50298B67C62 /* Design */ = {
 			isa = PBXGroup;
 			children = (
@@ -98,6 +108,7 @@
 			children = (
 				862195377975CB8FA2846EB2 /* DayStart */,
 				C3DC31CB89B564DFF523DCE5 /* Focus */,
+				04808A9719535D36A0BC07E3 /* Stats */,
 				5D96B945E1E3D71F036CB901 /* Today */,
 			);
 			path = Features;
@@ -197,6 +208,7 @@
 				8CD57953E872AF7A6FAF691D /* IOSAppModel.swift in Sources */,
 				A5465BE37DBAA78A1FB3C1A9 /* JingliApp.swift in Sources */,
 				CE4F61388333ED626B1C2209 /* RootView.swift in Sources */,
+				390A0715593B0CD34313D61C /* StatsView.swift in Sources */,
 				AE5E95FED3D3F8CFB42AA741 /* TodayView.swift in Sources */,
 				F7A54B477261A61BB05228BF /* Tokens.swift in Sources */,
 			);

@@ -2,7 +2,14 @@ import SwiftUI
 
 struct RootView: View {
     @Environment(IOSAppModel.self) private var model
-    @State private var tab: Tab = .today
+    @State private var tab: Tab
+
+    init() {
+        // 截图/联调用：-screen=统计 直接打开对应 Tab
+        let arg = CommandLine.arguments.first { $0.hasPrefix("-screen=") }
+        let name = arg?.dropFirst("-screen=".count).description
+        _tab = State(initialValue: name.flatMap(Tab.init(rawValue:)) ?? .today)
+    }
 
     enum Tab: String, CaseIterable {
         case today = "今天", projects = "项目", stats = "统计", settings = "设置"
@@ -29,6 +36,8 @@ struct RootView: View {
                     } else {
                         DayStartView()
                     }
+                case .stats:
+                    StatsView()
                 default:
                     PlaceholderView(title: tab.rawValue)
                 }
