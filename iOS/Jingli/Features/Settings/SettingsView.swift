@@ -5,6 +5,7 @@ import JingliCore
 /// 等 M3 的 transport 接上，这里再加同步状态和手动同步。
 struct SettingsView: View {
     @Environment(IOSAppModel.self) private var model
+    @State private var syncing = false
 
     private var fileSize: String {
         let url = AppPaths.databaseURL
@@ -26,10 +27,7 @@ struct SettingsView: View {
                     ("number", "任务总数", "\(taskCount)"),
                     ("lock.shield", "位置", "App Group"),
                 ])
-                section("同步", rows: [
-                    ("icloud", "iCloud", "未接入"),
-                    ("arrow.triangle.2.circlepath", "待同步", "0 条"),
-                ])
+                syncSection
                 hint.padding(.top, 16)
                 section("关于", rows: [
                     ("app.badge", "版本", version),
@@ -42,6 +40,78 @@ struct SettingsView: View {
             .padding(.horizontal, 20)
             .padding(.bottom, 24)
         }
+        .task { await model.refreshSyncStatus() }
+    }
+
+    private var syncSection: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("同步")
+                .font(.system(size: 10.5)).tracking(1.2)
+                .foregroundStyle(Tokens.text3)
+                .padding(.leading, 4).padding(.bottom, 8).padding(.top, 18)
+
+            VStack(spacing: 0) {
+                row("icloud", "iCloud", "已开启")
+                Divider().overlay(Tokens.line).padding(.leading, 46)
+                row("arrow.triangle.2.circlepath", "待同步", "\(model.syncStatus?.pending ?? 0) 条")
+                Divider().overlay(Tokens.line).padding(.leading, 46)
+                row("clock", "上次同步", lastSyncText)
+                if let error = model.syncStatus?.lastError {
+                    Divider().overlay(Tokens.line).padding(.leading, 46)
+                    HStack(spacing: 10) {
+                        Image(systemName: "exclamationmark.triangle")
+                            .font(.system(size: 12)).foregroundStyle(Tokens.tomato).frame(width: 22)
+                        Text(error).font(.system(size: 11)).foregroundStyle(Tokens.tomato)
+                            .lineLimit(2)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 14).padding(.vertical, 11)
+                }
+
+                Divider().overlay(Tokens.line).padding(.leading, 46)
+                Button {
+                    _Concurrency.Task {
+                        syncing = true
+                        await model.syncNow()
+                        syncing = false
+                    }
+                } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: "arrow.clockwise")
+                            .font(.system(size: 12)).foregroundStyle(Tokens.accent).frame(width: 22)
+                        Text(syncing ? "同步中…" : "立即同步")
+                            .font(.system(size: 13.5)).foregroundStyle(Tokens.accent)
+                        Spacer()
+                        if syncing { ProgressView().controlSize(.small) }
+                    }
+                    .padding(.horizontal, 14).padding(.vertical, 13)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .disabled(syncing)
+            }
+            .background(Tokens.card, in: RoundedRectangle(cornerRadius: 14))
+            .overlay(RoundedRectangle(cornerRadius: 14).stroke(Tokens.line))
+        }
+    }
+
+    private func row(_ icon: String, _ title: String, _ value: String) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: icon)
+                .font(.system(size: 12)).foregroundStyle(Tokens.text3).frame(width: 22)
+            Text(title).font(.system(size: 13.5)).foregroundStyle(Tokens.text)
+            Spacer()
+            Text(value).font(.system(size: 12)).foregroundStyle(Tokens.text3)
+        }
+        .padding(.horizontal, 14).padding(.vertical, 13)
+    }
+
+    private var lastSyncText: String {
+        guard let date = model.syncStatus?.lastSyncAt else { return "还没同步" }
+        let formatter = RelativeDateTimeFormatter()
+        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.unitsStyle = .short
+        return formatter.localizedString(for: date, relativeTo: Date())
     }
 
     private var version: String {
@@ -89,9 +159,9 @@ struct SettingsView: View {
 
     private var hint: some View {
         HStack(spacing: 9) {
-            Image(systemName: "info.circle")
+            Image(systemName: "lock.shield")
                 .font(.system(size: 12)).foregroundStyle(Tokens.accent)
-            Text("同步还没接：等 iCloud 容器就绪后，这里会显示上次同步时间和待推送条数。")
+            Text("数据只在你自己的 iCloud 私有库里，主 App 和 Widget 共用同一份。")
                 .font(.system(size: 11)).foregroundStyle(Tokens.text3)
             Spacer()
         }

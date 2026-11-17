@@ -11,6 +11,9 @@ import JingliSync
 final class IOSAppModel {
     let database: JingliDatabase
     let store: WorkspaceStore
+    let syncStore: SyncStore
+    private var syncService: SyncService?
+    private(set) var syncStatus: SyncService.Status?
     let timerStore: FocusTimerStore
 
     private(set) var snapshot: TodaySnapshot?
@@ -75,6 +78,34 @@ final class IOSAppModel {
         }
     }
 
+    /// 本地写入完成后调用：去抖 2 秒再同步。
+    func noteSyncChange() {
+        let service = syncService
+        _Concurrency.Task { await service?.noteLocalChange() }
+    }
+
+    func syncNow() async {
+        guard let syncService else { return }
+        syncStatus = await syncService.syncNow()
+    }
+
+    func refreshSyncStatus() async {
+        guard let syncService else { return }
+        syncStatus = await syncService.status()
+    }
+
+    /// 自检：走「本地写入 → noteSyncChange → 去抖 → 推送」这条真实路径。
+    func testSyncWiring() async {
+        let stamp = DateFormatter()
+        stamp.dateFormat = "HHmmss"
+        _ = try? store.createTask(title: "接线验证 \(stamp.string(from: Date()))", lane: "temporary", plannedDate: today)
+        noteSyncChange()
+        NSLog("[WIRE] 写入完成，待推送=\(((try? syncStore.pendingCount()) ?? -1))")
+        try? await _Concurrency.Task.sleep(nanoseconds: 8_000_000_000)
+        await refreshSyncStatus()
+        NSLog("[WIRE] 8 秒后 待推送=\(((try? syncStore.pendingCount()) ?? -1)) 上次同步=\(String(describing: syncStatus?.lastSyncAt)) 错误=\(String(describing: syncStatus?.lastError))")
+    }
+
     /// 真机自检：用真实的库跑一次完整同步（推本地变更 → 拉远端 → 重放）。
     func runCloudKitSync() async {
         let sync = SyncStore(database: database)
@@ -114,6 +145,16 @@ final class IOSAppModel {
         }
         store = WorkspaceStore(database: database)
         timerStore = FocusTimerStore(database: database)
+        syncStore = SyncStore(database: database)
+        syncService = SyncService(
+            store: syncStore,
+            engine: SyncEngine(
+                store: syncStore,
+                transport: CloudKitTransport(config: .init(containerIdentifier: CloudKitDiagnostics.containerID))
+            ),
+            debounceSeconds: 2
+        )
+
         seedDemoIfNeeded()
         refresh()
 
@@ -122,6 +163,9 @@ final class IOSAppModel {
         }
         if CommandLine.arguments.contains("-cksync") {
             _Concurrency.Task { await self.runCloudKitSync() }
+        }
+        if CommandLine.arguments.contains("-syncwiring") {
+            _Concurrency.Task { await self.testSyncWiring() }
         }
 
         // 截图/联调用：-autofocus 直接起一轮
@@ -174,6 +218,7 @@ final class IOSAppModel {
     func createProject(name: String, description: String, color: String) throws {
         _ = try store.createProject(name: name, description: description, color: color)
         refresh()
+        noteSyncChange()
     }
 
     @discardableResult
@@ -195,30 +240,35 @@ final class IOSAppModel {
             _ = try store.updateTask(id: task.id, title: task.title, note: note, estimate: estimate)
         }
         refresh()
+        noteSyncChange()
         return task
     }
 
     func addToToday(taskIDs: [String]) throws {
         _ = try store.addToToday(taskIDs: taskIDs, today: today)
         refresh()
+        noteSyncChange()
     }
 
     @discardableResult
     func updateTask(id: String, title: String, note: String, estimate: Int?) throws -> JingliCore.Task? {
         let updated = try store.updateTask(id: id, title: title, note: note, estimate: estimate)
         refresh()
+        noteSyncChange()
         return updated
     }
 
     func deleteTask(id: String) throws {
         _ = try store.deleteTask(id: id)
         refresh()
+        noteSyncChange()
     }
 
     func toggle(_ task: JingliCore.Task) {
         do {
             _ = try store.toggleTask(id: task.id)
             refresh()
+            noteSyncChange()
         } catch {
             errorText = error.localizedDescription
         }
@@ -314,6 +364,7 @@ final class IOSAppModel {
         NotificationScheduler.cancelFocusEnd()
         FocusActivityManager.shared.end()
         refresh()
+        noteSyncChange()
     }
 
     // MARK: - 休息

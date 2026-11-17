@@ -12,9 +12,18 @@ struct JingliApp: App {
         _model = State(initialValue: IOSAppModel())
     }
 
+    @Environment(\.scenePhase) private var scenePhase
+
     var body: some Scene {
         WindowGroup {
-            RootView().environment(model)
+            RootView()
+                .environment(model)
+                .onChange(of: scenePhase) { _, phase in
+                    // 回到前台补一次同步（后台期间可能错过了对端的写入）
+                    if phase == .active {
+                        _Concurrency.Task { await model.syncNow() }
+                    }
+                }
         }
     }
 }
