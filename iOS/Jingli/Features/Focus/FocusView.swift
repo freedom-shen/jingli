@@ -70,6 +70,7 @@ struct FocusView: View {
                             .overlay(RoundedRectangle(cornerRadius: 15).stroke(Tokens.line))
                     }
                     .buttonStyle(.plain)
+                    .accessibilityIdentifier("focus.end")
 
                     Button {
                         if model.timer?.phase == .paused { model.resumeFocus() } else { model.pauseFocus() }
@@ -81,6 +82,7 @@ struct FocusView: View {
                             .background(Tokens.accent, in: RoundedRectangle(cornerRadius: 15))
                     }
                     .buttonStyle(.plain)
+                    .accessibilityIdentifier("focus.pause")
                 }
                 .padding(.bottom, 18)
 

@@ -88,6 +88,7 @@ struct SettingsView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.syncNow")
                 .disabled(syncing)
             }
             .background(Tokens.card, in: RoundedRectangle(cornerRadius: 14))

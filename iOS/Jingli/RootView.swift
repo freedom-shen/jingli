@@ -14,6 +14,15 @@ struct RootView: View {
     enum Tab: String, CaseIterable {
         case today = "今天", projects = "项目", stats = "统计", settings = "设置"
 
+        var accessibilityKey: String {
+            switch self {
+            case .today: return "today"
+            case .projects: return "projects"
+            case .stats: return "stats"
+            case .settings: return "settings"
+            }
+        }
+
         var icon: String {
             switch self {
             case .today: return "checklist"
@@ -86,6 +95,7 @@ struct RootView: View {
                     .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("tab.\(item.accessibilityKey)")
             }
         }
         .padding(.top, 10)

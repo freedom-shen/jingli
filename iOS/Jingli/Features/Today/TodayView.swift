@@ -87,8 +87,10 @@ struct TodayView: View {
             HStack(spacing: 8) {
                 Button { showAdd = true } label: { iconButton("plus") }
                     .buttonStyle(.plain)
+                    .accessibilityIdentifier("today.header.add")
                 Button { showAssistant = true } label: { iconButton("sparkles", tint: Tokens.accent) }
                     .buttonStyle(.plain)
+                    .accessibilityIdentifier("today.header.assistant")
             }
         }
         .padding(.top, 8)

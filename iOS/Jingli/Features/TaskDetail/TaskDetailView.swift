@@ -55,6 +55,7 @@ struct TaskDetailView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("保存") { save() }
                         .fontWeight(.semibold)
+                        .accessibilityIdentifier("taskdetail.save")
                         .foregroundStyle(Tokens.accent)
                         .disabled(title.trimmingCharacters(in: .whitespaces).isEmpty)
                 }

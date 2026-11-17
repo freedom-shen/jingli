@@ -72,6 +72,7 @@ struct CompletionSheet: View {
                     .background(Tokens.green, in: RoundedRectangle(cornerRadius: 15))
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("completion.break")
             .padding(.top, 16)
 
             Button {
@@ -86,6 +87,7 @@ struct CompletionSheet: View {
                     .overlay(RoundedRectangle(cornerRadius: 13).stroke(Tokens.line))
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("completion.dismiss")
             .padding(.top, 9)
         }
         .padding(.horizontal, 20)

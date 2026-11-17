@@ -137,6 +137,7 @@ struct DayStartView: View {
                                 in: RoundedRectangle(cornerRadius: 15))
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("daystart.start")
             .disabled(selected.isEmpty)
         }
         .padding(.horizontal, 20)

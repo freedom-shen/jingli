@@ -186,6 +186,7 @@ struct AssistantView: View {
                     )
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("assistant.mic")
 
             Button(action: send) {
                 Image(systemName: "arrow.up")
@@ -195,6 +196,7 @@ struct AssistantView: View {
                     .background(draft.isEmpty ? Tokens.accent.opacity(0.35) : Tokens.accent, in: Circle())
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("assistant.send")
             .disabled(draft.isEmpty || model.assistantBusy)
             }
         }

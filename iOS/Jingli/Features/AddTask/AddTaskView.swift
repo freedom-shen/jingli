@@ -51,6 +51,7 @@ struct AddTaskView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("保存") { save() }
                         .fontWeight(.semibold)
+                        .accessibilityIdentifier("addtask.save")
                         .foregroundStyle(canSave ? Tokens.accent : Tokens.text3)
                         .disabled(!canSave)
                 }

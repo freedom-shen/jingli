@@ -53,6 +53,7 @@ struct ProjectsView: View {
                     .background(Color.white.opacity(0.06), in: Circle())
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("projects.add")
         }
         .padding(.top, 8)
     }
