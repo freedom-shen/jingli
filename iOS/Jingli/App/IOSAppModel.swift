@@ -18,6 +18,9 @@ final class IOSAppModel {
     private(set) var projectGroups: [ProjectGroup] = []
     private(set) var today: String = DayKey.make()
     private(set) var timer: FocusTimer?
+    private(set) var pendingCompletion: FocusCompletion?
+    private(set) var breakEndsAt: Date?
+    private(set) var breakMinutes: Int = 0
     var errorText: String?
 
     // MARK: - 助手
@@ -92,6 +95,10 @@ final class IOSAppModel {
         refresh()
 
         // 截图/联调用：-autofocus 直接起一轮
+        if CommandLine.arguments.contains("-fasttimer"), timer == nil,
+           let first = snapshot?.todayTasks.first(where: { !$0.done && $0.lane == "main" }) {
+            startFocus(taskID: first.id, durationMs: 6_000)
+        }
         if CommandLine.arguments.contains("-autofocus"), timer == nil,
            let first = snapshot?.todayTasks.first(where: { !$0.done && $0.lane == "main" }) {
             startFocus(taskID: first.id)
@@ -210,15 +217,18 @@ final class IOSAppModel {
 
     private func nowMs() -> Int64 { Int64(Date().timeIntervalSince1970 * 1000) }
 
-    func startFocus(taskID: String) {
+    func startFocus(taskID: String, durationMs: Int = FocusTimer.defaultDurationMs) {
         guard timer == nil,
-              var newTimer = FocusTimer(taskIDs: [taskID], sessionDate: today) else { return }
+              var newTimer = FocusTimer(taskIDs: [taskID], sessionDate: today, durationMs: durationMs) else { return }
         newTimer.start(now: nowMs(), sessionID: UUID().uuidString)
         timer = newTimer
         try? timerStore.saveActive(newTimer)
     }
 
     func tick() {
+        if let end = breakEndsAt, end <= Date() {
+            skipBreak()
+        }
         guard var current = timer, current.phase == .running else { return }
         current.tick(now: nowMs())
         timer = current
@@ -241,10 +251,42 @@ final class IOSAppModel {
 
     func finishRound() {
         guard let current = timer else { return }
-        if current.isFinished { _ = try? timerStore.complete(current) }
+        if current.isFinished {
+            pendingCompletion = try? timerStore.complete(current)
+        }
         timer = nil
         try? timerStore.clearActive()
         refresh()
+    }
+
+    // MARK: - 休息
+
+    /// 连续 4 个番茄后下一次休息是长休（25 分钟），否则 5 分钟。
+    var longBreakPending: Bool {
+        let pomodoros = stats?.pomodoros ?? 0
+        return pomodoros > 0 && pomodoros % FocusStreak.threshold == 0
+    }
+
+    var isOnBreak: Bool { breakEndsAt != nil }
+
+    var breakRemainingMs: Int {
+        guard let breakEndsAt else { return 0 }
+        return max(0, Int(breakEndsAt.timeIntervalSinceNow * 1000))
+    }
+
+    func startBreak() {
+        let minutes = longBreakPending ? 25 : 5
+        breakMinutes = minutes
+        breakEndsAt = Date().addingTimeInterval(TimeInterval(minutes * 60))
+        pendingCompletion = nil
+    }
+
+    func skipBreak() {
+        breakEndsAt = nil
+    }
+
+    func dismissCompletion() {
+        pendingCompletion = nil
     }
 
     // MARK: - Demo 数据（只在 -demo 启动参数下写入一次）

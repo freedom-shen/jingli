@@ -58,6 +58,17 @@ struct RootView: View {
                 .opacity(model.timer == nil ? 1 : 0)
         }
         .preferredColorScheme(.dark)
+        .sheet(isPresented: Binding(
+            get: { model.pendingCompletion != nil },
+            set: { if !$0 { model.dismissCompletion() } }
+        )) {
+            if let completion = model.pendingCompletion {
+                CompletionSheet(completion: completion)
+                    .presentationDetents([.height(420)])
+                    .presentationDragIndicator(.visible)
+                    .presentationBackground(Tokens.bg)
+            }
+        }
     }
 
     private var tabBar: some View {

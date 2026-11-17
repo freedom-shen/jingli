@@ -21,6 +21,9 @@ struct TodayView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
+                if model.isOnBreak {
+                    BreakBanner().padding(.bottom, 12)
+                }
                 header
                 if let stats = model.stats {
                     SummaryStrip(stats: stats, mainCount: mainTasks.count)
