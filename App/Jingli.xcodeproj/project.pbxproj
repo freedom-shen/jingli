@@ -42,6 +42,7 @@
 		DAF84A1D562BD1BB41F2A8BA /* TaskDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A74B80342124F664E60A8A17 /* TaskDetailView.swift */; };
 		E28996E8F472B638EE36B8A5 /* TaskCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB8767B7A713D102C631EF4 /* TaskCard.swift */; };
 		F09691D382E6B33E87DDDAA4 /* JingliTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDD74A624DACE35D5575E551 /* JingliTests.swift */; };
+		F625D24EAAD9431C3DD34766 /* JingliAgentSocket in Frameworks */ = {isa = PBXBuildFile; productRef = F2E67580ABAAD326E10FC7E8 /* JingliAgentSocket */; };
 		FF00BF88A88ED10537CD2B0A /* JingliCore in Frameworks */ = {isa = PBXBuildFile; productRef = 8B43A917917AD4BD75DF5D28 /* JingliCore */; };
 /* End PBXBuildFile section */
 
@@ -109,6 +110,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				272F9FAE80A662AF8FC4CD1C /* JingliCore in Frameworks */,
+				F625D24EAAD9431C3DD34766 /* JingliAgentSocket in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -320,6 +322,7 @@
 			name = Jingli;
 			packageProductDependencies = (
 				00854301257684596A8AE39D /* JingliCore */,
+				F2E67580ABAAD326E10FC7E8 /* JingliAgentSocket */,
 			);
 			productName = Jingli;
 			productReference = 83D70C90B6CB19BF9F0720D9 /* Jingli.app */;
@@ -365,6 +368,7 @@
 				};
 			};
 			buildConfigurationList = DCFA703EEA55213148D3F7C3 /* Build configuration list for PBXProject "Jingli" */;
+			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -377,7 +381,6 @@
 				5142151ACA68B8A33EF9E354 /* XCLocalSwiftPackageReference "../Packages/JingliCore" */,
 			);
 			preferredProjectObjectVersion = 77;
-			productRefGroup = E57D9291E9C9FC423B254D6A /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -709,6 +712,10 @@
 		8B43A917917AD4BD75DF5D28 /* JingliCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = JingliCore;
+		};
+		F2E67580ABAAD326E10FC7E8 /* JingliAgentSocket */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = JingliAgentSocket;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

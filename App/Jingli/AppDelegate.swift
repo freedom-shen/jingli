@@ -1,5 +1,6 @@
 import AppKit
 import JingliCore
+import JingliAgentSocket
 import OSLog
 
 @MainActor

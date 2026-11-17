@@ -2,6 +2,7 @@ import Darwin
 import Foundation
 import XCTest
 @testable import JingliCore
+@testable import JingliAgentSocket
 
 final class AgentServerTests: XCTestCase {
     func testPingPermissionAndConcurrentWrites() throws {

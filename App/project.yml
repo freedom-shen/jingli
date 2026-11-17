@@ -25,6 +25,8 @@ targets:
       - path: Jingli
     dependencies:
       - package: JingliCore
+      - package: JingliCore
+        product: JingliAgentSocket
     settings:
       base:
         PRODUCT_NAME: Jingli

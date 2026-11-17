@@ -6,6 +6,7 @@ let package = Package(
     platforms: [.macOS(.v15), .iOS(.v17)],
     products: [
         .library(name: "JingliCore", targets: ["JingliCore"]),
+        .library(name: "JingliAgentSocket", targets: ["JingliAgentSocket"]),
         .executable(name: "jingli-snapshot-diff", targets: ["SnapshotDiff"]),
         .executable(name: "jingli", targets: ["jingli"])
     ],
@@ -19,9 +20,13 @@ let package = Package(
                 .product(name: "GRDB", package: "GRDB.swift")
             ]
         ),
+        .target(
+            name: "JingliAgentSocket",
+            dependencies: ["JingliCore"]
+        ),
         .testTarget(
             name: "JingliCoreTests",
-            dependencies: ["JingliCore"]
+            dependencies: ["JingliCore", "JingliAgentSocket"]
         ),
         .executableTarget(
             name: "SnapshotDiff",
