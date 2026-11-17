@@ -78,6 +78,33 @@ final class IOSAppModel {
         }
     }
 
+    @discardableResult
+    func createTask(
+        title: String,
+        projectID: String?,
+        lane: String,
+        estimate: Int?,
+        note: String
+    ) throws -> JingliCore.Task {
+        let task = try store.createTask(
+            title: title,
+            projectID: projectID,
+            lane: lane,
+            plannedDate: nil,
+            estimate: estimate
+        )
+        if !note.isEmpty {
+            _ = try store.updateTask(id: task.id, title: task.title, note: note, estimate: estimate)
+        }
+        refresh()
+        return task
+    }
+
+    func addToToday(taskIDs: [String]) throws {
+        _ = try store.addToToday(taskIDs: taskIDs, today: today)
+        refresh()
+    }
+
     func toggle(_ task: JingliCore.Task) {
         do {
             _ = try store.toggleTask(id: task.id)

@@ -3,6 +3,7 @@ import JingliCore
 
 struct TodayView: View {
     @Environment(IOSAppModel.self) private var model
+    @State private var showAdd = false
 
     private var mainTasks: [JingliCore.Task] {
         (model.snapshot?.todayTasks.filter { $0.lane == "main" } ?? [])
@@ -53,6 +54,10 @@ struct TodayView: View {
             .padding(.bottom, 24)
         }
         .safeAreaInset(edge: .top) { Color.clear.frame(height: 0) }
+        .sheet(isPresented: $showAdd) { AddTaskView() }
+        .task {
+            if CommandLine.arguments.contains("-addsheet") { showAdd = true }
+        }
     }
 
     private var header: some View {
@@ -64,7 +69,8 @@ struct TodayView: View {
             Spacer()
             HStack(spacing: 8) {
                 iconButton("mic.fill", tint: Tokens.accent)
-                iconButton("plus")
+                Button { showAdd = true } label: { iconButton("plus") }
+                    .buttonStyle(.plain)
                 iconButton("ellipsis")
             }
         }
