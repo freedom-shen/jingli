@@ -1,0 +1,262 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1680" height="1500" viewBox="0 0 1680 1500">
+<rect width="1680" height="1500" fill="#0D1117"/>
+<defs><linearGradient id="glow" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1B2A33" stop-opacity="0.55"/><stop offset="1" stop-color="#0D1117" stop-opacity="0"/></linearGradient></defs>
+<rect width="1680" height="440" fill="url(#glow)"/>
+<marker id="ah-sage" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#6FBF9B"/></marker>
+<marker id="ah-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#E3B662"/></marker>
+<marker id="ah-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#6CA9E0"/></marker>
+<marker id="ah-violet" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#A98BE0"/></marker>
+<marker id="ah-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#E08A8A"/></marker>
+<marker id="ah-grey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#5C6675"/></marker>
+<rect x="72" y="42" width="34" height="4" rx="2" fill="#6FBF9B"/>
+<text x="72" y="92" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="34" font-weight="700" fill="#E6EDF3" text-anchor="start">精力管理 · iOS + iCloud 架构</text>
+<text x="72" y="124" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="15" font-weight="400" fill="#8B98A5" text-anchor="start">v0.1 设计稿 · 一套 JingliCore、一条变更日志、一个工具表</text>
+<text x="1608" y="92" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="13" font-weight="400" fill="#6B7785" text-anchor="end">2026-11-17</text>
+<text x="1608" y="116" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#6B7785" text-anchor="end">基于 v0.6.50 代码</text>
+<rect x="72" y="176" width="928" height="152" rx="14" fill="#131922" stroke="#242C37" stroke-width="1"/>
+<rect x="88" y="198" width="3" height="11" rx="1.5" fill="#6FBF9B"/>
+<text x="100" y="208" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="600" fill="#8B98A5" text-anchor="start" letter-spacing="1.5">CLIENTS</text>
+<text x="206.39999999999998" y="208" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="400" fill="#6B7785" text-anchor="start">四个进入面：两个 App、一个网页、一个 Agent</text>
+<rect x="88.0" y="216" width="213.5" height="96" rx="10" fill="#0F141B" stroke="#242C37" stroke-width="1"/>
+<rect x="88.0" y="216" width="3" height="96" rx="1.5" fill="#6FBF9B" opacity="0.85"/>
+<text x="104.0" y="243" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#E6EDF3" text-anchor="start">macOS · 精力管理</text>
+<text x="104.0" y="266" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">SwiftUI + AppKit</text>
+<text x="104.0" y="284" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">菜单栏 / 浮窗 / 全局弹窗</text>
+<text x="104.0" y="302" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">v0.6.50 已上线</text>
+<rect x="315.5" y="216" width="213.5" height="96" rx="10" fill="#0F141B" stroke="#242C37" stroke-width="1"/>
+<rect x="315.5" y="216" width="3" height="96" rx="1.5" fill="#6FBF9B" opacity="0.85"/>
+<text x="331.5" y="243" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#E6EDF3" text-anchor="start">iPhone · 精力管理</text>
+<text x="331.5" y="266" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">SwiftUI｜今天 / 项目 / 统计</text>
+<text x="331.5" y="284" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">Widget · Live Activity</text>
+<text x="331.5" y="302" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">本设计稿</text>
+<rect x="488.6" y="225" width="28.4" height="18" rx="9" fill="#6FBF9B" opacity="0.14"/>
+<text x="502.79999999999995" y="237.5" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="500" fill="#6FBF9B" text-anchor="middle">新增</text>
+<rect x="543.0" y="216" width="213.5" height="96" rx="10" fill="#0F141B" stroke="#242C37" stroke-width="1"/>
+<rect x="543.0" y="216" width="3" height="96" rx="1.5" fill="#E3B662" opacity="0.85"/>
+<text x="559.0" y="243" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#E6EDF3" text-anchor="start">手机网页（已上线）</text>
+<text x="559.0" y="266" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">Safari + Tailscale</text>
+<text x="559.0" y="284" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">看今天 · 加临时任务</text>
+<text x="559.0" y="302" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">勾完成 · 开启今天</text>
+<rect x="716.1" y="225" width="28.4" height="18" rx="9" fill="#E3B662" opacity="0.14"/>
+<text x="730.3" y="237.5" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="500" fill="#E3B662" text-anchor="middle">v1</text>
+<rect x="770.5" y="216" width="213.5" height="96" rx="10" fill="#0F141B" stroke="#242C37" stroke-width="1"/>
+<rect x="770.5" y="216" width="3" height="96" rx="1.5" fill="#5C6675" opacity="0.85"/>
+<text x="786.5" y="243" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#E6EDF3" text-anchor="start">外部 Agent</text>
+<text x="786.5" y="266" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">Claude Code / Codex</text>
+<text x="786.5" y="284" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">CLI → socket（仅 macOS）</text>
+<text x="786.5" y="302" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">SKILL.md</text>
+<rect x="72" y="376" width="928" height="172" rx="14" fill="#131922" stroke="#242C37" stroke-width="1"/>
+<rect x="88" y="398" width="3" height="11" rx="1.5" fill="#A98BE0"/>
+<text x="100" y="408" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="600" fill="#8B98A5" text-anchor="start" letter-spacing="1.5">ENTRY</text>
+<text x="180.0" y="408" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="400" fill="#6B7785" text-anchor="start">对话 · 快捷指令 · CLI · 网页，都落到同一张工具表</text>
+<rect x="88.0" y="416" width="213.5" height="116" rx="10" fill="#0F141B" stroke="#242C37" stroke-width="1"/>
+<rect x="88.0" y="416" width="3" height="116" rx="1.5" fill="#A98BE0" opacity="0.85"/>
+<text x="104.0" y="443" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#E6EDF3" text-anchor="start">对话 / 代理循环</text>
+<text x="104.0" y="466" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">模型流式输出</text>
+<text x="104.0" y="484" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">→ tool_calls</text>
+<text x="104.0" y="502" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">→ 执行 → 结果回灌</text>
+<rect x="315.5" y="416" width="213.5" height="116" rx="10" fill="#0F141B" stroke="#242C37" stroke-width="1"/>
+<rect x="315.5" y="416" width="3" height="116" rx="1.5" fill="#A98BE0" opacity="0.85"/>
+<text x="331.5" y="443" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#E6EDF3" text-anchor="start">模型 Provider</text>
+<text x="331.5" y="466" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">端上 Foundation Models</text>
+<text x="331.5" y="484" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">云端 OpenAI 兼容</text>
+<text x="331.5" y="502" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">Key 存 Keychain</text>
+<rect x="543.0" y="416" width="213.5" height="116" rx="10" fill="#0F141B" stroke="#242C37" stroke-width="1"/>
+<rect x="543.0" y="416" width="3" height="116" rx="1.5" fill="#E3B662" opacity="0.85"/>
+<text x="559.0" y="443" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#E6EDF3" text-anchor="start">Skill 契约</text>
+<text x="559.0" y="466" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">SKILL.md：提示词 + 工具说明</text>
+<text x="559.0" y="484" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">ToolCatalog：JSON Schema</text>
+<text x="559.0" y="502" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">与 CLI 子命令一一对应</text>
+<rect x="770.5" y="416" width="213.5" height="116" rx="10" fill="#0F141B" stroke="#242C37" stroke-width="1"/>
+<rect x="770.5" y="416" width="3" height="116" rx="1.5" fill="#E3B662" opacity="0.85"/>
+<text x="786.5" y="443" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#E6EDF3" text-anchor="start">App Intents</text>
+<text x="786.5" y="466" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">Siri / 快捷指令</text>
+<text x="786.5" y="484" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">聚焦 / Apple Intelligence</text>
+<text x="786.5" y="502" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">不用模型也能操作</text>
+<rect x="72" y="596" width="928" height="152" rx="14" fill="#131922" stroke="#242C37" stroke-width="1"/>
+<rect x="88" y="618" width="3" height="11" rx="1.5" fill="#6FBF9B"/>
+<text x="100" y="628" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="600" fill="#8B98A5" text-anchor="start" letter-spacing="1.5">CORE</text>
+<text x="166.8" y="628" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="400" fill="#6B7785" text-anchor="start">macOS 与 iOS 共用同一份 Swift Package</text>
+<rect x="88.0" y="636" width="213.5" height="96" rx="10" fill="#0F141B" stroke="#242C37" stroke-width="1"/>
+<rect x="88.0" y="636" width="3" height="96" rx="1.5" fill="#E3B662" opacity="0.85"/>
+<text x="104.0" y="663" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#E6EDF3" text-anchor="start">AgentCommandRouter</text>
+<text x="104.0" y="686" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">方法表：today / task.* /</text>
+<text x="104.0" y="704" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">day.* / focus.* / stats.*</text>
+<text x="104.0" y="722" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">CLI · 模型 · Intents · 网页共用</text>
+<rect x="315.5" y="636" width="213.5" height="96" rx="10" fill="#0F141B" stroke="#242C37" stroke-width="1"/>
+<rect x="315.5" y="636" width="3" height="96" rx="1.5" fill="#6FBF9B" opacity="0.85"/>
+<text x="331.5" y="663" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#E6EDF3" text-anchor="start">业务规则</text>
+<text x="331.5" y="686" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">WorkspaceStore</text>
+<text x="331.5" y="704" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">主线 ≤ 4、lane、日期锁</text>
+<rect x="543.0" y="636" width="213.5" height="96" rx="10" fill="#0F141B" stroke="#242C37" stroke-width="1"/>
+<rect x="543.0" y="636" width="3" height="96" rx="1.5" fill="#6FBF9B" opacity="0.85"/>
+<text x="559.0" y="663" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#E6EDF3" text-anchor="start">计时</text>
+<text x="559.0" y="686" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">FocusTimer</text>
+<text x="559.0" y="704" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">只存 endsAt，按截止对时</text>
+<rect x="770.5" y="636" width="213.5" height="96" rx="10" fill="#0F141B" stroke="#242C37" stroke-width="1"/>
+<rect x="770.5" y="636" width="3" height="96" rx="1.5" fill="#6FBF9B" opacity="0.85"/>
+<text x="786.5" y="663" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#E6EDF3" text-anchor="start">统计 · 备份 · 审计</text>
+<text x="786.5" y="686" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">Stats / History</text>
+<text x="786.5" y="704" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">BackupService / agent_event</text>
+<rect x="72" y="796" width="928" height="152" rx="14" fill="#131922" stroke="#242C37" stroke-width="1"/>
+<rect x="88" y="818" width="3" height="11" rx="1.5" fill="#6CA9E0"/>
+<text x="100" y="828" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="600" fill="#8B98A5" text-anchor="start" letter-spacing="1.5">LOCAL DATA</text>
+<text x="246.0" y="828" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="400" fill="#6B7785" text-anchor="start">SQLite 仍是主工作区，在线与否都先落本机</text>
+<rect x="88.0" y="836" width="213.5" height="96" rx="10" fill="#0F141B" stroke="#242C37" stroke-width="1"/>
+<rect x="88.0" y="836" width="3" height="96" rx="1.5" fill="#6CA9E0" opacity="0.85"/>
+<text x="104.0" y="863" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#E6EDF3" text-anchor="start">SQLite（GRDB）</text>
+<text x="104.0" y="886" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">project / task / day_plan</text>
+<text x="104.0" y="904" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">focus_session / completion</text>
+<rect x="315.5" y="836" width="213.5" height="96" rx="10" fill="#0F141B" stroke="#242C37" stroke-width="1"/>
+<rect x="315.5" y="836" width="3" height="96" rx="1.5" fill="#6CA9E0" opacity="0.85"/>
+<text x="331.5" y="863" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#E6EDF3" text-anchor="start">Trigger 变更日志</text>
+<text x="331.5" y="886" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">sync_change：一行一个字段</text>
+<text x="331.5" y="904" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">HLC rev = 毫秒 + 设备 + 序号</text>
+<rect x="543.0" y="836" width="213.5" height="96" rx="10" fill="#0F141B" stroke="#242C37" stroke-width="1"/>
+<rect x="543.0" y="836" width="3" height="96" rx="1.5" fill="#6CA9E0" opacity="0.85"/>
+<text x="559.0" y="863" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#E6EDF3" text-anchor="start">合并元数据</text>
+<text x="559.0" y="886" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">sync_field_rev</text>
+<text x="559.0" y="904" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">sync_tombstone / sync_clock</text>
+<rect x="770.5" y="836" width="213.5" height="96" rx="10" fill="#0F141B" stroke="#242C37" stroke-width="1"/>
+<rect x="770.5" y="836" width="3" height="96" rx="1.5" fill="#6CA9E0" opacity="0.85"/>
+<text x="786.5" y="863" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#E6EDF3" text-anchor="start">Snapshot</text>
+<text x="786.5" y="886" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">物化快照 + snapshotRev</text>
+<text x="786.5" y="904" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">新设备首屏，不重放历史</text>
+<rect x="72" y="996" width="928" height="152" rx="14" fill="#131922" stroke="#242C37" stroke-width="1"/>
+<rect x="88" y="1018" width="3" height="11" rx="1.5" fill="#E3B662"/>
+<text x="100" y="1028" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="600" fill="#8B98A5" text-anchor="start" letter-spacing="1.5">SYNC</text>
+<text x="166.8" y="1028" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="400" fill="#6B7785" text-anchor="start">传输层可替换：CloudKit（Apple 端）· CloudBase（小程序）</text>
+<rect x="88.0" y="1036" width="289.3333333333333" height="96" rx="10" fill="#0F141B" stroke="#242C37" stroke-width="1"/>
+<rect x="88.0" y="1036" width="3" height="96" rx="1.5" fill="#E3B662" opacity="0.85"/>
+<text x="104.0" y="1063" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#E6EDF3" text-anchor="start">SyncEngine</text>
+<text x="104.0" y="1086" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">push / pull 调度、重试、幂等</text>
+<text x="104.0" y="1104" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">断点续传、失败降级</text>
+<rect x="391.3333333333333" y="1036" width="289.3333333333333" height="96" rx="10" fill="#0F141B" stroke="#242C37" stroke-width="1"/>
+<rect x="391.3333333333333" y="1036" width="3" height="96" rx="1.5" fill="#E3B662" opacity="0.85"/>
+<text x="407.3333333333333" y="1063" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#E6EDF3" text-anchor="start">SyncTransport 协议</text>
+<text x="407.3333333333333" y="1086" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">CloudKit ⇄ CloudBase 可替换</text>
+<text x="407.3333333333333" y="1104" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">复用同一套 apply / merge</text>
+<rect x="694.6666666666666" y="1036" width="289.3333333333333" height="96" rx="10" fill="#0F141B" stroke="#242C37" stroke-width="1"/>
+<rect x="694.6666666666666" y="1036" width="3" height="96" rx="1.5" fill="#E3B662" opacity="0.85"/>
+<text x="710.6666666666666" y="1063" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#E6EDF3" text-anchor="start">同步状态</text>
+<text x="710.6666666666666" y="1086" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">上次同步时间 / 待推送条数</text>
+<text x="710.6666666666666" y="1104" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">无账号时静默本地模式</text>
+<rect x="72" y="1196" width="928" height="146" rx="14" fill="#131922" stroke="#242C37" stroke-width="1"/>
+<rect x="88" y="1218" width="3" height="11" rx="1.5" fill="#6CA9E0"/>
+<text x="100" y="1228" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="600" fill="#8B98A5" text-anchor="start" letter-spacing="1.5">iCloud</text>
+<text x="193.2" y="1228" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="400" fill="#6B7785" text-anchor="start">CloudKit 私有库 · Zone「JingliZone」· 每台设备只写自己的 recordName</text>
+<rect x="88.0" y="1236" width="289.3333333333333" height="90" rx="10" fill="#0F141B" stroke="#242C37" stroke-width="1"/>
+<rect x="88.0" y="1236" width="3" height="90" rx="1.5" fill="#6CA9E0" opacity="0.85"/>
+<text x="104.0" y="1263" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#E6EDF3" text-anchor="start">Change</text>
+<text x="104.0" y="1286" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">recordName = deviceID:seq</text>
+<text x="104.0" y="1304" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">推送天然幂等</text>
+<rect x="391.3333333333333" y="1236" width="289.3333333333333" height="90" rx="10" fill="#0F141B" stroke="#242C37" stroke-width="1"/>
+<rect x="391.3333333333333" y="1236" width="3" height="90" rx="1.5" fill="#6CA9E0" opacity="0.85"/>
+<text x="407.3333333333333" y="1263" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#E6EDF3" text-anchor="start">Snapshot</text>
+<text x="407.3333333333333" y="1286" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">按周覆盖写</text>
+<text x="407.3333333333333" y="1304" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">首屏 bootstrap</text>
+<rect x="694.6666666666666" y="1236" width="289.3333333333333" height="90" rx="10" fill="#0F141B" stroke="#242C37" stroke-width="1"/>
+<rect x="694.6666666666666" y="1236" width="3" height="90" rx="1.5" fill="#5C6675" opacity="0.85"/>
+<text x="710.6666666666666" y="1263" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#E6EDF3" text-anchor="start">Presence（可选）</text>
+<text x="710.6666666666666" y="1286" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">设备心跳 / 正在计时</text>
+<text x="710.6666666666666" y="1304" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="11.6" font-weight="400" fill="#8B98A5" text-anchor="start">只做提示，不做仲裁</text>
+<line x1="350" y1="336" x2="350" y2="368" stroke="#6FBF9B" stroke-width="1.6" marker-end="url(#ah-sage)" stroke-linecap="round"/>
+<text x="362" y="358" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="10.8" font-weight="400" fill="#6B7785" text-anchor="start">点击 / 说话</text>
+<line x1="811" y1="336" x2="811" y2="368" stroke="#5C6675" stroke-width="1.6" stroke-dasharray="5 5" marker-end="url(#ah-grey)" stroke-linecap="round"/>
+<text x="823" y="358" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="10.8" font-weight="400" fill="#6B7785" text-anchor="start">CLI → socket（macOS）</text>
+<line x1="350" y1="556" x2="350" y2="588" stroke="#A98BE0" stroke-width="1.6" marker-start="url(#ah-violet)" marker-end="url(#ah-violet)" stroke-linecap="round"/>
+<text x="362" y="578" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="10.8" font-weight="400" fill="#6B7785" text-anchor="start">tool_calls（与 CLI 同一套校验）</text>
+<line x1="280" y1="756" x2="280" y2="788" stroke="#6CA9E0" stroke-width="1.6" marker-start="url(#ah-blue)" marker-end="url(#ah-blue)" stroke-linecap="round"/>
+<text x="292" y="778" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="10.8" font-weight="400" fill="#6B7785" text-anchor="start">SQL；trigger 同事务写变更</text>
+<line x1="880" y1="756" x2="880" y2="788" stroke="#6CA9E0" stroke-width="1.6" marker-start="url(#ah-blue)" marker-end="url(#ah-blue)" stroke-linecap="round"/>
+<text x="892" y="778" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="10.8" font-weight="400" fill="#6B7785" text-anchor="start">apply() 物化</text>
+<line x1="240" y1="956" x2="240" y2="988" stroke="#E3B662" stroke-width="1.6" marker-end="url(#ah-amber)" stroke-linecap="round"/>
+<text x="252" y="978" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="10.8" font-weight="400" fill="#6B7785" text-anchor="start">pending → push</text>
+<line x1="400" y1="988" x2="400" y2="956" stroke="#E3B662" stroke-width="1.6" marker-end="url(#ah-amber)" stroke-linecap="round"/>
+<text x="412" y="978" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="10.8" font-weight="400" fill="#6B7785" text-anchor="start">pull → apply</text>
+<line x1="240" y1="1156" x2="240" y2="1188" stroke="#6CA9E0" stroke-width="1.6" marker-start="url(#ah-blue)" marker-end="url(#ah-blue)" stroke-linecap="round"/>
+<text x="252" y="1178" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="10.8" font-weight="400" fill="#6B7785" text-anchor="start">CKModifyRecords / zone 增量 token</text>
+<rect x="1040" y="176" width="568" height="212" rx="12" fill="#131922" stroke="#242C37" stroke-width="1"/>
+<rect x="1040" y="176" width="3" height="212" rx="1.5" fill="#6FBF9B" opacity="0.8"/>
+<rect x="1064" y="196" width="3" height="14" rx="1.5" fill="#6FBF9B"/>
+<text x="1078" y="208" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#E6EDF3" text-anchor="start">计时语义：iOS 没有后台 tick</text>
+<circle cx="1081" cy="230" r="2.2" fill="#6FBF9B" opacity="0.85"/>
+<text x="1092" y="234" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="400" fill="#8B98A5" text-anchor="start">只存 endsAt，前台 / 回前台对时</text>
+<circle cx="1081" cy="256" r="2.2" fill="#6FBF9B" opacity="0.85"/>
+<text x="1092" y="260" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="400" fill="#8B98A5" text-anchor="start">锁屏倒计时交给 Live Activity</text>
+<circle cx="1081" cy="282" r="2.2" fill="#6FBF9B" opacity="0.85"/>
+<text x="1092" y="286" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="400" fill="#8B98A5" text-anchor="start">结束提醒用本地通知，不靠进程存活</text>
+<circle cx="1081" cy="308" r="2.2" fill="#6FBF9B" opacity="0.85"/>
+<text x="1092" y="312" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="400" fill="#8B98A5" text-anchor="start">冷启动读到过期的 active_timer → 补记完成</text>
+<circle cx="1081" cy="334" r="2.2" fill="#6FBF9B" opacity="0.85"/>
+<text x="1092" y="338" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="400" fill="#8B98A5" text-anchor="start">被系统杀掉不判废弃，回来继续算</text>
+<circle cx="1081" cy="360" r="2.2" fill="#6FBF9B" opacity="0.85"/>
+<text x="1092" y="364" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="400" fill="#8B98A5" text-anchor="start">两端同时计时只提示，不自动合并</text>
+<rect x="1040" y="421.0" width="568" height="212" rx="12" fill="#131922" stroke="#242C37" stroke-width="1"/>
+<rect x="1040" y="421.0" width="3" height="212" rx="1.5" fill="#6CA9E0" opacity="0.8"/>
+<rect x="1064" y="441.0" width="3" height="14" rx="1.5" fill="#6CA9E0"/>
+<text x="1078" y="453.0" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#E6EDF3" text-anchor="start">冲突与幂等：复用现有合并引擎</text>
+<circle cx="1081" cy="475.0" r="2.2" fill="#6CA9E0" opacity="0.85"/>
+<text x="1092" y="479.0" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="400" fill="#8B98A5" text-anchor="start">字段级 LWW：rev = 毫秒 + deviceID + 序号</text>
+<circle cx="1081" cy="501.0" r="2.2" fill="#6CA9E0" opacity="0.85"/>
+<text x="1092" y="505.0" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="400" fill="#8B98A5" text-anchor="start">删除墓碑：__deleted 是终态，旧改动不能复活</text>
+<circle cx="1081" cy="527.0" r="2.2" fill="#6CA9E0" opacity="0.85"/>
+<text x="1092" y="531.0" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="400" fill="#8B98A5" text-anchor="start">recordName = deviceID:seq，重复推送幂等</text>
+<circle cx="1081" cy="553.0" r="2.2" fill="#6CA9E0" opacity="0.85"/>
+<text x="1092" y="557.0" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="400" fill="#8B98A5" text-anchor="start">deviceID 每次安装重生成；用 IDFV 会重撞号</text>
+<circle cx="1081" cy="579.0" r="2.2" fill="#6CA9E0" opacity="0.85"/>
+<text x="1092" y="583.0" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="400" fill="#8B98A5" text-anchor="start">今日计划按成员并集，移除用 __present=false</text>
+<circle cx="1081" cy="605.0" r="2.2" fill="#6CA9E0" opacity="0.85"/>
+<text x="1092" y="609.0" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="400" fill="#8B98A5" text-anchor="start">apply 期间 suppress，避免回声再推送</text>
+<rect x="1040" y="666.0" width="568" height="212" rx="12" fill="#131922" stroke="#242C37" stroke-width="1"/>
+<rect x="1040" y="666.0" width="3" height="212" rx="1.5" fill="#E3B662" opacity="0.8"/>
+<rect x="1064" y="686.0" width="3" height="14" rx="1.5" fill="#E3B662"/>
+<text x="1078" y="698.0" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#E6EDF3" text-anchor="start">前提与成本：动手前先过这几关</text>
+<circle cx="1081" cy="720.0" r="2.2" fill="#E3B662" opacity="0.85"/>
+<text x="1092" y="724.0" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="400" fill="#8B98A5" text-anchor="start">CloudKit 需要付费开发者账号 + container</text>
+<circle cx="1081" cy="746.0" r="2.2" fill="#E3B662" opacity="0.85"/>
+<text x="1092" y="750.0" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="400" fill="#8B98A5" text-anchor="start">Mac 端 ad-hoc 签名要换 Developer ID + profile</text>
+<circle cx="1081" cy="772.0" r="2.2" fill="#E3B662" opacity="0.85"/>
+<text x="1092" y="776.0" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="400" fill="#8B98A5" text-anchor="start">私有库计入用户 iCloud 配额（约 15MB / 年）</text>
+<circle cx="1081" cy="798.0" r="2.2" fill="#E3B662" opacity="0.85"/>
+<text x="1092" y="802.0" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="400" fill="#8B98A5" text-anchor="start">日志保留 90 天 + 每周 Snapshot 压实</text>
+<circle cx="1081" cy="824.0" r="2.2" fill="#E3B662" opacity="0.85"/>
+<text x="1092" y="828.0" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="400" fill="#8B98A5" text-anchor="start">没有 iCloud 账号 → 静默本地模式，不打扰</text>
+<circle cx="1081" cy="850.0" r="2.2" fill="#E3B662" opacity="0.85"/>
+<text x="1092" y="854.0" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="400" fill="#8B98A5" text-anchor="start">ADR-0002 已把小程序 hub 定成 CloudBase，双端会分叉</text>
+<rect x="1040" y="911.0" width="568" height="186" rx="12" fill="#131922" stroke="#242C37" stroke-width="1"/>
+<rect x="1040" y="911.0" width="3" height="186" rx="1.5" fill="#A98BE0" opacity="0.8"/>
+<rect x="1064" y="931.0" width="3" height="14" rx="1.5" fill="#A98BE0"/>
+<text x="1078" y="943.0" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#E6EDF3" text-anchor="start">落地顺序</text>
+<circle cx="1081" cy="965.0" r="2.2" fill="#A98BE0" opacity="0.85"/>
+<text x="1092" y="969.0" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="400" fill="#8B98A5" text-anchor="start">P0 拆包：iOS 平台 + AgentRouter + socket 分 target</text>
+<circle cx="1081" cy="991.0" r="2.2" fill="#A98BE0" opacity="0.85"/>
+<text x="1092" y="995.0" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="400" fill="#8B98A5" text-anchor="start">P1 iOS 本地 MVP：今天 / 项目 / 统计 / 计时</text>
+<circle cx="1081" cy="1017.0" r="2.2" fill="#A98BE0" opacity="0.85"/>
+<text x="1092" y="1021.0" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="400" fill="#8B98A5" text-anchor="start">P2 iCloud：CloudKit transport + Snapshot + 双端联调</text>
+<circle cx="1081" cy="1043.0" r="2.2" fill="#A98BE0" opacity="0.85"/>
+<text x="1092" y="1047.0" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="400" fill="#8B98A5" text-anchor="start">P3 模型：Provider + ToolCatalog + 对话页</text>
+<circle cx="1081" cy="1069.0" r="2.2" fill="#A98BE0" opacity="0.85"/>
+<text x="1092" y="1073.0" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="400" fill="#8B98A5" text-anchor="start">P4 端形态：Widget / Live Activity / App Intents</text>
+<rect x="1040" y="1130.0" width="568" height="212" rx="12" fill="#131922" stroke="#242C37" stroke-width="1"/>
+<rect x="1040" y="1130.0" width="3" height="212" rx="1.5" fill="#E08A8A" opacity="0.8"/>
+<rect x="1064" y="1150.0" width="3" height="14" rx="1.5" fill="#E08A8A"/>
+<text x="1078" y="1162.0" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#E6EDF3" text-anchor="start">验收：每条都能测</text>
+<circle cx="1081" cy="1184.0" r="2.2" fill="#E08A8A" opacity="0.85"/>
+<text x="1092" y="1188.0" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="400" fill="#8B98A5" text-anchor="start">两台设备离线各改不同字段 → 合并后都在</text>
+<circle cx="1081" cy="1210.0" r="2.2" fill="#E08A8A" opacity="0.85"/>
+<text x="1092" y="1214.0" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="400" fill="#8B98A5" text-anchor="start">一台删任务、另一台离线改标题 → 删除赢</text>
+<circle cx="1081" cy="1236.0" r="2.2" fill="#E08A8A" opacity="0.85"/>
+<text x="1092" y="1240.0" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="400" fill="#8B98A5" text-anchor="start">iPhone 锁屏 25 分钟 → 通知 + 回来记 1 个番茄</text>
+<circle cx="1081" cy="1262.0" r="2.2" fill="#E08A8A" opacity="0.85"/>
+<text x="1092" y="1266.0" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="400" fill="#8B98A5" text-anchor="start">「加个临时任务 X」→ 端上模型做完，Mac 查到</text>
+<circle cx="1081" cy="1288.0" r="2.2" fill="#E08A8A" opacity="0.85"/>
+<text x="1092" y="1292.0" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="400" fill="#8B98A5" text-anchor="start">关掉 iCloud → App 完整可用，打开后自动追平</text>
+<circle cx="1081" cy="1314.0" r="2.2" fill="#E08A8A" opacity="0.85"/>
+<text x="1092" y="1318.0" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="400" fill="#8B98A5" text-anchor="start">手机网页链路继续可用（Tailscale 打开）</text>
+<line x1="72" y1="1390" x2="1608" y2="1390" stroke="#242C37" stroke-width="1"/>
+<text x="72" y="1424" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#8B98A5" text-anchor="start">本地优先：没有 iCloud 账号、断网、配额满，App 仍完整可用，只是不同步。</text>
+<text x="72" y="1450" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#8B98A5" text-anchor="start">一套 Core：macOS / iOS 共享模型、规则与变更日志；UI 各写各的（AppKit ↔ SwiftUI）。</text>
+<text x="72" y="1476" font-family="PingFang SC, Hiragino Sans GB, Helvetica Neue, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#8B98A5" text-anchor="start">Skill 即工具表：CLI、模型、Intents、网页，落到同一个 AgentCommandRouter。</text>
+<text x="1608" y="1476" font-family="SF Mono, Menlo, monospace" font-size="11" font-weight="400" fill="#6B7785" text-anchor="end">jingli · ios + icloud</text>
+</svg>
