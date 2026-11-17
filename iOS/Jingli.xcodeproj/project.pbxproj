@@ -22,6 +22,7 @@
 		AE5E95FED3D3F8CFB42AA741 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E13E357DCCBD85D8BA129B9 /* TodayView.swift */; };
 		B800971455EFD789C087E55D /* FocusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7D8943A027AE96346006510 /* FocusView.swift */; };
 		CE4F61388333ED626B1C2209 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94DA84C0289342098B879CF7 /* RootView.swift */; };
+		CE9946856F92945520DA423F /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52259A025FBADDF236368319 /* SettingsView.swift */; };
 		F7A54B477261A61BB05228BF /* Tokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67D83A0B37B580F15B3BA038 /* Tokens.swift */; };
 /* End PBXBuildFile section */
 
@@ -52,6 +53,7 @@
 /* Begin PBXFileReference section */
 		2C0E4E24117278D4F3BDF3A0 /* AddTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTaskView.swift; sourceTree = "<group>"; };
 		34E53179D1AC1ED3DE4F9855 /* AddProjectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddProjectView.swift; sourceTree = "<group>"; };
+		52259A025FBADDF236368319 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		596365C37ACAE9360CD54339 /* JingliWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = JingliWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		67D83A0B37B580F15B3BA038 /* Tokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tokens.swift; sourceTree = "<group>"; };
 		689D9A00DB2D1D13C2BA8E55 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -146,6 +148,14 @@
 			name = Packages;
 			sourceTree = "<group>";
 		};
+		B4929375F98688F8ED405D5C /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				52259A025FBADDF236368319 /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
 		B8565ED483BFC14554E9D633 /* Widget */ = {
 			isa = PBXGroup;
 			children = (
@@ -190,6 +200,7 @@
 				862195377975CB8FA2846EB2 /* DayStart */,
 				C3DC31CB89B564DFF523DCE5 /* Focus */,
 				9F058E590D1133D562B7792A /* Projects */,
+				B4929375F98688F8ED405D5C /* Settings */,
 				04808A9719535D36A0BC07E3 /* Stats */,
 				23B5CF5C8C64965C3EAF00B1 /* TaskDetail */,
 				5D96B945E1E3D71F036CB901 /* Today */,
@@ -322,6 +333,7 @@
 				A5465BE37DBAA78A1FB3C1A9 /* JingliApp.swift in Sources */,
 				691529F196F6FD5813FDCFE0 /* ProjectsView.swift in Sources */,
 				CE4F61388333ED626B1C2209 /* RootView.swift in Sources */,
+				CE9946856F92945520DA423F /* SettingsView.swift in Sources */,
 				390A0715593B0CD34313D61C /* StatsView.swift in Sources */,
 				4F270223BD4E02FBF433A5D8 /* TaskDetailView.swift in Sources */,
 				AE5E95FED3D3F8CFB42AA741 /* TodayView.swift in Sources */,

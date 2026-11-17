@@ -40,6 +40,8 @@ struct RootView: View {
                     ProjectsView()
                 case .stats:
                     StatsView()
+                case .settings:
+                    SettingsView()
                 default:
                     PlaceholderView(title: tab.rawValue)
                 }
