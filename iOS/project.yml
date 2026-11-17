@@ -1,0 +1,42 @@
+name: Jingli
+options:
+  bundleIdPrefix: com.freedom-shen
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+
+packages:
+  JingliCore:
+    path: ../Packages/JingliCore
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: W695YL8UYY
+    GENERATE_INFOPLIST_FILE: YES
+
+targets:
+  Jingli:
+    type: application
+    platform: iOS
+    sources:
+      - path: Jingli
+    dependencies:
+      - package: JingliCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.freedom-shen.jingli.ios
+        PRODUCT_NAME: Jingli
+        INFOPLIST_KEY_CFBundleDisplayName: 精力管理
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait"
+        TARGETED_DEVICE_FAMILY: "1"
+        MARKETING_VERSION: "0.7.0"
+        CURRENT_PROJECT_VERSION: "1"
+
+schemes:
+  Jingli:
+    build:
+      targets:
+        Jingli: all

@@ -5,6 +5,20 @@ public protocol ShortcutRunning: Sendable {
     func list() throws -> [String]
 }
 
+/// iOS 上没有 `Process`，也没有可脚本化的快捷指令；这里给一个显式的「不支持」实现。
+public struct UnsupportedShortcutRunner: ShortcutRunning {
+    public init() {}
+
+    public func run(_ name: String) throws {
+        throw FocusError.unsupported
+    }
+
+    public func list() throws -> [String] {
+        throw FocusError.unsupported
+    }
+}
+
+#if os(macOS)
 public struct ProcessShortcutRunner: ShortcutRunning {
     public init() {}
 
@@ -43,6 +57,7 @@ public struct ProcessShortcutRunner: ShortcutRunning {
         return (process.terminationStatus, output.trimmingCharacters(in: .whitespacesAndNewlines))
     }
 }
+#endif
 
 public final class FocusController: @unchecked Sendable {
     public static let shared = FocusController()
@@ -52,13 +67,21 @@ public final class FocusController: @unchecked Sendable {
     private let offName: String
 
     public init(
-        runner: ShortcutRunning = ProcessShortcutRunner(),
+        runner: ShortcutRunning = FocusController.defaultRunner(),
         onName: String = "Jingli Focus On",
         offName: String = "Jingli Focus Off"
     ) {
         self.runner = runner
         self.onName = onName
         self.offName = offName
+    }
+
+    public static func defaultRunner() -> ShortcutRunning {
+        #if os(macOS)
+        return ProcessShortcutRunner()
+        #else
+        return UnsupportedShortcutRunner()
+        #endif
     }
 
     public func enable() throws {
@@ -85,6 +108,7 @@ public final class FocusController: @unchecked Sendable {
 public enum FocusError: Error, LocalizedError {
     case shortcutFailed(String, String)
     case listFailed(String)
+    case unsupported
 
     public var errorDescription: String? {
         switch self {
@@ -92,6 +116,8 @@ public enum FocusError: Error, LocalizedError {
             return "shortcut \(name) failed: \(message)"
         case let .listFailed(message):
             return "shortcuts list failed: \(message)"
+        case .unsupported:
+            return "这个平台不支持快捷指令联动"
         }
     }
 }

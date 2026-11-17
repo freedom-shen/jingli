@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "JingliCore",
-    platforms: [.macOS(.v15)],
+    platforms: [.macOS(.v15), .iOS(.v17)],
     products: [
         .library(name: "JingliCore", targets: ["JingliCore"]),
         .executable(name: "jingli-snapshot-diff", targets: ["SnapshotDiff"]),
