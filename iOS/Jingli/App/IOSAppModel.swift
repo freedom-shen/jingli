@@ -77,6 +77,7 @@ final class IOSAppModel {
             let reply = try await agent.send(trimmed)
             chat.append(ChatItem(role: .assistant, text: reply.text, tools: reply.toolCalls))
             refresh()
+            if !reply.toolCalls.isEmpty { noteSyncChange() }
         } catch {
             chat.append(ChatItem(role: .assistant, text: "出错了：\(error.localizedDescription)", tools: []))
         }
@@ -289,10 +290,23 @@ final class IOSAppModel {
         seedDemoIfNeeded()
         restoreBreakIfNeeded()
         refresh()
+        startSyncTimer()
 
         if CommandLine.arguments.contains("-ckcheck") {
             _Concurrency.Task { await CloudKitDiagnostics.run() }
         }
+        // 一次性写入模型配置（Key 从环境变量来，仓库和日志里都没有明文）
+        if CommandLine.arguments.contains("-setllm") {
+            let env = ProcessInfo.processInfo.environment
+            var config = LLMConfigStore.load()
+            if let v = env["JINGLI_LLM_BASE_URL"], !v.isEmpty { config.baseURL = v }
+            if let v = env["JINGLI_LLM_MODEL"], !v.isEmpty { config.model = v }
+            if let v = env["JINGLI_LLM_SESSION"], !v.isEmpty { config.session = v }
+            if let v = env["JINGLI_LLM_API_KEY"], !v.isEmpty { config.apiKey = v }
+            LLMConfigStore.save(config)
+            NSLog("[LLM] 已写入配置 base=\(config.baseURL) model=\(config.model) session=\(config.session) keyLength=\(config.apiKey.count)")
+        }
+
         if CommandLine.arguments.contains("-cksync") {
             _Concurrency.Task { await self.runCloudKitSync() }
         }
@@ -503,7 +517,37 @@ final class IOSAppModel {
         )
     }
 
+    private var lastSyncTick = Date.distantPast
+    private var syncTimer: Timer?
+
+    /// 独立的同步节拍。
+    ///
+    /// 之前只在专注页的 TimelineView 里跑 tick()，不专心时根本不走，
+    /// 结果手机放着不动就永远收不到对端的数据。
+    private func startSyncTimer() {
+        guard syncTimer == nil else { return }
+        let timer = Timer(timeInterval: 15, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated { self?.syncTick() }
+        }
+        RunLoop.main.add(timer, forMode: .common)
+        syncTimer = timer
+    }
+
+    /// 每 15 秒最多跑一次：有未推送就推，没有就拉。
+    private func syncTick() {
+        let now = Date()
+        guard now.timeIntervalSince(lastSyncTick) > 15 else { return }
+        lastSyncTick = now
+        let pending = (try? syncStore.pendingCount()) ?? 0
+        if pending > 0 {
+            noteSyncChange()
+        } else {
+            _Concurrency.Task { await syncNow() }
+        }
+    }
+
     func tick() {
+        syncTick()
         if let end = breakEndsAt, end <= Date() {
             skipBreak()
         }
