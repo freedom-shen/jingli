@@ -29,6 +29,16 @@
 |---|---|---|
 | 2026-11-17 | T03 语音链路 spike、T10 iOS 平台、T11 socket 拆分、T12 命令层、T13 iOS target、T21–T26（M2 全部界面 + 任务/项目增删改 + 设置页 + Widget）、T33 sync_retry、T30 SyncEngine + FakeTransport、T31 CloudKit transport（真机往返已打通）、T32 SyncService 接入 App（去抖 + 回前台补同步 + 设置页状态）、T34 多设备离线场景测试、T35 双端收敛真机验证、T36 同步失败自动退避重试、T37 语音链路验证
 
+### 真机截图（2026-11-17）
+
+`idevicescreenshot` 在 iOS 17+ 不可用，改用：
+
+```bash
+pymobiledevice3 developer dvt screenshot --udid <硬件UDID> --userspace shot.png
+```
+
+注意 `xcrun devicectl list devices` 给的是 CoreDevice UUID，不能传给 pymobiledevice3。
+
 ### 语音链路（2026-11-17）
 
 真机（iPhone 16 Pro Max）用系统 TTS 生成的中文音频跑识别，结果：

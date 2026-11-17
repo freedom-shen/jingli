@@ -4,6 +4,7 @@ import JingliCore
 import JingliAgent
 import ActivityKit
 import JingliSync
+import CloudKit
 
 /// iOS 端的应用状态。业务规则全部走 JingliCore，这里只负责「读出来给 UI、写回去刷新」。
 @MainActor
@@ -92,6 +93,47 @@ final class IOSAppModel {
     func refreshSyncStatus() async {
         guard let syncService else { return }
         syncStatus = await syncService.status()
+    }
+
+    /// 自检用：把现有任务排进今天并开启（跳过点击）。
+    func startDayForCheck() async {
+        guard let snapshot, !snapshot.dayStarted else { NSLog("[DAY] 已经开启或没有数据"); return }
+        let ids = snapshot.todayTasks.isEmpty
+            ? Array((try? store.listTasks()) ?? []).prefix(4).map(\.id)
+            : snapshot.todayTasks.map(\.id)
+        _ = try? store.saveDaySelection(taskIDs: ids, today: today)
+        _ = try? store.startDay(taskIDs: ids, today: today)
+        noteSyncChange()
+        refresh()
+        NSLog("[DAY] 已开启，任务数=\(ids.count)")
+    }
+
+    /// 清掉自检产生的脏数据（CloudKit 里的 PROBE 记录 + 本地验证任务）。
+    func cleanProbeData() async {
+        let transport = CloudKitTransport(config: .init(containerIdentifier: CloudKitDiagnostics.containerID))
+        do {
+            let (changes, _) = try await transport.pull(cursor: nil)
+            let probes = changes.filter { $0.deviceID == "PROBE" }
+            NSLog("[CLEAN] 远端 PROBE 记录=\(probes.count)")
+            if !probes.isEmpty {
+                let zoneID = CKRecordZone.ID(zoneName: "JingliZone", ownerName: CKCurrentUserDefaultName)
+                let ids = probes.map { CKRecord.ID(recordName: $0.changeID, zoneID: zoneID) }
+                let database = CKContainer(identifier: CloudKitDiagnostics.containerID).privateCloudDatabase
+                _ = try? await database.modifyRecords(saving: [], deleting: ids, savePolicy: .changedKeys, atomically: false)
+                NSLog("[CLEAN] 已删除远端 PROBE 记录")
+            }
+        } catch {
+            NSLog("[CLEAN] 拉取失败: \(error)")
+        }
+        let junk = ["probe"]
+        let junkPrefixes = ["A 端任务", "B 端任务", "接线验证", "真机同步验证"]
+        for task in (try? store.listTasks(includeDone: true)) ?? []
+        where junk.contains(task.title) || junkPrefixes.contains(where: { task.title.hasPrefix($0) }) {
+            _ = try? store.deleteTask(id: task.id)
+            NSLog("[CLEAN] 删除本地任务 \(task.title)")
+        }
+        refresh()
+        noteSyncChange()
     }
 
     /// 自检：用真实 CloudKit 模拟第二台设备（全新的内存库 + 独立 deviceID），
@@ -205,6 +247,12 @@ final class IOSAppModel {
         }
         if CommandLine.arguments.contains("-syncwiring") {
             _Concurrency.Task { await self.testSyncWiring() }
+        }
+        if CommandLine.arguments.contains("-startday") {
+            _Concurrency.Task { await self.startDayForCheck() }
+        }
+        if CommandLine.arguments.contains("-cleanprobe") {
+            _Concurrency.Task { await self.cleanProbeData() }
         }
         if CommandLine.arguments.contains("-asrfile") {
             _Concurrency.Task { await SpeechFileCheck.run() }

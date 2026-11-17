@@ -108,10 +108,12 @@ struct SettingsView: View {
 
     private var lastSyncText: String {
         guard let date = model.syncStatus?.lastSyncAt else { return "还没同步" }
-        let formatter = RelativeDateTimeFormatter()
-        formatter.locale = Locale(identifier: "zh_CN")
-        formatter.unitsStyle = .short
-        return formatter.localizedString(for: date, relativeTo: Date())
+        let seconds = Int(Date().timeIntervalSince(date))
+        if seconds < 60 { return "刚刚" }
+        if seconds < 3_600 { return "\(seconds / 60) 分钟前" }
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        return formatter.string(from: date)
     }
 
     private var version: String {
