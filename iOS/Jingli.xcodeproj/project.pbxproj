@@ -7,7 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		04CC883775E2713E7FCE2B43 /* voice-sample.m4a in Resources */ = {isa = PBXBuildFile; fileRef = AF91080BEE838D76644B2A15 /* voice-sample.m4a */; };
 		1DA6D4717A9EEA717A7EDD2D /* AddProjectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34E53179D1AC1ED3DE4F9855 /* AddProjectView.swift */; };
+		2007F8DBC31BCAFB9C9C2BC0 /* voice-sample.m4a in Resources */ = {isa = PBXBuildFile; fileRef = AF91080BEE838D76644B2A15 /* voice-sample.m4a */; };
 		272F9FAE80A662AF8FC4CD1C /* JingliCore in Frameworks */ = {isa = PBXBuildFile; productRef = 00854301257684596A8AE39D /* JingliCore */; };
 		2E29B1746F39E1025D19C0F8 /* DayStartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7212BA70871C2AD4EA5768C /* DayStartView.swift */; };
 		323BE329083FD84C434877F4 /* AddTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C0E4E24117278D4F3BDF3A0 /* AddTaskView.swift */; };
@@ -27,6 +29,7 @@
 		A5465BE37DBAA78A1FB3C1A9 /* JingliApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC9618A2DBBE55DDF8631873 /* JingliApp.swift */; };
 		AE5E95FED3D3F8CFB42AA741 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E13E357DCCBD85D8BA129B9 /* TodayView.swift */; };
 		B800971455EFD789C087E55D /* FocusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7D8943A027AE96346006510 /* FocusView.swift */; };
+		BAB42C26929CF85FE3392711 /* SpeechFileCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1034D9005866E28B1BBCBD7A /* SpeechFileCheck.swift */; };
 		BB15282C39809C14BB8FF06F /* FocusActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 236C6DAD310EB896A92CA1A7 /* FocusActivityAttributes.swift */; };
 		C5C7BD4840CF8D4C26A5BAAE /* AssistantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4CA4D40EEE596681D7D2A0D /* AssistantView.swift */; };
 		CC41819B4AEAFF1CD11175E3 /* FocusActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E21D64797BDA89522113657 /* FocusActivityManager.swift */; };
@@ -63,6 +66,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1034D9005866E28B1BBCBD7A /* SpeechFileCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechFileCheck.swift; sourceTree = "<group>"; };
 		236C6DAD310EB896A92CA1A7 /* FocusActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusActivityAttributes.swift; sourceTree = "<group>"; };
 		2C0E4E24117278D4F3BDF3A0 /* AddTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTaskView.swift; sourceTree = "<group>"; };
 		34E53179D1AC1ED3DE4F9855 /* AddProjectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddProjectView.swift; sourceTree = "<group>"; };
@@ -85,6 +89,7 @@
 		A6F49F42964661894DFC6505 /* LLMConfigStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMConfigStore.swift; sourceTree = "<group>"; };
 		A7D8943A027AE96346006510 /* FocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusView.swift; sourceTree = "<group>"; };
 		AD7A6112EF268FFFA3842620 /* CompletionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionSheet.swift; sourceTree = "<group>"; };
+		AF91080BEE838D76644B2A15 /* voice-sample.m4a */ = {isa = PBXFileReference; path = "voice-sample.m4a"; sourceTree = "<group>"; };
 		B3C65F7C7DAB7596473E0DD5 /* ProjectsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectsView.swift; sourceTree = "<group>"; };
 		CC9618A2DBBE55DDF8631873 /* JingliApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JingliApp.swift; sourceTree = "<group>"; };
 		D2753D9DD0590DB36DBD5E7A /* JingliWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JingliWidget.swift; sourceTree = "<group>"; };
@@ -135,6 +140,7 @@
 			isa = PBXGroup;
 			children = (
 				236C6DAD310EB896A92CA1A7 /* FocusActivityAttributes.swift */,
+				C9E4ABFA2846E8650AFB1721 /* Resources */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -174,6 +180,7 @@
 		9D1E0D752A44D9B54EEE19DE /* Voice */ = {
 			isa = PBXGroup;
 			children = (
+				1034D9005866E28B1BBCBD7A /* SpeechFileCheck.swift */,
 				3E8578DB1995AD591E503C7E /* SpeechTranscriber.swift */,
 			);
 			path = Voice;
@@ -221,6 +228,14 @@
 				A7D8943A027AE96346006510 /* FocusView.swift */,
 			);
 			path = Focus;
+			sourceTree = "<group>";
+		};
+		C9E4ABFA2846E8650AFB1721 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				AF91080BEE838D76644B2A15 /* voice-sample.m4a */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		D7DE3C305CA8B869FCA29794 /* AddTask */ = {
@@ -301,6 +316,7 @@
 			buildConfigurationList = D699305548125EB5F69EA8DE /* Build configuration list for PBXNativeTarget "JingliWidget" */;
 			buildPhases = (
 				67E3967B393C72EFF75E1B48 /* Sources */,
+				E5F680D2FFEA18BE04E3AFD7 /* Resources */,
 				0B02889E352F34624E8EFBF5 /* Frameworks */,
 			);
 			buildRules = (
@@ -320,6 +336,7 @@
 			buildConfigurationList = ABCB7A4743A2E465C18594B3 /* Build configuration list for PBXNativeTarget "Jingli" */;
 			buildPhases = (
 				2DB4D529CCEA0E94A23E4DEA /* Sources */,
+				E22ED99CB9EA9C19E4A1C4A8 /* Resources */,
 				59095B66D694BD2F9EF1AA71 /* Frameworks */,
 				F8ED37236AC97D38CE66FC34 /* Embed Foundation Extensions */,
 			);
@@ -380,6 +397,25 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		E22ED99CB9EA9C19E4A1C4A8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2007F8DBC31BCAFB9C9C2BC0 /* voice-sample.m4a in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E5F680D2FFEA18BE04E3AFD7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				04CC883775E2713E7FCE2B43 /* voice-sample.m4a in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		2DB4D529CCEA0E94A23E4DEA /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -401,6 +437,7 @@
 				691529F196F6FD5813FDCFE0 /* ProjectsView.swift in Sources */,
 				CE4F61388333ED626B1C2209 /* RootView.swift in Sources */,
 				CE9946856F92945520DA423F /* SettingsView.swift in Sources */,
+				BAB42C26929CF85FE3392711 /* SpeechFileCheck.swift in Sources */,
 				E42CDDC5445BFF8A92F861F1 /* SpeechTranscriber.swift in Sources */,
 				390A0715593B0CD34313D61C /* StatsView.swift in Sources */,
 				4F270223BD4E02FBF433A5D8 /* TaskDetailView.swift in Sources */,

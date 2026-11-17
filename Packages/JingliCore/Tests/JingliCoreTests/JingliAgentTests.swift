@@ -109,6 +109,35 @@ final class JingliAgentTests: XCTestCase {
         XCTAssertEqual(tasks.first?.estimate, 5, "两小时应按 25 分钟向上取整成 5 个番茄")
     }
 
+    /// 真机语音识别出来的原文（无标点），验证模型对 ASR 腔调的鲁棒性。
+    func testRealModelWithAsrTranscript() async throws {
+        let env = ProcessInfo.processInfo.environment
+        guard let key = env["JINGLI_LLM_KEY"], !key.isEmpty else {
+            throw XCTSkip("没有 JINGLI_LLM_KEY，跳过")
+        }
+        let base = env["JINGLI_LLM_BASE"].flatMap(URL.init(string:))
+            ?? URL(string: "https://api.deepseek.com/v1")!
+        let model = env["JINGLI_LLM_MODEL"] ?? "deepseek-chat"
+        var headers: [String: String] = [:]
+        if let session = env["JINGLI_LLM_SESSION"], !session.isEmpty {
+            headers["x-opencode-session"] = session
+        }
+
+        let database = try JingliDatabase.inMemory()
+        let router = AgentCommandRouter(database: database, focus: nil, onChange: nil, actor: "test")
+        let provider = OpenAICompatibleProvider(config: .init(
+            baseURL: base, model: model, apiKey: key, extraHeaders: headers
+        ))
+        let agent = JingliAgent(provider: provider, runner: ToolRunner(router: router))
+
+        let asrText = "帮我加一个临时任务评审设计稿大概两个钟"
+        let reply = try await agent.send(asrText)
+        let tasks = try WorkspaceStore(database: database).listTasks(includeDone: true)
+        XCTAssertEqual(tasks.count, 1, "应该只落一条：\(reply.text ?? "")")
+        XCTAssertEqual(tasks.first?.lane, "temporary")
+        XCTAssertEqual(tasks.first?.estimate, 5)
+    }
+
     func testLoopStopsAfterMaxRounds() async throws {
         let makeCall = { (i: Int) in ModelToolCall(id: "c\(i)", name: "today_get", argumentsJSON: "{}") }
         let responses = (0..<10).map { ModelResponse(text: nil, toolCalls: [makeCall($0)]) }

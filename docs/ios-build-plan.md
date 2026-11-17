@@ -27,7 +27,21 @@
 
 | 日期 | 已完成 | 卡在哪 |
 |---|---|---|
-| 2026-11-17 | T03 语音链路 spike、T10 iOS 平台、T11 socket 拆分、T12 命令层、T13 iOS target、T21–T26（M2 全部界面 + 任务/项目增删改 + 设置页 + Widget）、T33 sync_retry、T30 SyncEngine + FakeTransport、T31 CloudKit transport（真机往返已打通）、T32 SyncService 接入 App（去抖 + 回前台补同步 + 设置页状态）、T34 多设备离线场景测试、T35 双端收敛真机验证、T36 同步失败自动退避重试
+| 2026-11-17 | T03 语音链路 spike、T10 iOS 平台、T11 socket 拆分、T12 命令层、T13 iOS target、T21–T26（M2 全部界面 + 任务/项目增删改 + 设置页 + Widget）、T33 sync_retry、T30 SyncEngine + FakeTransport、T31 CloudKit transport（真机往返已打通）、T32 SyncService 接入 App（去抖 + 回前台补同步 + 设置页状态）、T34 多设备离线场景测试、T35 双端收敛真机验证、T36 同步失败自动退避重试、T37 语音链路验证
+
+### 语音链路（2026-11-17）
+
+真机（iPhone 16 Pro Max）用系统 TTS 生成的中文音频跑识别，结果：
+
+```
+[ASR] 授权状态=3 (authorized)
+[ASR] 识别器可用=true 端上支持=true
+[ASR] 识别结果=帮我加一个临时任务评审设计稿大概两个钟
+```
+
+把这段**无标点的识别原文**直接喂给真实模型（`testRealModelWithAsrTranscript`），模型正确落了一条临时任务、预估 5 个番茄 —— 说明 ASR 的"没有标点、连着说"的腔调不影响工具调用。
+
+唯一没验的是「真人对着麦克风说话」这一段（AVAudioEngine 采集），属于硬件路径。
 
 ### 真机双端收敛（2026-11-17）
 

@@ -206,6 +206,9 @@ final class IOSAppModel {
         if CommandLine.arguments.contains("-syncwiring") {
             _Concurrency.Task { await self.testSyncWiring() }
         }
+        if CommandLine.arguments.contains("-asrfile") {
+            _Concurrency.Task { await SpeechFileCheck.run() }
+        }
         if CommandLine.arguments.contains("-cktwodevice") {
             _Concurrency.Task { await self.testTwoDeviceConvergence() }
         }
