@@ -75,6 +75,15 @@ public enum ToolCatalog {
             schema: object([:], required: [])
         ),
         ToolSpec(
+            name: "stats_history",
+            summary: "按天回顾：返回最近 N 天（默认 7 天）每天的番茄数、专注秒数、完成任务和每轮记录。用户问「上周」「最近几天」时用它。",
+            method: "stats.history",
+            schema: object([
+                "days": ["type": "integer", "description": "回溯天数，默认 7", "minimum": 1, "maximum": 90],
+                "date": string("截止日期 YYYY-MM-DD，默认今天"),
+            ], required: [])
+        ),
+        ToolSpec(
             name: "stats_today",
             summary: "今天的番茄数、专注分钟、完成任务和每轮记录。",
             method: "stats.today",

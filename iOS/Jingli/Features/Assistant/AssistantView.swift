@@ -5,6 +5,8 @@ import JingliAgent
 struct AssistantView: View {
     @Environment(IOSAppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
+    /// 从统计页带过来的问题，放在输入框里等用户确认，不自动发。
+    var prefill: String?
     @State private var draft = ""
     @State private var transcriber = SpeechTranscriber()
 
@@ -56,6 +58,7 @@ struct AssistantView: View {
             if transcriber.isRecording { draft = value }
         }
         .task {
+            if let prefill, draft.isEmpty { draft = prefill }
             let args = CommandLine.arguments
             if args.contains("-voice") {
                 await transcriber.start()

@@ -25,6 +25,28 @@ final class JingliAgentTests: XCTestCase {
         return (agent, database, provider)
     }
 
+    func testHistoryToolAnswersWeeklyQuestion() async throws {
+        let call = ModelToolCall(id: "h1", name: "stats_history", argumentsJSON: #"{"days": 7}"#)
+        let (agent, database, _) = try makeAgent([
+            ModelResponse(text: nil, toolCalls: [call]),
+            ModelResponse(text: "最近 7 天一共 3 个番茄。", toolCalls: []),
+        ])
+
+        // 先造一条已完成的记录
+        let store = WorkspaceStore(database: database)
+        let task = try store.createTask(title: "回顾用", lane: "temporary", plannedDate: DayKey.make())
+        try store.startDay(taskIDs: [task.id], today: DayKey.make())
+        var timer = FocusTimer(taskIDs: [task.id], sessionDate: DayKey.make())!
+        timer.start(now: 0, sessionID: "s1")
+        timer.tick(now: Int64(FocusTimer.defaultDurationMs))
+        _ = try FocusTimerStore(database: database).complete(timer)
+
+        let reply = try await agent.send("上周专注了多少")
+        XCTAssertTrue(reply.toolCalls.contains { $0.name == "stats_history" })
+        XCTAssertTrue(reply.toolCalls[0].ok, "工具应成功：\(reply.toolCalls[0].output)")
+        XCTAssertTrue(reply.toolCalls[0].output.contains("pomodoros"))
+    }
+
     func testCatalogNamesAreUnique() {
         let names = ToolCatalog.all.map(\.name)
         XCTAssertEqual(Set(names).count, names.count)

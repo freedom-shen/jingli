@@ -83,6 +83,7 @@ pymobiledevice3 developer dvt screenshot --udid <硬件UDID> --userspace shot.pn
 | 失败重试 | 单测：失败后 pending 保留，退避重试成功后对端能收到 |
 | 多设备合并 | 单测：不同字段都保留 / 同字段收敛 / 删除传播 |
 | 模型操作数据库 | 真机 + 单测：模型调 `task_add` 落一条 temporary、estimate=5 |
+| 历史回顾 | 单测：模型调 `stats_history` 返回按天数据；统计页入口带预填问题 |
 | 中文语音识别 | 真机日志：TTS 音频 → `帮我加一个临时任务评审设计稿大概两个钟` |
 | ASR 原文喂模型 | 单测：无标点原文 → 仍只落一条任务、预估正确 |
 | Widget / App Group | 共享容器里直查 sqlite；Widget 编译嵌入安装成功 |

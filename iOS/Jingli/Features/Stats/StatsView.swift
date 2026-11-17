@@ -5,6 +5,7 @@ import JingliCore
 struct StatsView: View {
     @Environment(IOSAppModel.self) private var model
     @State private var showAssistant = false
+    @State private var prefill: String?
 
     private var stats: TodayStats? { model.stats }
 
@@ -29,12 +30,24 @@ struct StatsView: View {
                 Text("统计").font(.system(size: 30, weight: .bold)).foregroundStyle(Tokens.text)
             }
             Spacer()
-            Text("历史回顾")
-                .font(.system(size: 12))
-                .foregroundStyle(Tokens.text2)
+            Button {
+                prefill = "上周专注了多少？"
+                showAssistant = true
+            } label: {
+                HStack(spacing: 4) {
+                    Text("历史回顾")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Tokens.text2)
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 9, weight: .semibold))
+                        .foregroundStyle(Tokens.text3)
+                }
                 .padding(.horizontal, 12).padding(.vertical, 7)
                 .background(Color.white.opacity(0.06), in: Capsule())
                 .overlay(Capsule().stroke(Tokens.line))
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("stats.history")
         }
         .padding(.top, 8)
     }
@@ -120,7 +133,10 @@ struct StatsView: View {
     }
 
     private var hint: some View {
-        Button { showAssistant = true } label: {
+        Button {
+            prefill = "上周专注了多少？"
+            showAssistant = true
+        } label: {
             HStack(spacing: 10) {
             Image(systemName: "sparkles")
                 .font(.system(size: 13))
@@ -139,7 +155,9 @@ struct StatsView: View {
             .overlay(RoundedRectangle(cornerRadius: 14).stroke(Tokens.accent.opacity(0.20)))
         }
         .buttonStyle(.plain)
-        .sheet(isPresented: $showAssistant) { AssistantView() }
+        .sheet(isPresented: $showAssistant) {
+            AssistantView(prefill: prefill)
+        }
     }
 
     // MARK: - 格式化
