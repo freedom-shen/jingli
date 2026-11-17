@@ -27,7 +27,7 @@
 
 | 日期 | 已完成 | 卡在哪 |
 |---|---|---|
-| 2026-11-17 | T03 语音链路 spike、T10 iOS 平台、T11 socket 拆分、T12 命令层、T13 iOS target、T21–T26（M2 全部界面 + 任务/项目增删改 + 设置页 + Widget）、T33 sync_retry、T30 SyncEngine + FakeTransport、T31 CloudKit transport（映射已单测，联网待 container）、T41 ToolCatalog（8 个工具）、T42 OpenAI 兼容 provider + Agent 循环、T43 助手对话界面（真实模型在 App 里跑通）、T40 端上转写接入（权限流程已验证）、T50 Live Activity（已启动成功；模拟器 runtime 不渲染动态岛，渲染待真机验） | T01 iCloud 能力被开发者协议（PLA）拦住；T02 真机断开；T31/T32 CloudKit 实现等 container |
+| 2026-11-17 | T03 语音链路 spike、T10 iOS 平台、T11 socket 拆分、T12 命令层、T13 iOS target、T21–T26（M2 全部界面 + 任务/项目增删改 + 设置页 + Widget）、T33 sync_retry、T30 SyncEngine + FakeTransport、T31 CloudKit transport（真机已连通账号，容器写入待服务端初始化）、T41 ToolCatalog（8 个工具）、T42 OpenAI 兼容 provider + Agent 循环、T43 助手对话界面（真实模型在 App 里跑通）、T40 端上转写接入（权限流程已验证）、T50 Live Activity（已启动成功；模拟器 runtime 不渲染动态岛，渲染待真机验） | T01 iCloud 能力被开发者协议（PLA）拦住；T02 真机断开；T31/T32 CloudKit 实现等 container |
 
 > 恢复工作时先看这张表：T01 不解决，M3 整段动不了。
 
@@ -286,3 +286,16 @@ scripts/self-test.sh --full
 - **新增**：`Sources/JingliAgent`（工具表）、`Sources/JingliAgentSocket`（socket 分离）、`Sources/JingliSync`（传输层）、`iOS/`、`Packages/JingliWidgets/`。
 - **改动**：`Package.swift` 平台、`AppPaths` 容器注入、`AgentServer` 只留 IO、`SyncStore.apply` 返回被跳过项、`App/project.yml` 签名。
 - **文档**：`docs/ios-icloud-design.md`（已完成）、本文件（拆分）、`docs/sync-acceptance.md`（M3 产出）。
+
+## CloudKit 真机自检记录（2026-11-17）
+
+- 开发者协议（PLA）已接受，账号恢复正常访问。
+- 新建 App ID：`Jingli iOS` / `com.freedom-shen.jingli.ios`，开启 iCloud（CloudKit）与 App Groups。
+- 新建 iCloud 容器：`iCloud.com.freedom-shen.jingli`，并已分配给该 App ID。
+- 新建 App Group：`group.com.freedom-shen.jingli`。
+- 真机构建 / 安装 / 启动均成功，entitlements 正确（容器 + CloudKit + App Group）。
+- 真机自检结果：
+  - `accountStatus=1`（iCloud 可用）
+  - `userRecordID` 获取成功
+  - **写默认 zone / 自定义 zone 均返回 `CKError 15 / CKInternalErrorDomain 2000`**
+- 结论：客户端配置无问题，服务端拒绝该容器的一切写入。典型原因是容器尚未初始化（首次进入 CloudKit Console 的数据库页）或新建容器仍在传播。下一步：在 CloudKit Console 里打开该容器的 Development 环境，然后重跑 `-ckcheck`。

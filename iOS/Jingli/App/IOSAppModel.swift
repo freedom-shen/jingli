@@ -3,6 +3,7 @@ import Observation
 import JingliCore
 import JingliAgent
 import ActivityKit
+import JingliSync
 
 /// iOS 端的应用状态。业务规则全部走 JingliCore，这里只负责「读出来给 UI、写回去刷新」。
 @MainActor
@@ -94,6 +95,10 @@ final class IOSAppModel {
         timerStore = FocusTimerStore(database: database)
         seedDemoIfNeeded()
         refresh()
+
+        if CommandLine.arguments.contains("-ckcheck") {
+            _Concurrency.Task { await CloudKitDiagnostics.run() }
+        }
 
         // 截图/联调用：-autofocus 直接起一轮
         if CommandLine.arguments.contains("-fasttimer"), timer == nil,

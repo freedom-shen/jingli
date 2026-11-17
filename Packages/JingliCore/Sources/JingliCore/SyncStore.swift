@@ -262,6 +262,30 @@ public final class SyncStore: @unchecked Sendable {
         }
     }
 
+    public func lastSyncAt() throws -> Date? {
+        let raw = try database.queue.read { db in
+            try String.fetchOne(db, sql: "SELECT value FROM sync_meta WHERE key = 'last_sync_at'")
+        }
+        guard let raw else { return nil }
+        return ISO8601DateFormatter().date(from: raw)
+    }
+
+    public func setLastSyncAt(_ date: Date?) throws {
+        try database.queue.write { db in
+            guard let date else {
+                try db.execute(sql: "DELETE FROM sync_meta WHERE key = 'last_sync_at'")
+                return
+            }
+            try db.execute(
+                sql: """
+                INSERT INTO sync_meta (key, value) VALUES ('last_sync_at', ?)
+                ON CONFLICT(key) DO UPDATE SET value = excluded.value
+                """,
+                arguments: [ISO8601DateFormatter().string(from: date)]
+            )
+        }
+    }
+
     public func pendingRetryCount() throws -> Int {
         try database.queue.read { db in
             try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM sync_retry") ?? 0

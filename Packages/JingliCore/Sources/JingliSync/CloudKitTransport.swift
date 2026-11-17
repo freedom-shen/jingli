@@ -54,6 +54,26 @@ public final class CloudKitTransport: SyncTransport, @unchecked Sendable {
                 savePolicy: .changedKeys,
                 atomically: false
             )
+            if saveResults.values.allSatisfy({ if case .failure = $0 { return true } else { return false } }),
+               saveResults.count == batch.count {
+                // 整批都被拒：多半是 zone 刚建好还没就绪，等一下重试一次
+                try? await _Concurrency.Task.sleep(nanoseconds: 1_200_000_000)
+                let retry = try await database.modifyRecords(
+                    saving: records,
+                    deleting: [],
+                    savePolicy: .changedKeys,
+                    atomically: false
+                )
+                for (recordID, result) in retry.saveResults {
+                    switch result {
+                    case .success: accepted.append(recordID.recordName)
+                    case let .failure(error):
+                        if Self.isAlreadySynced(error) { accepted.append(recordID.recordName) }
+                        else { NSLog("[CK] push record failed: \(error)") }
+                    }
+                }
+                continue
+            }
             for (recordID, result) in saveResults {
                 switch result {
                 case .success:
@@ -126,6 +146,8 @@ public final class CloudKitTransport: SyncTransport, @unchecked Sendable {
         guard needsZoneCreation() else { return }
         do {
             _ = try await database.save(CKRecordZone(zoneID: zoneID))
+            // 新建 zone 后立刻写入偶尔会被服务端拒绝，给它一点时间
+            try? await _Concurrency.Task.sleep(nanoseconds: 800_000_000)
         } catch let error as CKError where error.code == .serverRecordChanged {
             // zone 已存在（CloudKit 对重复创建返回 serverRecordChanged），继续
         }
