@@ -333,7 +333,15 @@ Widget / Live Activity 是独立进程，读不到 App 沙盒里的库。方案�
 2. 选择：**这台 iPhone 是新的** / **已有 Mac 数据**（后者只是提示「会在几秒内自动出现」，不做导入）。
 3. iCloud 不可用（未登录 / 关闭 / 配额满）→ 顶部黄条「仅本机，不同步」，功能全可用。
 
-### 7.6 安全
+### 7.6 语音录入
+
+- **语音 → 文字**：iOS 系统 Speech（iOS 26 的 `SpeechAnalyzer`，中文在端上跑）。DeepSeek 没有 ASR 接口，不承担转写。
+- **文字 → 字段**：转写文本交给 OpenAI 兼容的模型做 function calling，直接产出 `task.add` 的参数（标题 / lane / 项目 / 日期 / 预估）。已实测这条通道能用：`deepseek-v4.1-flash` 正确返回 `{"title":"评审设计稿","lane":"temporary","estimate":2}`。
+- **确认后写入**：解析结果先落 UI（可点的 chip），用户确认才进库；低置信度字段标黄，不直接写 SQLite。
+- **降级**：没网或解析失败 → 原文当标题；转写为空 → 保持打字。
+- **Key**：存 Keychain；`baseURL` 可配（OpenCode Go / DeepSeek 官方 / 自建），模型名与协议都是 OpenAI 兼容，换供应商不改代码。
+
+### 7.7 安全
 
 - 可选 Face ID 解锁（`LocalAuthentication`），只挡 UI 不加密库。
 - 数据库文件 `NSFileProtectionCompleteUntilFirstUserAuthentication`。

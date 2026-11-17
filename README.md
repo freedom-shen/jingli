@@ -22,7 +22,7 @@
 
 > 设计稿第 4 页包含「近 7 天番茄钟」柱状图；当前版本的界面没有做这张图，统计页只展示今日 KPI 和今日记录。历史回顾通过 Agent 的按天查询完成。
 
-iOS 版设计稿（12 屏，纯 HTML，浏览器直接打开）：[`Design/ios-design.html`](Design/ios-design.html) · [整页预览](Design/preview/ios-overview.png)
+iOS 版设计稿（15 屏，纯 HTML，浏览器直接打开）：[`Design/ios-design.html`](Design/ios-design.html) · [整页预览](Design/preview/ios-overview.png)
 
 ## 它解决什么问题
 
