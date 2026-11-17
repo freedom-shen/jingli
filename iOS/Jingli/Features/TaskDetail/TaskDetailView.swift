@@ -61,9 +61,11 @@ struct TaskDetailView: View {
                 }
             }
             .onAppear(perform: loadIfNeeded)
-            .confirmationDialog("删除这条任务？", isPresented: $confirmDelete, titleVisibility: .visible) {
-                Button("删除", role: .destructive) { delete() }
+            // 用 alert 而不是 confirmationDialog：后者在手机上只渲染破坏性按钮，
+            // 看不到「取消」，用户只能靠点外面退出，不明确。
+            .alert("删除这条任务？", isPresented: $confirmDelete) {
                 Button("取消", role: .cancel) {}
+                Button("删除", role: .destructive) { delete() }
             } message: {
                 Text("删除后不可撤销，它在今日记录里的分摊也会一起消失。")
             }
