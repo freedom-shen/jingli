@@ -94,6 +94,45 @@ final class IOSAppModel {
         syncStatus = await syncService.status()
     }
 
+    /// 自检：用真实 CloudKit 模拟第二台设备（全新的内存库 + 独立 deviceID），
+    /// 验证「A 写 → B 收到 → B 写 → A 收到」的双向收敛。
+    func testTwoDeviceConvergence() async {
+        let stamp = DateFormatter()
+        stamp.dateFormat = "HHmmss"
+        let tag = stamp.string(from: Date())
+
+        guard let dbB = try? JingliDatabase.inMemory() else { return }
+        let storeB = WorkspaceStore(database: dbB)
+        let syncB = SyncStore(database: dbB)
+        let engineB = SyncEngine(
+            store: syncB,
+            transport: CloudKitTransport(config: .init(containerIdentifier: CloudKitDiagnostics.containerID))
+        )
+
+        // A 写一条并推上去
+        let titleA = "A 端任务 \(tag)"
+        _ = try? store.createTask(title: titleA, lane: "temporary", plannedDate: today)
+        await syncNow()
+        NSLog("[TWO] A 已推送，待推送=\(((try? syncStore.pendingCount()) ?? -1))")
+
+        // B 拉取
+        do {
+            let reportB = try await engineB.syncOnce()
+            let tasksB = (try? storeB.listTasks(includeDone: true)) ?? []
+            NSLog("[TWO] B pulled=\(reportB.pulled) applied=\(reportB.applied) 任务数=\(tasksB.count) 看到A的=\(tasksB.contains { $0.title == titleA })")
+
+            // B 写一条，A 再拉
+            let titleB = "B 端任务 \(tag)"
+            _ = try? storeB.createTask(title: titleB, lane: "temporary")
+            _ = try await engineB.syncOnce()
+            await syncNow()
+            let tasksA = (try? store.listTasks(includeDone: true)) ?? []
+            NSLog("[TWO] A 看到B的=\(tasksA.contains { $0.title == titleB }) 总任务数=\(tasksA.count)")
+        } catch {
+            NSLog("[TWO] 失败: \(error)")
+        }
+    }
+
     /// 自检：走「本地写入 → noteSyncChange → 去抖 → 推送」这条真实路径。
     func testSyncWiring() async {
         let stamp = DateFormatter()
@@ -166,6 +205,9 @@ final class IOSAppModel {
         }
         if CommandLine.arguments.contains("-syncwiring") {
             _Concurrency.Task { await self.testSyncWiring() }
+        }
+        if CommandLine.arguments.contains("-cktwodevice") {
+            _Concurrency.Task { await self.testTwoDeviceConvergence() }
         }
 
         // 截图/联调用：-autofocus 直接起一轮

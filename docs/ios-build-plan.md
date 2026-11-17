@@ -27,7 +27,21 @@
 
 | 日期 | 已完成 | 卡在哪 |
 |---|---|---|
-| 2026-11-17 | T03 语音链路 spike、T10 iOS 平台、T11 socket 拆分、T12 命令层、T13 iOS target、T21–T26（M2 全部界面 + 任务/项目增删改 + 设置页 + Widget）、T33 sync_retry、T30 SyncEngine + FakeTransport、T31 CloudKit transport（真机往返已打通）、T32 SyncService 接入 App（去抖 + 回前台补同步 + 设置页状态）、T34 多设备离线场景测试、T41 ToolCatalog（8 个工具）、T42 OpenAI 兼容 provider + Agent 循环、T43 助手对话界面（真实模型在 App 里跑通）、T40 端上转写接入（权限流程已验证）、T50 Live Activity（已启动成功；模拟器 runtime 不渲染动态岛，渲染待真机验） | T01 iCloud 能力被开发者协议（PLA）拦住；T02 真机断开；T31/T32 CloudKit 实现等 container |
+| 2026-11-17 | T03 语音链路 spike、T10 iOS 平台、T11 socket 拆分、T12 命令层、T13 iOS target、T21–T26（M2 全部界面 + 任务/项目增删改 + 设置页 + Widget）、T33 sync_retry、T30 SyncEngine + FakeTransport、T31 CloudKit transport（真机往返已打通）、T32 SyncService 接入 App（去抖 + 回前台补同步 + 设置页状态）、T34 多设备离线场景测试、T35 双端收敛真机验证
+
+### 真机双端收敛（2026-11-17）
+
+用真实 CloudKit、本机库 + 一个全新内存库（独立 deviceID，等价于第二台设备）跑双向收敛：
+
+```
+[TWO] A 已推送，待推送=0
+[TWO] B pulled=28 applied=28 任务数=4 看到A的=true
+[TWO] A 看到B的=true 总任务数=5
+```
+
+A 建的任务 B 收到了，B 建的任务 A 也收到了 —— 推、拉、应用三段都是真实 iCloud。
+
+注：`devicectl device process launch` 传带前导 `-` 的参数时要在 bundle id 后加 `--`，否则会被当成 devicectl 自己的选项。、T41 ToolCatalog（8 个工具）、T42 OpenAI 兼容 provider + Agent 循环、T43 助手对话界面（真实模型在 App 里跑通）、T40 端上转写接入（权限流程已验证）、T50 Live Activity（已启动成功；模拟器 runtime 不渲染动态岛，渲染待真机验） | T01 iCloud 能力被开发者协议（PLA）拦住；T02 真机断开；T31/T32 CloudKit 实现等 container |
 
 > 恢复工作时先看这张表：T01 不解决，M3 整段动不了。
 
