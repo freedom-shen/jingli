@@ -23,7 +23,11 @@ final class FocusActivityManager {
                 attributes: attributes,
                 content: .init(state: state, staleDate: endsAt)
             )
-            NSLog("[Jingli] Live Activity 已开始")
+            let live = Activity<FocusActivityAttributes>.activities
+            NSLog("[Jingli] Live Activity 已开始，当前活动数=\(live.count)")
+            for item in live {
+                NSLog("[Jingli] 活动 \(item.id) state=\(String(describing: item.content.state.isPaused)) active=\(item.activityState == .active)")
+            }
         } catch {
             NSLog("[Jingli] Live Activity 启动失败：\(error)")
         }

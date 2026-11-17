@@ -110,7 +110,9 @@ idb ui text --udid <SIM_UDID> "text"
 
 ## 七、已知问题
 
-- 动态岛：`Activity.request` 确认成功（日志），但真机上没看到我们的活动内容，需要在手机上人工看一眼
+- 动态岛：真机日志已确认 `Live Activity 已开始，当前活动数=1`、`activityState=active`；
+  但 `pymobiledevice3` 截出来的岛区域时有时无（同一条件下一次有黑胶囊、一次空白），
+  说明**截图这条观测手段本身不可靠**，需要在手机上看一眼。
 - Widget 需要在桌面手动添加，命令行加不了
 - Mac 端还没接同步（见下）
 
