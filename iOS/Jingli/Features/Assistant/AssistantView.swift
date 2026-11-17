@@ -8,6 +8,8 @@ struct AssistantView: View {
     /// 从统计页带过来的问题，放在输入框里等用户确认，不自动发。
     var prefill: String?
     @State private var draft = ""
+    /// 换一个 id 就重建输入框，用来清掉输入法还在组合中的文字
+    @State private var fieldID = UUID()
     @State private var transcriber = SpeechTranscriber()
 
     private let suggestions = ["今天还剩几件", "把评审设计稿加进今天，两个番茄", "昨天专注了多久"]
@@ -158,6 +160,7 @@ struct AssistantView: View {
             }
             HStack(spacing: 8) {
             TextField("", text: $draft, prompt: Text("说点什么…").foregroundStyle(Tokens.text3))
+                .id(fieldID)
                 .font(.system(size: 13.5))
                 .foregroundStyle(Tokens.text)
                 .padding(.horizontal, 14).padding(.vertical, 11)
@@ -211,8 +214,13 @@ struct AssistantView: View {
     }
 
     private func send() {
-        let text = draft
+        let text = draft.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else { return }
+        // 先停录音：否则识别结果会继续往 draft 里写，看起来像"发完没清空"
+        if transcriber.isRecording { transcriber.stop() }
         draft = ""
+        // 中文输入法里没上屏的拼音靠改 binding 清不掉，重建一次输入框
+        fieldID = UUID()
         _Concurrency.Task { await model.send(text) }
     }
 }
