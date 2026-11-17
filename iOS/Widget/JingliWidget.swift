@@ -102,10 +102,3 @@ struct JingliWidget: Widget {
         .supportedFamilies([.systemMedium])
     }
 }
-
-@main
-struct JingliWidgetBundle: WidgetBundle {
-    var body: some Widget {
-        JingliWidget()
-    }
-}

@@ -2,6 +2,7 @@ import Foundation
 import Observation
 import JingliCore
 import JingliAgent
+import ActivityKit
 
 /// iOS 端的应用状态。业务规则全部走 JingliCore，这里只负责「读出来给 UI、写回去刷新」。
 @MainActor
@@ -223,6 +224,13 @@ final class IOSAppModel {
         newTimer.start(now: nowMs(), sessionID: UUID().uuidString)
         timer = newTimer
         try? timerStore.saveActive(newTimer)
+        let title = snapshot?.todayTasks.first { $0.id == taskID }?.title ?? "专注"
+        FocusActivityManager.shared.start(
+            taskTitle: title,
+            taskCount: 1,
+            endsAt: Date().addingTimeInterval(TimeInterval(durationMs) / 1000),
+            remainingSeconds: durationMs / 1000
+        )
     }
 
     func tick() {
@@ -240,6 +248,11 @@ final class IOSAppModel {
         current.pause(now: nowMs())
         timer = current
         try? timerStore.saveActive(current)
+        FocusActivityManager.shared.update(
+            isPaused: true,
+            endsAt: Date(),
+            remainingSeconds: current.remaining(now: nowMs()) / 1000
+        )
     }
 
     func resumeFocus() {
@@ -247,6 +260,11 @@ final class IOSAppModel {
         current.resume(now: nowMs())
         timer = current
         try? timerStore.saveActive(current)
+        FocusActivityManager.shared.update(
+            isPaused: false,
+            endsAt: Date().addingTimeInterval(TimeInterval(current.remaining(now: nowMs())) / 1000),
+            remainingSeconds: current.remaining(now: nowMs()) / 1000
+        )
     }
 
     func finishRound() {
@@ -256,6 +274,7 @@ final class IOSAppModel {
         }
         timer = nil
         try? timerStore.clearActive()
+        FocusActivityManager.shared.end()
         refresh()
     }
 

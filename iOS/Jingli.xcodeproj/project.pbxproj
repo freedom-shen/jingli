@@ -19,10 +19,14 @@
 		691529F196F6FD5813FDCFE0 /* ProjectsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3C65F7C7DAB7596473E0DD5 /* ProjectsView.swift */; };
 		893AF3ED2BF9EC58A57B457F /* JingliWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2753D9DD0590DB36DBD5E7A /* JingliWidget.swift */; };
 		8CD57953E872AF7A6FAF691D /* IOSAppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7725BAEB1AECAA6F13EF9E9D /* IOSAppModel.swift */; };
+		8D81B80BBACB9F7FE02CBF92 /* FocusActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 236C6DAD310EB896A92CA1A7 /* FocusActivityAttributes.swift */; };
+		9B29CD751F025FED34A87846 /* JingliLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BF2BAA604BE26C901931B5B /* JingliLiveActivity.swift */; };
 		A5465BE37DBAA78A1FB3C1A9 /* JingliApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC9618A2DBBE55DDF8631873 /* JingliApp.swift */; };
 		AE5E95FED3D3F8CFB42AA741 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E13E357DCCBD85D8BA129B9 /* TodayView.swift */; };
 		B800971455EFD789C087E55D /* FocusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7D8943A027AE96346006510 /* FocusView.swift */; };
+		BB15282C39809C14BB8FF06F /* FocusActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 236C6DAD310EB896A92CA1A7 /* FocusActivityAttributes.swift */; };
 		C5C7BD4840CF8D4C26A5BAAE /* AssistantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4CA4D40EEE596681D7D2A0D /* AssistantView.swift */; };
+		CC41819B4AEAFF1CD11175E3 /* FocusActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E21D64797BDA89522113657 /* FocusActivityManager.swift */; };
 		CE4F61388333ED626B1C2209 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94DA84C0289342098B879CF7 /* RootView.swift */; };
 		CE9946856F92945520DA423F /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52259A025FBADDF236368319 /* SettingsView.swift */; };
 		E168534876EB5A9DD6B461B6 /* LLMConfigStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6F49F42964661894DFC6505 /* LLMConfigStore.swift */; };
@@ -56,13 +60,16 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		236C6DAD310EB896A92CA1A7 /* FocusActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusActivityAttributes.swift; sourceTree = "<group>"; };
 		2C0E4E24117278D4F3BDF3A0 /* AddTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTaskView.swift; sourceTree = "<group>"; };
 		34E53179D1AC1ED3DE4F9855 /* AddProjectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddProjectView.swift; sourceTree = "<group>"; };
+		3E21D64797BDA89522113657 /* FocusActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusActivityManager.swift; sourceTree = "<group>"; };
 		3E8578DB1995AD591E503C7E /* SpeechTranscriber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechTranscriber.swift; sourceTree = "<group>"; };
 		52259A025FBADDF236368319 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		596365C37ACAE9360CD54339 /* JingliWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = JingliWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		67D83A0B37B580F15B3BA038 /* Tokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tokens.swift; sourceTree = "<group>"; };
 		689D9A00DB2D1D13C2BA8E55 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		6BF2BAA604BE26C901931B5B /* JingliLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JingliLiveActivity.swift; sourceTree = "<group>"; };
 		7725BAEB1AECAA6F13EF9E9D /* IOSAppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IOSAppModel.swift; sourceTree = "<group>"; };
 		7E13E357DCCBD85D8BA129B9 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
 		83D70C90B6CB19BF9F0720D9 /* Jingli.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Jingli.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -76,6 +83,7 @@
 		B3C65F7C7DAB7596473E0DD5 /* ProjectsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectsView.swift; sourceTree = "<group>"; };
 		CC9618A2DBBE55DDF8631873 /* JingliApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JingliApp.swift; sourceTree = "<group>"; };
 		D2753D9DD0590DB36DBD5E7A /* JingliWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JingliWidget.swift; sourceTree = "<group>"; };
+		D4B9CB4F1A08E2D08B7772F2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		E7212BA70871C2AD4EA5768C /* DayStartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayStartView.swift; sourceTree = "<group>"; };
 		F4CA4D40EEE596681D7D2A0D /* AssistantView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssistantView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -115,6 +123,14 @@
 				999E063A1C0C38F59C897B70 /* TaskDetailView.swift */,
 			);
 			path = TaskDetail;
+			sourceTree = "<group>";
+		};
+		388AABDA2C83D97FA967E6FB /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				236C6DAD310EB896A92CA1A7 /* FocusActivityAttributes.swift */,
+			);
+			path = Shared;
 			sourceTree = "<group>";
 		};
 		55E4ADA9813DD50298B67C62 /* Design */ = {
@@ -186,6 +202,7 @@
 			isa = PBXGroup;
 			children = (
 				689D9A00DB2D1D13C2BA8E55 /* Info.plist */,
+				6BF2BAA604BE26C901931B5B /* JingliLiveActivity.swift */,
 				D2753D9DD0590DB36DBD5E7A /* JingliWidget.swift */,
 			);
 			path = Widget;
@@ -211,6 +228,7 @@
 		DBB32DD9EEC13BD511B4A2F0 /* Jingli */ = {
 			isa = PBXGroup;
 			children = (
+				D4B9CB4F1A08E2D08B7772F2 /* Info.plist */,
 				CC9618A2DBBE55DDF8631873 /* JingliApp.swift */,
 				94DA84C0289342098B879CF7 /* RootView.swift */,
 				EEE9F7D87ABF1B555C08AAB7 /* App */,
@@ -251,6 +269,7 @@
 			children = (
 				DBB32DD9EEC13BD511B4A2F0 /* Jingli */,
 				B3959EEEB3BA261B32889EE5 /* Packages */,
+				388AABDA2C83D97FA967E6FB /* Shared */,
 				B8565ED483BFC14554E9D633 /* Widget */,
 				E57D9291E9C9FC423B254D6A /* Products */,
 			);
@@ -259,6 +278,7 @@
 		EEE9F7D87ABF1B555C08AAB7 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				3E21D64797BDA89522113657 /* FocusActivityManager.swift */,
 				7725BAEB1AECAA6F13EF9E9D /* IOSAppModel.swift */,
 				A6F49F42964661894DFC6505 /* LLMConfigStore.swift */,
 			);
@@ -361,6 +381,8 @@
 				C5C7BD4840CF8D4C26A5BAAE /* AssistantView.swift in Sources */,
 				4506A2347CC56A49CE0FCBBB /* CompletionSheet.swift in Sources */,
 				2E29B1746F39E1025D19C0F8 /* DayStartView.swift in Sources */,
+				BB15282C39809C14BB8FF06F /* FocusActivityAttributes.swift in Sources */,
+				CC41819B4AEAFF1CD11175E3 /* FocusActivityManager.swift in Sources */,
 				B800971455EFD789C087E55D /* FocusView.swift in Sources */,
 				8CD57953E872AF7A6FAF691D /* IOSAppModel.swift in Sources */,
 				A5465BE37DBAA78A1FB3C1A9 /* JingliApp.swift in Sources */,
@@ -380,6 +402,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8D81B80BBACB9F7FE02CBF92 /* FocusActivityAttributes.swift in Sources */,
+				9B29CD751F025FED34A87846 /* JingliLiveActivity.swift in Sources */,
 				893AF3ED2BF9EC58A57B457F /* JingliWidget.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -402,11 +426,8 @@
 				CODE_SIGN_ENTITLEMENTS = Jingli/Jingli.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				INFOPLIST_KEY_CFBundleDisplayName = "精力管理";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "录一段语音，直接变成任务标题，不需要手打。";
-				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "把你说的话转成文字，只用于填写任务。";
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Jingli/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -525,11 +546,8 @@
 				CODE_SIGN_ENTITLEMENTS = Jingli/Jingli.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				INFOPLIST_KEY_CFBundleDisplayName = "精力管理";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "录一段语音，直接变成任务标题，不需要手打。";
-				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "把你说的话转成文字，只用于填写任务。";
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Jingli/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

@@ -20,10 +20,22 @@ targets:
   Jingli:
     type: application
     platform: iOS
+    info:
+      path: Jingli/Info.plist
+      properties:
+        CFBundleDisplayName: 精力管理
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        NSSupportsLiveActivities: true
+        NSMicrophoneUsageDescription: "录一段语音，直接变成任务标题，不需要手打。"
+        NSSpeechRecognitionUsageDescription: "把你说的话转成文字，只用于填写任务。"
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations: ["UIInterfaceOrientationPortrait"]
     sources:
       - path: Jingli
         excludes:
           - "*.entitlements"
+      - path: Shared
     dependencies:
       - package: JingliCore
       - package: JingliCore
@@ -35,11 +47,10 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.freedom-shen.jingli.ios
         CODE_SIGN_ENTITLEMENTS: Jingli/Jingli.entitlements
         PRODUCT_NAME: Jingli
-        INFOPLIST_KEY_CFBundleDisplayName: 精力管理
-        INFOPLIST_KEY_UILaunchScreen_Generation: YES
-        INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait"
-        INFOPLIST_KEY_NSMicrophoneUsageDescription: "录一段语音，直接变成任务标题，不需要手打。"
-        INFOPLIST_KEY_NSSpeechRecognitionUsageDescription: "把你说的话转成文字，只用于填写任务。"
+        GENERATE_INFOPLIST_FILE: NO
+        MARKETING_VERSION: "0.7.0"
+        CURRENT_PROJECT_VERSION: "1"
+
         TARGETED_DEVICE_FAMILY: "1"
         MARKETING_VERSION: "0.7.0"
         CURRENT_PROJECT_VERSION: "1"
@@ -49,6 +60,7 @@ targets:
     platform: iOS
     sources:
       - path: Widget
+      - path: Shared
     dependencies:
       - package: JingliCore
     info:
