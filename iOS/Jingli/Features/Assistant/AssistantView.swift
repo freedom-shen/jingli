@@ -41,13 +41,6 @@ struct AssistantView: View {
             .navigationTitle("助手")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Text(model.llmConfig.model)
-                        .font(.system(size: 10))
-                        .foregroundStyle(Tokens.text3)
-                        .lineLimit(1)
-                        .frame(maxWidth: 92, alignment: .leading)
-                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("关闭") { dismiss() }.foregroundStyle(Tokens.text3)
                 }
