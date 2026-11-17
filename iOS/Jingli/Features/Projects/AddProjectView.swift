@@ -5,6 +5,9 @@ struct AddProjectView: View {
     @Environment(IOSAppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
 
+    /// 传了项目就是编辑，否则是新建
+    var editing: Project?
+
     @State private var name = ""
     @State private var note = ""
     @State private var color = "sage"
@@ -16,6 +19,13 @@ struct AddProjectView: View {
         "sage": "鼠尾草", "amber": "琥珀", "blue": "蓝",
         "rose": "玫瑰", "violet": "紫罗兰", "slate": "石板",
     ]
+
+    init(editing: Project? = nil) {
+        self.editing = editing
+        _name = State(initialValue: editing?.name ?? "")
+        _note = State(initialValue: editing?.description ?? "")
+        _color = State(initialValue: editing?.color ?? "sage")
+    }
 
     private var canSave: Bool {
         !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -80,7 +90,7 @@ struct AddProjectView: View {
                 .padding(.top, 8)
             }
             .background(Tokens.bg)
-            .navigationTitle("新建项目")
+            .navigationTitle(editing == nil ? "新建项目" : "编辑项目")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -100,7 +110,11 @@ struct AddProjectView: View {
 
     private func save() {
         do {
-            try model.createProject(name: name, description: note, color: color)
+            if let editing {
+                try model.updateProject(id: editing.id, name: name, description: note, color: color)
+            } else {
+                try model.createProject(name: name, description: note, color: color)
+            }
             dismiss()
         } catch {
             errorText = error.localizedDescription

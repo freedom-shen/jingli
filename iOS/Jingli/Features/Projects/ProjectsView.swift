@@ -136,6 +136,7 @@ struct ProjectDetailView: View {
     @State private var detailTask: JingliCore.Task?
     @State private var showAddTask = false
     @State private var confirmDeleteProject = false
+    @State private var showEditProject = false
     @Environment(\.dismiss) private var dismissDetail
 
     private var group: IOSAppModel.ProjectGroup? {
@@ -195,6 +196,18 @@ struct ProjectDetailView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $detailTask) { task in TaskDetailView(taskID: task.id) }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                if let project = group?.project {
+                    Button("编辑") { showEditProject = true }
+                        .foregroundStyle(Tokens.accent)
+                        .accessibilityIdentifier("project.edit")
+                }
+            }
+        }
+        .sheet(isPresented: $showEditProject) {
+            AddProjectView(editing: group?.project)
+        }
         .alert("删除这个项目？", isPresented: $confirmDeleteProject) {
             Button("取消", role: .cancel) {}
             Button("删除", role: .destructive) {
