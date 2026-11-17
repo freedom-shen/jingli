@@ -27,7 +27,7 @@
 
 | 日期 | 已完成 | 卡在哪 |
 |---|---|---|
-| 2026-11-17 | T03 语音链路 spike、T10 iOS 平台、T11 socket 拆分、T12 命令层、T13 iOS target、T21–T26（M2 全部界面 + 任务/项目增删改 + 设置页 + Widget）、T33 sync_retry、T30 SyncEngine + FakeTransport、T31 CloudKit transport（真机往返已打通）、T32 SyncService 接入 App（去抖 + 回前台补同步 + 设置页状态）、T34 多设备离线场景测试、T35 双端收敛真机验证
+| 2026-11-17 | T03 语音链路 spike、T10 iOS 平台、T11 socket 拆分、T12 命令层、T13 iOS target、T21–T26（M2 全部界面 + 任务/项目增删改 + 设置页 + Widget）、T33 sync_retry、T30 SyncEngine + FakeTransport、T31 CloudKit transport（真机往返已打通）、T32 SyncService 接入 App（去抖 + 回前台补同步 + 设置页状态）、T34 多设备离线场景测试、T35 双端收敛真机验证、T36 同步失败自动退避重试
 
 ### 真机双端收敛（2026-11-17）
 

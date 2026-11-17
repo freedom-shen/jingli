@@ -143,3 +143,37 @@ extension SyncEngineTests {
         )
     }
 }
+
+// MARK: - 失败重试
+
+extension SyncEngineTests {
+    func testFailedSyncRetriesAutomatically() async throws {
+        let transport = FakeTransport()
+        let a = try makeDevice(transport)
+        let b = try makeDevice(transport)
+        _ = try a.store.createTask(title: "网络抖动时写的", lane: "temporary")
+
+        let service = SyncService(
+            store: a.sync,
+            engine: a.engine,
+            debounceSeconds: 0,
+            retryBaseSeconds: 0.05
+        )
+        await transport.setFailNextPush(true)
+        let failed = await service.syncNow()
+        XCTAssertNotNil(failed.lastError, "第一次应该失败")
+        XCTAssertGreaterThan(failed.pending, 0, "变更必须留着")
+
+        // 等退避重试把剩下的推上去
+        try? await _Concurrency.Task.sleep(nanoseconds: 600_000_000)
+        let recovered = await service.status()
+        XCTAssertNil(recovered.lastError, "重试成功后错误应清掉")
+        XCTAssertEqual(recovered.pending, 0)
+
+        _ = try await b.engine.syncOnce()
+        XCTAssertTrue(
+            try b.store.listTasks(includeDone: true).contains { $0.title == "网络抖动时写的" },
+            "重试推上去的变更对端应该能收到"
+        )
+    }
+}
