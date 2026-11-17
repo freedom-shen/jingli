@@ -1,5 +1,8 @@
 # 精力管理 iOS + iCloud · 实施拆分
 
+> ⚠️ **当前状态请看 [`ios-status.md`](ios-status.md)**（已实现什么、怎么跑、验证到什么程度）。
+> 本文是**任务拆解与过程记录**，保留历史进度，不代表当前完成度。
+>
 > v1 · 2026-11-17 · 配套：[iOS 设计稿](../Design/ios-design.html)（15 屏） · [技术设计](ios-icloud-design.md) · [架构图](ios-icloud-architecture.svg)
 > 硬性要求：**iCloud 必须能把数据同步起来**（不是"预留接口"，是双端跑通、能验收）。
 

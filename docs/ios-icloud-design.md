@@ -1,5 +1,7 @@
 # 精力管理 · iOS 版 + iCloud 同步 · 设计稿
 
+> ⚠️ **当前实现状态请看 [`ios-status.md`](ios-status.md)**；本文是最初的技术方案（含已落地的决策与踩过的坑）。
+>
 > v0.1 · 2026-11-17 · 基于当前代码：v0.6.50 + 手机网页 v1（`3f8bd08`）+ [ADR-0002 换 CloudBase](adr/0002-sync-backend-cloudbase.md)
 >
 > 配套架构图：[`ios-icloud-architecture.svg`](ios-icloud-architecture.svg)（可编辑）· [`ios-icloud-architecture.png`](ios-icloud-architecture.png)（2x）
