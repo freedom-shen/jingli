@@ -215,10 +215,11 @@ CKFetchRecordZoneChangesOperation(zoneID: JingliZone, previousChangeToken: store
 
 **这里有个现有代码的坑**：`SyncStore.apply` 遇到外键约束失败会 `continue`（对端还没同步到被引用的 task）。原来 LeanCloud 方案靠「每次多拉 2 分钟重叠窗口」把它捞回来；CloudKit 换成 `changeToken` 后，**被跳过的变更不会再被投递**。CloudBase 如果按 `createdAt` 游标做，同样要靠重叠窗口，别指望它自动重投。
 
-处理方式（二选一，建议 A）：
+处理方式（已实现，v7 迁移）：
 
-- **A. 重试表**：`apply` 返回「被跳过的 change」，写进 `sync_retry`；每次 pull 完先 drain 这张表，成功则删。表很小（通常 0–5 条）。
-- B. 不推进 token，直到整批干净；靠幂等重放。简单但可能卡住（一条坏数据一直失败）。
+- `sync_retry(change_id, payload, attempts, last_tried_at)` 存住外键没到的变更；
+- `SyncStore.apply(_:)` 返回被跳过的那些，并顺手入队；
+- `SyncEngine.syncOnce()` 在每轮拉取后调用 `retryPending()` 重放，成功即删。
 
 同时，`apply` 已经按 entity 优先级排序（project → task → …），批内顺序是对的，只有跨批才会出现「task 先到、project 后到」。
 

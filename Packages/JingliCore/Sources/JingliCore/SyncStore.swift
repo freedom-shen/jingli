@@ -142,8 +142,11 @@ public final class SyncStore: @unchecked Sendable {
 
     // MARK: - Applying remote changes
 
-    public func apply(_ changes: [SyncChange]) throws {
-        guard !changes.isEmpty else { return }
+    /// 应用远端变更。返回「因为外键没到而没落地」的变更（同时写进 sync_retry）。
+    @discardableResult
+    public func apply(_ changes: [SyncChange]) throws -> [SyncChange] {
+        guard !changes.isEmpty else { return [] }
+        var skipped: [SyncChange] = []
         let sorted = changes.sorted { lhs, rhs in
             let lp = Self.schemasByEntity[lhs.entity]?.priority ?? Int.max
             let rp = Self.schemasByEntity[rhs.entity]?.priority ?? Int.max
@@ -160,11 +163,88 @@ public final class SyncStore: @unchecked Sendable {
                         try applyOne(db, change)
                     } catch let error as DatabaseError
                         where error.extendedResultCode == .SQLITE_CONSTRAINT_FOREIGNKEY {
-                        // 对端可能还没同步到被引用的 task/session；跳过，等下一轮。
-                        continue
+                        // 对端还没同步到被引用的 task/session：先存起来，等依赖到了再重放。
+                        // CloudKit 的 change token 不会重投，所以这里必须自己留底。
+                        skipped.append(change)
+                        try SyncSchema.enqueueRetry(db, change, at: Self.timestamp())
                     }
                 }
             }
+        }
+        return skipped
+    }
+
+    /// 重放卡在外键上的变更；返回这轮成功落地的条数。
+    @discardableResult
+    public func retryPending(limit: Int = 200) throws -> Int {
+        let rows = try database.queue.read { db in
+            try Row.fetchAll(
+                db,
+                sql: "SELECT change_id, payload FROM sync_retry ORDER BY attempts, change_id LIMIT ?",
+                arguments: [limit]
+            )
+        }
+        var succeeded = 0
+        for row in rows {
+            guard let payload: String = row["payload"],
+                  let data = payload.data(using: .utf8),
+                  let change = try? JSONDecoder().decode(SyncChange.self, from: data)
+            else { continue }
+
+            do {
+                try database.queue.write { db in
+                    try SyncSchema.withSuppressed(db) {
+                        try applyOne(db, change)
+                    }
+                }
+                try database.queue.write { db in
+                    try db.execute(
+                        sql: "DELETE FROM sync_retry WHERE change_id = ?",
+                        arguments: [change.changeID]
+                    )
+                }
+                succeeded += 1
+            } catch let error as DatabaseError
+                where error.extendedResultCode == .SQLITE_CONSTRAINT_FOREIGNKEY {
+                try database.queue.write { db in
+                    try db.execute(
+                        sql: "UPDATE sync_retry SET attempts = attempts + 1, last_tried_at = ? WHERE change_id = ?",
+                        arguments: [Self.timestamp(), change.changeID]
+                    )
+                }
+            } catch {
+                // 其他错误先留着，下一轮再试
+            }
+        }
+        return succeeded
+    }
+
+    /// 拉取游标：由传输层解释，存在本地 sync_meta（设备本地，不上云）。
+    public func syncCursor() throws -> String? {
+        try database.queue.read { db in
+            try String.fetchOne(db, sql: "SELECT value FROM sync_meta WHERE key = 'pull_cursor'")
+        }
+    }
+
+    public func setSyncCursor(_ value: String?) throws {
+        try database.queue.write { db in
+            guard let value else {
+                try db.execute(sql: "DELETE FROM sync_meta WHERE key = 'pull_cursor'")
+                return
+            }
+            try db.execute(
+                sql: """
+                INSERT INTO sync_meta (key, value) VALUES ('pull_cursor', ?)
+                ON CONFLICT(key) DO UPDATE SET value = excluded.value
+                """,
+                arguments: [value]
+            )
+        }
+    }
+
+    public func pendingRetryCount() throws -> Int {
+        try database.queue.read { db in
+            try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM sync_retry") ?? 0
         }
     }
 

@@ -20,6 +20,19 @@ enum SyncSchema {
         try createTableTriggers(db)
     }
 
+    /// 外键没到的变更先存这里，等依赖到达再重放。
+    /// CloudKit 用 change token 之后，被跳过的变更不会重投，所以必须自己留一份。
+    static func migrateRetry(_ db: Database) throws {
+        try db.execute(sql: """
+            CREATE TABLE IF NOT EXISTS sync_retry (
+                change_id TEXT PRIMARY KEY,
+                payload TEXT NOT NULL,
+                attempts INTEGER NOT NULL DEFAULT 0,
+                last_tried_at TEXT
+            )
+            """)
+    }
+
     /// 静默写入：不产生同步变更，适合 rollover 这类本地派生状态。
     static func withSuppressed(_ db: Database, _ body: () throws -> Void) throws {
         try db.execute(
@@ -36,6 +49,21 @@ enum SyncSchema {
             )
         }
         try body()
+    }
+
+    static func enqueueRetry(_ db: Database, _ change: SyncChange, at now: String) throws {
+        let data = try JSONEncoder().encode(change)
+        guard let payload = String(data: data, encoding: .utf8) else { return }
+        try db.execute(
+            sql: """
+            INSERT INTO sync_retry (change_id, payload, attempts, last_tried_at)
+            VALUES (?, ?, 0, ?)
+            ON CONFLICT(change_id) DO UPDATE SET
+                attempts = sync_retry.attempts + 1,
+                last_tried_at = excluded.last_tried_at
+            """,
+            arguments: [change.changeID, payload, now]
+        )
     }
 
     // MARK: - Schema

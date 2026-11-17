@@ -152,6 +152,9 @@ public final class JingliDatabase: @unchecked Sendable {
         migrator.registerMigration("v6_sync") { db in
             try SyncSchema.migrate(db)
         }
+        migrator.registerMigration("v7_sync_retry") { db in
+            try SyncSchema.migrateRetry(db)
+        }
         return migrator
     }
 

@@ -27,7 +27,7 @@
 
 | 日期 | 已完成 | 卡在哪 |
 |---|---|---|
-| 2026-11-17 | T03 语音链路 spike、T10 iOS 平台、T11 socket 拆分、T12 命令层、T13 iOS target、T21 今天页、T22 开启一天、T23 计时、T24 项目、T25 统计、T20 App Group、T26 Widget（模拟器已验证） | T01 iCloud 能力被开发者协议（PLA）拦住；T02 真机断开（Widget 需手动加到桌面） |
+| 2026-11-17 | T03 语音链路 spike、T10 iOS 平台、T11 socket 拆分、T12 命令层、T13 iOS target、T21–T26（M2 全部界面 + Widget）、T33 sync_retry、T30 SyncEngine + FakeTransport | T01 iCloud 能力被开发者协议（PLA）拦住；T02 真机断开；T31/T32 CloudKit 实现等 container |
 
 > 恢复工作时先看这张表：T01 不解决，M3 整段动不了。
 

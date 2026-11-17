@@ -366,3 +366,46 @@ final class SyncTests: XCTestCase {
         )
     }
 }
+
+// MARK: - 外键没到时的重试（sync_retry）
+
+extension SyncTests {
+    func testForeignKeySkippedChangeIsKeptAndReplayed() throws {
+        let a = try makeDevice()
+        let b = try makeDevice()
+        let date = "2026-10-22"
+
+        let task = try a.store.createTask(title: "先建的", lane: "main")
+        try a.store.saveDaySelection(taskIDs: [task.id], today: date)
+
+        // 只把「今日计划成员」推过去，task 本身还没到 → 外键失败
+        let planOnly = try a.sync.allChanges().filter { $0.entity == "dayPlanTask" }
+        XCTAssertFalse(planOnly.isEmpty)
+        let skipped = try b.sync.apply(planOnly)
+        XCTAssertEqual(skipped.count, planOnly.count, "外键没到的变更应被记下来")
+        XCTAssertEqual(try b.sync.pendingRetryCount(), planOnly.count)
+        XCTAssertTrue(try b.store.snapshot(today: date).selection.isEmpty)
+
+        // 依赖到了：把 task 补上，再重放
+        let taskOnly = try a.sync.allChanges().filter { $0.entity == "task" || $0.entity == "project" }
+        try b.sync.apply(taskOnly)
+        let replayed = try b.sync.retryPending()
+        XCTAssertEqual(replayed, planOnly.count, "重放应全部成功")
+        XCTAssertEqual(try b.sync.pendingRetryCount(), 0)
+        XCTAssertEqual(Set(try b.store.snapshot(today: date).selection), Set([task.id]))
+    }
+
+    func testRetryKeepsChangeWhenDependencyStillMissing() throws {
+        let a = try makeDevice()
+        let b = try makeDevice()
+        let date = "2026-10-22"
+        let task = try a.store.createTask(title: "还是没到", lane: "main")
+        try a.store.saveDaySelection(taskIDs: [task.id], today: date)
+
+        let planOnly = try a.sync.allChanges().filter { $0.entity == "dayPlanTask" }
+        _ = try b.sync.apply(planOnly)
+
+        XCTAssertEqual(try b.sync.retryPending(), 0, "依赖还没到，重放不该成功")
+        XCTAssertEqual(try b.sync.pendingRetryCount(), planOnly.count, "失败的记录要留着")
+    }
+}
