@@ -83,6 +83,7 @@ pymobiledevice3 developer dvt screenshot --udid <硬件UDID> --userspace shot.pn
 | 失败重试 | 单测：失败后 pending 保留，退避重试成功后对端能收到 |
 | 多设备合并 | 单测：不同字段都保留 / 同字段收敛 / 删除传播 |
 | 模型操作数据库 | 真机 + 单测：模型调 `task_add` 落一条 temporary、estimate=5 |
+| 界面配置 Key 后可用 | 模拟器实点：设置填 Key → 助手问「今天还剩几件」→ 模型答「还剩 1 件：Refactor module」并调 `today_get` |
 | 历史回顾 | 单测：模型调 `stats_history` 返回按天数据；统计页入口带预填问题 |
 | 中文语音识别 | 真机日志：TTS 音频 → `帮我加一个临时任务评审设计稿大概两个钟` |
 | 语音落在录入口 | 新建任务页标题栏有麦克风（`addtask.mic`），说完直接成为标题 |
