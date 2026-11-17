@@ -80,6 +80,7 @@ idb ui text --udid <SIM_UDID> "text"
 | `-addsheet` / `-detail` | 打开新建任务 / 任务详情 |
 | `-asrfile` | 用打包的中文音频跑识别自检 |
 | `-voice` / `-ask=…` | 语音识别 / 直接给助手发一句话 |
+| `-setllm` | 从 `JINGLI_LLM_*` 环境变量写入模型配置（Key 只进 Keychain） |
 | `-ckcheck` / `-cksync` / `-cktwodevice` | CloudKit 自检 / 完整同步 / 双端收敛 |
 | `-syncwiring` | 验证「写入 → 去抖 → 自动推送」 |
 | `-cleanprobe` | 清掉自检脏数据 |
@@ -96,6 +97,8 @@ idb ui text --udid <SIM_UDID> "text"
 | 失败重试 | 单测：失败保留 + 退避重试成功 + 对端收到 |
 | 多设备合并 | 单测：不同字段都保留 / 同字段收敛 / 删除传播 |
 | 模型操作数据库 | 真机 + 单测：模型调 `task_add` 落一条 temporary、estimate=5 |
+| 真机配 Key + 模型建任务 | 真机：Key 写入 Keychain → 「帮我加一个临时任务：评审鸿蒙设计稿，两个番茄」→ 模型调 `today_get`+`task_add` 落 temporary/estimate=2 |
+| 真机问数据 | 真机：「今天还剩几件，按项目说一下」→ 「还剩 3 件，Lynx 2 件主线…主线用了 2/4」，数据来自 Mac 同步 |
 | 界面配置 Key 后可用 | 模拟器实点：设置填 Key → 助手问「今天还剩几件」→ 正确回答并调 `today_get` |
 | 中文语音识别 | 真机日志：TTS 音频 → `帮我加一个临时任务评审设计稿大概两个钟` |
 | 语音落录入 | 新建任务页标题栏麦克风，说完直接成为标题 |
