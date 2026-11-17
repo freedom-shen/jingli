@@ -10,6 +10,9 @@ MODE="${1:-compare}"
 
 SCENARIOS=(day-start today-running stats stats-detail completion projects temporary task-detail standby)
 export JINGLI_FAKE_NOW_MS="${JINGLI_FAKE_NOW_MS:-1792656000000}"
+# 注意：详细统计页「时间范围」分段控件的选中色取决于窗口是否为 key window
+# （key 时是系统蓝，非 key 时是灰）。stats-detail-main 偶尔不一致，多半是
+# 截图时窗口没抢到焦点，不是 UI 回归 —— 先 `--update` 重跑一次再判断。
 PANEL_SCENARIOS=(day-start today-running standby)
 
 if [ ! -d "$APP" ]; then
