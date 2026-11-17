@@ -13,3 +13,16 @@ xcuserdata/
 *.key
 secrets/
 artifacts/
+
+# 凭证 / 证书：一律不进仓库
+.env
+.env.*
+*.p8
+*.pem
+*.pfx
+*.jks
+*.keystore
+*.provisionprofile
+AuthKey_*.p8
+.netrc
+*.xcarchive
