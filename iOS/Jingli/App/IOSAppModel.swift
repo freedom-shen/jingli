@@ -14,6 +14,7 @@ final class IOSAppModel {
     private(set) var stats: TodayStats?
     private(set) var credits: [String: Double] = [:]
     private(set) var projects: [String: Project] = [:]
+    private(set) var projectGroups: [ProjectGroup] = []
     private(set) var today: String = DayKey.make()
     private(set) var timer: FocusTimer?
     var errorText: String?
@@ -47,9 +48,30 @@ final class IOSAppModel {
             snapshot = try store.snapshot(today: today)
             stats = try store.todayStats(today: today)
             credits = try store.creditTotals(today: today)
-            projects = Dictionary(
-                uniqueKeysWithValues: try store.listProjects().map { ($0.id, $0) }
-            )
+            let allProjects = try store.listProjects()
+            projects = Dictionary(uniqueKeysWithValues: allProjects.map { ($0.id, $0) })
+            var groups = allProjects.map { project in
+                ProjectGroup(
+                    id: project.id,
+                    project: project,
+                    tasks: (try? store.tasks(projectID: project.id)) ?? []
+                )
+            }
+            let uncategorized = ((try? store.listTasks(includeDone: true)) ?? [])
+                .filter { $0.projectID == nil }
+            if !uncategorized.isEmpty {
+                groups.append(ProjectGroup(id: "uncategorized", project: nil, tasks: uncategorized))
+            }
+            projectGroups = groups.map { group in
+                ProjectGroup(
+                    id: group.id,
+                    project: group.project,
+                    tasks: group.tasks.sorted { lhs, rhs in
+                        if lhs.done != rhs.done { return !lhs.done }
+                        return lhs.sortOrder < rhs.sortOrder
+                    }
+                )
+            }
             timer = try timerStore.loadActive(today: today)
         } catch {
             errorText = error.localizedDescription
@@ -72,6 +94,16 @@ final class IOSAppModel {
         } catch {
             errorText = error.localizedDescription
         }
+    }
+
+    /// 项目页用：每个项目 + 它的任务（含已完成，未完成排前）。
+    struct ProjectGroup: Identifiable {
+        let id: String
+        let project: Project?
+        let tasks: [JingliCore.Task]
+
+        var name: String { project?.name ?? "未分类" }
+        var openCount: Int { tasks.filter { !$0.done }.count }
     }
 
     // MARK: - 计时

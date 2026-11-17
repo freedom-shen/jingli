@@ -36,6 +36,8 @@ struct RootView: View {
                     } else {
                         DayStartView()
                     }
+                case .projects:
+                    ProjectsView()
                 case .stats:
                     StatsView()
                 default:
