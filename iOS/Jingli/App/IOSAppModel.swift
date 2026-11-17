@@ -15,6 +15,7 @@ final class IOSAppModel {
     private(set) var credits: [String: Double] = [:]
     private(set) var projects: [String: Project] = [:]
     private(set) var today: String = DayKey.make()
+    private(set) var timer: FocusTimer?
     var errorText: String?
 
     init() {
@@ -32,6 +33,12 @@ final class IOSAppModel {
         timerStore = FocusTimerStore(database: database)
         seedDemoIfNeeded()
         refresh()
+
+        // 截图/联调用：-autofocus 直接起一轮
+        if CommandLine.arguments.contains("-autofocus"), timer == nil,
+           let first = snapshot?.todayTasks.first(where: { !$0.done && $0.lane == "main" }) {
+            startFocus(taskID: first.id)
+        }
     }
 
     func refresh() {
@@ -43,7 +50,7 @@ final class IOSAppModel {
             projects = Dictionary(
                 uniqueKeysWithValues: try store.listProjects().map { ($0.id, $0) }
             )
-            errorText = (try timerStore.loadActive(today: today)) == nil ? nil : "有一轮计时正在进行"
+            timer = try timerStore.loadActive(today: today)
         } catch {
             errorText = error.localizedDescription
         }
@@ -65,6 +72,47 @@ final class IOSAppModel {
         } catch {
             errorText = error.localizedDescription
         }
+    }
+
+    // MARK: - 计时
+
+    private func nowMs() -> Int64 { Int64(Date().timeIntervalSince1970 * 1000) }
+
+    func startFocus(taskID: String) {
+        guard timer == nil,
+              var newTimer = FocusTimer(taskIDs: [taskID], sessionDate: today) else { return }
+        newTimer.start(now: nowMs(), sessionID: UUID().uuidString)
+        timer = newTimer
+        try? timerStore.saveActive(newTimer)
+    }
+
+    func tick() {
+        guard var current = timer, current.phase == .running else { return }
+        current.tick(now: nowMs())
+        timer = current
+        if current.isFinished { finishRound() }
+    }
+
+    func pauseFocus() {
+        guard var current = timer else { return }
+        current.pause(now: nowMs())
+        timer = current
+        try? timerStore.saveActive(current)
+    }
+
+    func resumeFocus() {
+        guard var current = timer else { return }
+        current.resume(now: nowMs())
+        timer = current
+        try? timerStore.saveActive(current)
+    }
+
+    func finishRound() {
+        guard let current = timer else { return }
+        if current.isFinished { _ = try? timerStore.complete(current) }
+        timer = nil
+        try? timerStore.clearActive()
+        refresh()
     }
 
     // MARK: - Demo 数据（只在 -demo 启动参数下写入一次）

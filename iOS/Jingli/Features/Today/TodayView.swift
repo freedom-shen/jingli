@@ -148,11 +148,16 @@ private struct MainTaskCard: View {
                     .strikethrough(task.done, color: Tokens.text3)
                 Spacer(minLength: 8)
                 if !task.done {
-                    Image(systemName: "play.fill")
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundStyle(Tokens.accent)
-                        .frame(width: 30, height: 30)
-                        .background(Tokens.accent.opacity(0.14), in: Circle())
+                    Button {
+                        model.startFocus(taskID: task.id)
+                    } label: {
+                        Image(systemName: "play.fill")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundStyle(Tokens.accent)
+                            .frame(width: 30, height: 30)
+                            .background(Tokens.accent.opacity(0.14), in: Circle())
+                    }
+                    .buttonStyle(.plain)
                 }
             }
             HStack(spacing: 8) {

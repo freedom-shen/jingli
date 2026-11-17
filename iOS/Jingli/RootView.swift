@@ -35,7 +35,14 @@ struct RootView: View {
             }
             .padding(.bottom, 76)
 
+            if model.timer != nil {
+                FocusView()
+                    .transition(.move(edge: .bottom))
+                    .zIndex(2)
+            }
+
             tabBar
+                .opacity(model.timer == nil ? 1 : 0)
         }
         .preferredColorScheme(.dark)
     }
