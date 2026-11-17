@@ -24,6 +24,8 @@
 
 iOS 版设计稿（15 屏，纯 HTML，浏览器直接打开）：[`Design/ios-design.html`](Design/ios-design.html) · [整页预览](Design/preview/ios-overview.png)
 
+iOS 版现状、验证记录与调试参数：[`docs/ios-status.md`](docs/ios-status.md)
+
 ## 它解决什么问题
 
 - **每天只选 4 件主线**：减少面对无限长待办清单的决策成本。
