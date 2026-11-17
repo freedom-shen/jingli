@@ -78,6 +78,11 @@ final class IOSAppModel {
         }
     }
 
+    func createProject(name: String, description: String, color: String) throws {
+        _ = try store.createProject(name: name, description: description, color: color)
+        refresh()
+    }
+
     @discardableResult
     func createTask(
         title: String,

@@ -3,6 +3,7 @@ import JingliCore
 
 struct ProjectsView: View {
     @Environment(IOSAppModel.self) private var model
+    @State private var showAdd = false
 
     private let columns = [
         GridItem(.flexible(), spacing: 11),
@@ -30,16 +31,29 @@ struct ProjectsView: View {
             .navigationDestination(for: String.self) { id in
                 ProjectDetailView(groupID: id)
             }
+            .sheet(isPresented: $showAdd) { AddProjectView() }
         }
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 3) {
-            Text("项目").font(.system(size: 30, weight: .bold)).foregroundStyle(Tokens.text)
-            Text("\(model.projectGroups.count) 个分组 · \(openTasks) 件未完成")
-                .font(.system(size: 11.5)).foregroundStyle(Tokens.text3)
+        HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: 3) {
+                Text("项目").font(.system(size: 30, weight: .bold)).foregroundStyle(Tokens.text)
+                Text("\(model.projectGroups.count) 个分组 · \(openTasks) 件未完成")
+                    .font(.system(size: 11.5)).foregroundStyle(Tokens.text3)
+            }
+            Spacer()
+            Button {
+                showAdd = true
+            } label: {
+                Image(systemName: "plus")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(Tokens.text2)
+                    .frame(width: 36, height: 36)
+                    .background(Color.white.opacity(0.06), in: Circle())
+            }
+            .buttonStyle(.plain)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.top, 8)
     }
 

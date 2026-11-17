@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1DA6D4717A9EEA717A7EDD2D /* AddProjectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34E53179D1AC1ED3DE4F9855 /* AddProjectView.swift */; };
 		272F9FAE80A662AF8FC4CD1C /* JingliCore in Frameworks */ = {isa = PBXBuildFile; productRef = 00854301257684596A8AE39D /* JingliCore */; };
 		2E29B1746F39E1025D19C0F8 /* DayStartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7212BA70871C2AD4EA5768C /* DayStartView.swift */; };
 		323BE329083FD84C434877F4 /* AddTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C0E4E24117278D4F3BDF3A0 /* AddTaskView.swift */; };
@@ -49,6 +50,7 @@
 
 /* Begin PBXFileReference section */
 		2C0E4E24117278D4F3BDF3A0 /* AddTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTaskView.swift; sourceTree = "<group>"; };
+		34E53179D1AC1ED3DE4F9855 /* AddProjectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddProjectView.swift; sourceTree = "<group>"; };
 		596365C37ACAE9360CD54339 /* JingliWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = JingliWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		67D83A0B37B580F15B3BA038 /* Tokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tokens.swift; sourceTree = "<group>"; };
 		689D9A00DB2D1D13C2BA8E55 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -120,6 +122,7 @@
 		9F058E590D1133D562B7792A /* Projects */ = {
 			isa = PBXGroup;
 			children = (
+				34E53179D1AC1ED3DE4F9855 /* AddProjectView.swift */,
 				B3C65F7C7DAB7596473E0DD5 /* ProjectsView.swift */,
 			);
 			path = Projects;
@@ -300,6 +303,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1DA6D4717A9EEA717A7EDD2D /* AddProjectView.swift in Sources */,
 				323BE329083FD84C434877F4 /* AddTaskView.swift in Sources */,
 				2E29B1746F39E1025D19C0F8 /* DayStartView.swift in Sources */,
 				B800971455EFD789C087E55D /* FocusView.swift in Sources */,
