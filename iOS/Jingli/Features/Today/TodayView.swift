@@ -318,8 +318,26 @@ private struct TempRow: View {
                 .lineLimit(1)
 
             Spacer(minLength: 8)
+
+            // 临时任务一样可以开始专注（Mac 端两侧卡片是一样的）
+            if !task.done {
+                Button {
+                    model.startFocus(taskID: task.id)
+                } label: {
+                    Image(systemName: "play.fill")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(Tokens.accent)
+                        .frame(width: 28, height: 28)
+                        .background(Tokens.accent.opacity(0.14), in: Circle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("开始专注")
+                .accessibilityIdentifier("today.temp.play")
+            }
+
             Text(credit == credit.rounded() ? String(Int(credit)) : String(format: "%.1f", credit))
                 .font(.system(size: 11)).foregroundStyle(Tokens.text3)
+                .frame(minWidth: 18, alignment: .trailing)
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
