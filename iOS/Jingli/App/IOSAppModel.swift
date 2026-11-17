@@ -427,6 +427,13 @@ final class IOSAppModel {
         return updated
     }
 
+    /// 重来今天：任务退回未安排，今日的番茄记录保留。
+    func resetDay() {
+        try? store.resetDay(today: today)
+        refresh()
+        noteSyncChange()
+    }
+
     func updateProject(id: String, name: String, description: String, color: String) throws {
         _ = try store.updateProject(id: id, name: name, description: description, color: color)
         refresh()

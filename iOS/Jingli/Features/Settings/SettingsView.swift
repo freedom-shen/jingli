@@ -7,6 +7,7 @@ struct SettingsView: View {
     @Environment(IOSAppModel.self) private var model
     @State private var syncing = false
     @State private var showModelConfig = false
+    @State private var confirmResetDay = false
 
     private var fileSize: String {
         let url = AppPaths.databaseURL
@@ -28,6 +29,24 @@ struct SettingsView: View {
                     ("number", "任务总数", "\(taskCount)"),
                     ("lock.shield", "位置", "App Group"),
                 ])
+
+                Button {
+                    confirmResetDay = true
+                } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: "arrow.counterclockwise")
+                            .font(.system(size: 12)).foregroundStyle(Tokens.tomato).frame(width: 22)
+                        Text("重来今天").font(.system(size: 13.5)).foregroundStyle(Tokens.tomato)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 14).padding(.vertical, 13)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.resetDay")
+                .background(Tokens.card, in: RoundedRectangle(cornerRadius: 14))
+                .overlay(RoundedRectangle(cornerRadius: 14).stroke(Tokens.line))
+                .padding(.top, 10)
                 syncSection
                 hint.padding(.top, 16)
                 modelSection
@@ -43,6 +62,14 @@ struct SettingsView: View {
             .padding(.bottom, 24)
         }
         .task { await model.refreshSyncStatus() }
+        .alert("重来今天？", isPresented: $confirmResetDay) {
+            Button("取消", role: .cancel) {}
+            Button("重来", role: .destructive) {
+                model.resetDay()
+            }
+        } message: {
+            Text("今天选中的任务会退回未安排，今日的番茄记录保留。")
+        }
     }
 
     private var modelSection: some View {
