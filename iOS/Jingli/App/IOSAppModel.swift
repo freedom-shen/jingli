@@ -225,6 +225,9 @@ final class IOSAppModel {
         timer = newTimer
         try? timerStore.saveActive(newTimer)
         let title = snapshot?.todayTasks.first { $0.id == taskID }?.title ?? "专注"
+        NotificationScheduler.cancelBreakEnd()
+        _Concurrency.Task { await NotificationScheduler.requestAuthorizationIfNeeded() }
+        NotificationScheduler.scheduleFocusEnd(after: durationMs / 1000, taskTitle: title)
         FocusActivityManager.shared.start(
             taskTitle: title,
             taskCount: 1,
@@ -248,6 +251,7 @@ final class IOSAppModel {
         current.pause(now: nowMs())
         timer = current
         try? timerStore.saveActive(current)
+        NotificationScheduler.cancelFocusEnd()
         FocusActivityManager.shared.update(
             isPaused: true,
             endsAt: Date(),
@@ -260,6 +264,10 @@ final class IOSAppModel {
         current.resume(now: nowMs())
         timer = current
         try? timerStore.saveActive(current)
+        NotificationScheduler.scheduleFocusEnd(
+            after: current.remaining(now: nowMs()) / 1000,
+            taskTitle: snapshot?.todayTasks.first { $0.id == current.taskIDs.first }?.title ?? "专注"
+        )
         FocusActivityManager.shared.update(
             isPaused: false,
             endsAt: Date().addingTimeInterval(TimeInterval(current.remaining(now: nowMs())) / 1000),
@@ -274,6 +282,7 @@ final class IOSAppModel {
         }
         timer = nil
         try? timerStore.clearActive()
+        NotificationScheduler.cancelFocusEnd()
         FocusActivityManager.shared.end()
         refresh()
     }
@@ -297,11 +306,13 @@ final class IOSAppModel {
         let minutes = longBreakPending ? 25 : 5
         breakMinutes = minutes
         breakEndsAt = Date().addingTimeInterval(TimeInterval(minutes * 60))
+        NotificationScheduler.scheduleBreakEnd(after: minutes * 60)
         pendingCompletion = nil
     }
 
     func skipBreak() {
         breakEndsAt = nil
+        NotificationScheduler.cancelBreakEnd()
     }
 
     func dismissCompletion() {
