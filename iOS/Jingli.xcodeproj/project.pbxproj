@@ -8,12 +8,20 @@
 
 /* Begin PBXBuildFile section */
 		272F9FAE80A662AF8FC4CD1C /* JingliCore in Frameworks */ = {isa = PBXBuildFile; productRef = 00854301257684596A8AE39D /* JingliCore */; };
+		8CD57953E872AF7A6FAF691D /* IOSAppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7725BAEB1AECAA6F13EF9E9D /* IOSAppModel.swift */; };
 		A5465BE37DBAA78A1FB3C1A9 /* JingliApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC9618A2DBBE55DDF8631873 /* JingliApp.swift */; };
+		AE5E95FED3D3F8CFB42AA741 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E13E357DCCBD85D8BA129B9 /* TodayView.swift */; };
+		CE4F61388333ED626B1C2209 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94DA84C0289342098B879CF7 /* RootView.swift */; };
+		F7A54B477261A61BB05228BF /* Tokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67D83A0B37B580F15B3BA038 /* Tokens.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		67D83A0B37B580F15B3BA038 /* Tokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tokens.swift; sourceTree = "<group>"; };
+		7725BAEB1AECAA6F13EF9E9D /* IOSAppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IOSAppModel.swift; sourceTree = "<group>"; };
+		7E13E357DCCBD85D8BA129B9 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
 		83D70C90B6CB19BF9F0720D9 /* Jingli.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Jingli.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8ECA132F9266F52FDF28D189 /* JingliCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = JingliCore; path = ../Packages/JingliCore; sourceTree = SOURCE_ROOT; };
+		94DA84C0289342098B879CF7 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		CC9618A2DBBE55DDF8631873 /* JingliApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JingliApp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -29,6 +37,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		55E4ADA9813DD50298B67C62 /* Design */ = {
+			isa = PBXGroup;
+			children = (
+				67D83A0B37B580F15B3BA038 /* Tokens.swift */,
+			);
+			path = Design;
+			sourceTree = "<group>";
+		};
+		5D96B945E1E3D71F036CB901 /* Today */ = {
+			isa = PBXGroup;
+			children = (
+				7E13E357DCCBD85D8BA129B9 /* TodayView.swift */,
+			);
+			path = Today;
+			sourceTree = "<group>";
+		};
 		B3959EEEB3BA261B32889EE5 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
@@ -41,8 +65,20 @@
 			isa = PBXGroup;
 			children = (
 				CC9618A2DBBE55DDF8631873 /* JingliApp.swift */,
+				94DA84C0289342098B879CF7 /* RootView.swift */,
+				EEE9F7D87ABF1B555C08AAB7 /* App */,
+				55E4ADA9813DD50298B67C62 /* Design */,
+				E0E0FE5946D5209CDB131C46 /* Features */,
 			);
 			path = Jingli;
+			sourceTree = "<group>";
+		};
+		E0E0FE5946D5209CDB131C46 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				5D96B945E1E3D71F036CB901 /* Today */,
+			);
+			path = Features;
 			sourceTree = "<group>";
 		};
 		E57D9291E9C9FC423B254D6A /* Products */ = {
@@ -60,6 +96,14 @@
 				B3959EEEB3BA261B32889EE5 /* Packages */,
 				E57D9291E9C9FC423B254D6A /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		EEE9F7D87ABF1B555C08AAB7 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				7725BAEB1AECAA6F13EF9E9D /* IOSAppModel.swift */,
+			);
+			path = App;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -126,7 +170,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8CD57953E872AF7A6FAF691D /* IOSAppModel.swift in Sources */,
 				A5465BE37DBAA78A1FB3C1A9 /* JingliApp.swift in Sources */,
+				CE4F61388333ED626B1C2209 /* RootView.swift in Sources */,
+				AE5E95FED3D3F8CFB42AA741 /* TodayView.swift in Sources */,
+				F7A54B477261A61BB05228BF /* Tokens.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
