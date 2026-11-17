@@ -55,7 +55,7 @@
 
 | ID | 任务 | 改动 / 产出 | 依赖 | 完成标准 | 天 |
 |---|---|---|---|---|---|
-| T01 | 确认开发者账号与 CloudKit 容器 | Apple Developer 后台建 `iCloud.com.freedom-shen.jingli`；`.entitlements` 两份 | — | 后台能看到容器；两个 bundle id 都勾上 CloudKit | 0.5 |
+| T01 | 确认开发者账号与 CloudKit 容器 | Apple Developer 后台建 `iCloud.com.freedom-shen.jingli`；`.entitlements` 两份（探针见 [`Spikes/cloudkit-probe`](../Spikes/cloudkit-probe/)） | — | 后台能看到容器；两个 bundle id 都勾上 CloudKit | 0.5 |
 | T02 | 最小 CloudKit 冒烟 | 临时 target：写 1 条 `CKRecord` → 另一台设备读到 | T01 | 两台设备（Mac + iPhone）能互读一条记录 | 0.5 |
 | T03 | 语音链路验证脚本 | ✅ `scripts/voice-spike.sh`：转写文本 → 模型 → 打印 `task.add` 参数（ASR 在端上，脚本吃转写结果） | 已有 Key | 一句话能正确产出 title/lane/date/estimate | 0.5 |
 
@@ -232,6 +232,11 @@ Mac 端现在 `CODE_SIGN_IDENTITY: "-"`（[App/project.yml](../App/project.yml)�
 ---
 
 ## 7. 风险与前置换算
+
+**2026-11-17 实测（真机 iPhone 16 Pro Max / iOS 26.5）**：Team `W695YL8UYY` 能签名、能装包、能启动；
+加 iCloud entitlement 后被 **PLA（开发者协议）** 拦住——需要先在 developer.apple.com/account 同意最新协议，
+`-allowProvisioningUpdates` 才能创建 container 和 profile。这条不解决，T31 起全部做不了。
+
 
 | 风险 | 触发条件 | 现在就要做的决定 |
 |---|---|---|
