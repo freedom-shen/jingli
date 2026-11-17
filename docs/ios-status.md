@@ -85,6 +85,7 @@ pymobiledevice3 developer dvt screenshot --udid <硬件UDID> --userspace shot.pn
 | 模型操作数据库 | 真机 + 单测：模型调 `task_add` 落一条 temporary、estimate=5 |
 | 历史回顾 | 单测：模型调 `stats_history` 返回按天数据；统计页入口带预填问题 |
 | 中文语音识别 | 真机日志：TTS 音频 → `帮我加一个临时任务评审设计稿大概两个钟` |
+| 语音落在录入口 | 新建任务页标题栏有麦克风（`addtask.mic`），说完直接成为标题 |
 | ASR 原文喂模型 | 单测：无标点原文 → 仍只落一条任务、预估正确 |
 | Widget / App Group | 共享容器里直查 sqlite；Widget 编译嵌入安装成功 |
 

@@ -12,6 +12,7 @@ struct AddTaskView: View {
     @State private var estimate: Int?
     @State private var note = ""
     @State private var errorText: String?
+    @State private var transcriber = SpeechTranscriber()
 
     private var projects: [Project] {
         model.projectGroups.compactMap(\.project)
@@ -61,14 +62,43 @@ struct AddTaskView: View {
     }
 
     private var titleField: some View {
-        TextField("", text: $title, prompt: Text("要做什么？").foregroundStyle(Tokens.text3))
-            .font(.system(size: 17, weight: .medium))
-            .foregroundStyle(Tokens.text)
-            .padding(14)
-            .background(Tokens.card, in: RoundedRectangle(cornerRadius: 14))
-            .overlay(RoundedRectangle(cornerRadius: 14).stroke(Tokens.line))
-            .textInputAutocapitalization(.never)
-            .submitLabel(.done)
+        HStack(spacing: 10) {
+            TextField("", text: $title, prompt: Text("要做什么？").foregroundStyle(Tokens.text3))
+                .font(.system(size: 17, weight: .medium))
+                .foregroundStyle(Tokens.text)
+                .textInputAutocapitalization(.never)
+                .submitLabel(.done)
+
+            // 语音录入：录一段，标题就是你说的话
+            Button {
+                _Concurrency.Task { await toggleVoice() }
+            } label: {
+                Image(systemName: transcriber.isRecording ? "waveform" : "mic.fill")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(transcriber.isRecording ? Tokens.tomato : Tokens.text2)
+                    .frame(width: 32, height: 32)
+                    .background(
+                        (transcriber.isRecording ? Tokens.tomato : Color.white).opacity(0.10),
+                        in: Circle()
+                    )
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("addtask.mic")
+        }
+        .padding(14)
+        .background(Tokens.card, in: RoundedRectangle(cornerRadius: 14))
+        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Tokens.line))
+        .onChange(of: transcriber.transcript) { _, value in
+            if transcriber.isRecording { title = value }
+        }
+    }
+
+    private func toggleVoice() async {
+        if transcriber.isRecording {
+            transcriber.stop()
+        } else {
+            await transcriber.start()
+        }
     }
 
     private var ruleCard: some View {
