@@ -303,6 +303,14 @@ final class IOSAppModel {
             refresh()
             NSLog("[DAY] 已结束本地计时")
         }
+        if CommandLine.arguments.contains("-emptytoday") {
+            _Concurrency.Task {
+                let task = try? self.store.createTask(title: "临时占位", lane: "temporary", plannedDate: self.today)
+                _ = try? self.store.startDay(taskIDs: [task?.id].compactMap { $0 }, today: self.today)
+                if let id = task?.id { _ = try? self.store.deleteTask(id: id) }
+                self.refresh()
+            }
+        }
         if CommandLine.arguments.contains("-prepareday") {
             _Concurrency.Task { await self.prepareDayForCheck() }
         }

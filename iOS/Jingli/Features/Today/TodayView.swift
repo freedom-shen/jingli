@@ -30,6 +30,10 @@ struct TodayView: View {
                         .padding(.top, 14)
                 }
 
+                if mainTasks.isEmpty && tempTasks.isEmpty {
+                    emptyToday.padding(.top, 26)
+                }
+
                 sectionTitle("主线任务", trailing: "\(mainTasks.count) / 4")
                 ForEach(mainTasks) { task in
                     MainTaskCard(task: task, project: projectName(for: task))
@@ -96,6 +100,47 @@ struct TodayView: View {
             .foregroundStyle(tint)
             .frame(width: 36, height: 36)
             .background(tint.opacity(name == "mic.fill" ? 0.16 : 0.06), in: Circle())
+    }
+
+    /// 今天一件都没有时的引导：不是错误，是还没安排。
+    private var emptyToday: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: 5) {
+                Text("今天还没有任务").font(.system(size: 16, weight: .semibold)).foregroundStyle(Tokens.text)
+                Text("从项目里挑几件，或者直接跟助手说一句话。").font(.system(size: 12)).foregroundStyle(Tokens.text3)
+            }
+            HStack(spacing: 9) {
+                Button {
+                    showAdd = true
+                } label: {
+                    Text("新建任务")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(Tokens.text)
+                        .padding(.horizontal, 16).padding(.vertical, 9)
+                        .background(Color.white.opacity(0.07), in: Capsule())
+                        .overlay(Capsule().stroke(Tokens.line))
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("today.empty.newTask")
+
+                Button {
+                    showAssistant = true
+                } label: {
+                    Text("跟助手说")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(Color(red: 0.04, green: 0.05, blue: 0.08))
+                        .padding(.horizontal, 16).padding(.vertical, 9)
+                        .background(Tokens.accent, in: Capsule())
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("today.empty.assistant")
+                Spacer()
+            }
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Tokens.card, in: RoundedRectangle(cornerRadius: 16))
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Tokens.line))
     }
 
     private func sectionTitle(_ title: String, trailing: String) -> some View {
