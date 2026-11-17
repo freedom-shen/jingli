@@ -33,6 +33,13 @@ enum SyncSchema {
             """)
     }
 
+    /// 进程被强杀时 withSuppressed 的 defer 不会执行，标记会残留，
+    /// 之后所有本地写入都不再产生 sync_change（同步静默失效）。
+    /// 每次打开库都清一次，代价是一条 DELETE。
+    static func clearStaleSuppression(_ db: Database) throws {
+        try db.execute(sql: "DELETE FROM sync_meta WHERE key = ?", arguments: [suppressKey])
+    }
+
     /// 静默写入：不产生同步变更，适合 rollover 这类本地派生状态。
     static func withSuppressed(_ db: Database, _ body: () throws -> Void) throws {
         try db.execute(

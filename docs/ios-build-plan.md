@@ -27,7 +27,7 @@
 
 | 日期 | 已完成 | 卡在哪 |
 |---|---|---|
-| 2026-11-17 | T03 语音链路 spike、T10 iOS 平台、T11 socket 拆分、T12 命令层、T13 iOS target、T21–T26（M2 全部界面 + 任务/项目增删改 + 设置页 + Widget）、T33 sync_retry、T30 SyncEngine + FakeTransport、T31 CloudKit transport（真机已连通账号，容器写入待服务端初始化）、T41 ToolCatalog（8 个工具）、T42 OpenAI 兼容 provider + Agent 循环、T43 助手对话界面（真实模型在 App 里跑通）、T40 端上转写接入（权限流程已验证）、T50 Live Activity（已启动成功；模拟器 runtime 不渲染动态岛，渲染待真机验） | T01 iCloud 能力被开发者协议（PLA）拦住；T02 真机断开；T31/T32 CloudKit 实现等 container |
+| 2026-11-17 | T03 语音链路 spike、T10 iOS 平台、T11 socket 拆分、T12 命令层、T13 iOS target、T21–T26（M2 全部界面 + 任务/项目增删改 + 设置页 + Widget）、T33 sync_retry、T30 SyncEngine + FakeTransport、T31 CloudKit transport（真机 iCloud 往返已打通）、T32 同步调度待接入、T41 ToolCatalog（8 个工具）、T42 OpenAI 兼容 provider + Agent 循环、T43 助手对话界面（真实模型在 App 里跑通）、T40 端上转写接入（权限流程已验证）、T50 Live Activity（已启动成功；模拟器 runtime 不渲染动态岛，渲染待真机验） | T01 iCloud 能力被开发者协议（PLA）拦住；T02 真机断开；T31/T32 CloudKit 实现等 container |
 
 > 恢复工作时先看这张表：T01 不解决，M3 整段动不了。
 
@@ -298,4 +298,10 @@ scripts/self-test.sh --full
   - `accountStatus=1`（iCloud 可用）
   - `userRecordID` 获取成功
   - **写默认 zone / 自定义 zone 均返回 `CKError 15 / CKInternalErrorDomain 2000`**
-- 结论：客户端配置无问题，服务端拒绝该容器的一切写入。典型原因是容器尚未初始化（首次进入 CloudKit Console 的数据库页）或新建容器仍在传播。下一步：在 CloudKit Console 里打开该容器的 Development 环境，然后重跑 `-ckcheck`。
+- 根因：CloudKit Console 默认打开的是另一个 team（Havells India Limited），容器从未被"打开"过，服务端因此拒绝一切写入。切到 `xiaomin shen W695YL8UYY` 并进入该容器的 Development / Records 页后，立刻恢复正常。
+- 修复后真机结果：
+  - `zone created` ✅
+  - `default zone write ok` ✅
+  - `push accepted=1` / `pull count=1 foundOwn=true` ✅
+  - 完整同步：`待推送=9 → pushed=9，pulled=9 applied=9 skipped=0` ✅
+- 顺带修掉一个隐患：`withSuppressed` 的标记在进程被强杀时会残留，之后所有本地写入都不再产生同步变更。现在每次打开库都会清一次（`SyncSchema.clearStaleSuppression`）。

@@ -13,6 +13,9 @@ public final class JingliDatabase: @unchecked Sendable {
     public init(_ queue: DatabaseQueue) throws {
         self.queue = queue
         try Self.migrator.migrate(queue)
+        try queue.write { db in
+            try SyncSchema.clearStaleSuppression(db)
+        }
     }
 
     public static func inMemory() throws -> JingliDatabase {

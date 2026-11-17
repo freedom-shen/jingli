@@ -75,6 +75,27 @@ final class IOSAppModel {
         }
     }
 
+    /// 真机自检：用真实的库跑一次完整同步（推本地变更 → 拉远端 → 重放）。
+    func runCloudKitSync() async {
+        let sync = SyncStore(database: database)
+        let engine = SyncEngine(
+            store: sync,
+            transport: CloudKitTransport(config: .init(containerIdentifier: CloudKitDiagnostics.containerID))
+        )
+        let stamp = DateFormatter()
+        stamp.dateFormat = "HHmmss"
+        _ = try? store.createTask(title: "真机同步验证 \(stamp.string(from: Date()))", lane: "temporary", plannedDate: today)
+        NSLog("[CKS] 已创建一条本地任务用于验证推送")
+        NSLog("[CKS] 本地任务数=\(((try? store.taskCount()) ?? -1)) 待推送=\(((try? sync.pendingCount()) ?? -1))")
+        do {
+            let report = try await engine.syncOnce()
+            NSLog("[CKS] pushed=\(report.pushed) pulled=\(report.pulled) applied=\(report.applied) skipped=\(report.skipped) retried=\(report.retried)")
+            NSLog("[CKS] 同步后待推送=\(((try? sync.pendingCount()) ?? -1)) 远端记录可拉=\((try await sync.syncCursor()) ?? "nil")")
+        } catch {
+            NSLog("[CKS] 同步失败: \(error)")
+        }
+    }
+
     func updateLLMConfig(_ config: LLMConfig) {
         llmConfig = config
         LLMConfigStore.save(config)
@@ -98,6 +119,9 @@ final class IOSAppModel {
 
         if CommandLine.arguments.contains("-ckcheck") {
             _Concurrency.Task { await CloudKitDiagnostics.run() }
+        }
+        if CommandLine.arguments.contains("-cksync") {
+            _Concurrency.Task { await self.runCloudKitSync() }
         }
 
         // 截图/联调用：-autofocus 直接起一轮
