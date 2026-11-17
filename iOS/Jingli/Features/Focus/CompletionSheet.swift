@@ -91,7 +91,8 @@ struct CompletionSheet: View {
         .padding(.horizontal, 20)
         .padding(.top, 4)
         .padding(.bottom, 16)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .fixedSize(horizontal: false, vertical: true)
         .background(Tokens.bg)
     }
 

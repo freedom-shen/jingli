@@ -69,6 +69,8 @@ pymobiledevice3 developer dvt screenshot --udid <硬件UDID> --userspace shot.pn
 | `-cleanprobe` | 清掉自检产生的脏数据 |
 | `-ask=…` | 打开助手并直接发送这句话 |
 
+环境变量 `JINGLI_NO_NOTIFICATIONS=1` 关闭真实通知（截图/自检时用，避免系统弹窗挡住界面）。
+
 ## 五、验证到什么程度
 
 | 能力 | 证据 |
@@ -87,7 +89,6 @@ pymobiledevice3 developer dvt screenshot --udid <硬件UDID> --userspace shot.pn
 
 ## 六、已知问题
 
-- 番茄结算弹层的 sheet 高度与内容没完全对齐，真机观感待调
 - Widget 需要在桌面手动添加（命令行加不了）
 - Mac 端还没接同步（Mac 目前 ad-hoc 签名、无 team，接 CloudKit 要改打包流程）
 

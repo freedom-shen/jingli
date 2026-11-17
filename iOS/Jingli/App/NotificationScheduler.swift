@@ -8,6 +8,7 @@ enum NotificationScheduler {
     nonisolated(unsafe) private static var asked = false
 
     static func requestAuthorizationIfNeeded() async {
+        if ProcessInfo.processInfo.environment["JINGLI_NO_NOTIFICATIONS"] == "1" { return }
         guard !asked else { return }
         asked = true
         let center = UNUserNotificationCenter.current()
@@ -18,6 +19,7 @@ enum NotificationScheduler {
 
     static func scheduleFocusEnd(after seconds: Int, taskTitle: String) {
         guard seconds > 0 else { return }
+        if ProcessInfo.processInfo.environment["JINGLI_NO_NOTIFICATIONS"] == "1" { return }
         let content = UNMutableNotificationContent()
         content.title = "专注结束"
         content.body = "「\(taskTitle)」这一轮完成了，回来结算一下。"
