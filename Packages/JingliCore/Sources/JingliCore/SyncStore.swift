@@ -17,6 +17,26 @@ public struct SyncChange: Codable, Sendable, Equatable {
 
     public var changeID: String { "\(deviceID):\(seq)" }
 
+    public init(
+        seq: Int64,
+        entity: String,
+        entityID: String,
+        field: String,
+        valueJSON: String,
+        rev: String,
+        deviceID: String,
+        ms: Int64
+    ) {
+        self.seq = seq
+        self.entity = entity
+        self.entityID = entityID
+        self.field = field
+        self.valueJSON = valueJSON
+        self.rev = rev
+        self.deviceID = deviceID
+        self.ms = ms
+    }
+
     init(row: Row) {
         self.seq = row["seq"]
         self.entity = row["entity"]
