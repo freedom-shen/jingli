@@ -95,6 +95,23 @@ final class IOSAppModel {
         syncStatus = await syncService.status()
     }
 
+    /// 自检用：种数据 → 开启一天 → 起一轮，一次做完（顺序敏感，必须串行）。
+    func prepareDayForCheck() async {
+        await seedCheckData()
+        let ids = Array(((try? store.listTasks()) ?? []).prefix(3).map(\.id))
+        if snapshot?.dayStarted != true {
+            _ = try? store.saveDaySelection(taskIDs: ids, today: today)
+            _ = try? store.startDay(taskIDs: ids, today: today)
+        } else if (snapshot?.todayTasks.isEmpty ?? true), !ids.isEmpty {
+            _ = try? store.addToToday(taskIDs: ids, today: today)
+        }
+        refresh()
+        if timer == nil, let first = snapshot?.todayTasks.first(where: { !$0.done }) {
+            startFocus(taskID: first.id)
+        }
+        NSLog("[PREP] 任务数=\((try? store.taskCount()) ?? -1) 今天=\(snapshot?.todayTasks.count ?? -1) 计时中=\(timer != nil)")
+    }
+
     /// 真机演示数据（都带 `·演示` 标记，`-cleandemo` 可整组删除）。
     func seedCheckData() async {
         guard ((try? store.listTasks()) ?? []).isEmpty else {
@@ -285,6 +302,9 @@ final class IOSAppModel {
             FocusActivityManager.shared.end()
             refresh()
             NSLog("[DAY] 已结束本地计时")
+        }
+        if CommandLine.arguments.contains("-prepareday") {
+            _Concurrency.Task { await self.prepareDayForCheck() }
         }
         if CommandLine.arguments.contains("-seedcheck") {
             _Concurrency.Task { await self.seedCheckData() }
