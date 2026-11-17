@@ -15,6 +15,30 @@ struct ProjectsView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
                     header
+                    if model.projectGroups.isEmpty {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("还没有项目").font(.system(size: 16, weight: .semibold)).foregroundStyle(Tokens.text)
+                            Text("先建一个项目，主线任务才有地方放。临时任务不需要项目。")
+                                .font(.system(size: 12)).foregroundStyle(Tokens.text3)
+                            Button {
+                                showAdd = true
+                            } label: {
+                                Text("新建项目")
+                                    .font(.system(size: 13, weight: .medium))
+                                    .foregroundStyle(Color(red: 0.04, green: 0.05, blue: 0.08))
+                                    .padding(.horizontal, 16).padding(.vertical, 9)
+                                    .background(Tokens.accent, in: Capsule())
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityIdentifier("projects.empty.new")
+                        }
+                        .padding(16)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Tokens.card, in: RoundedRectangle(cornerRadius: 16))
+                        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Tokens.line))
+                        .padding(.top, 18)
+                    }
+
                     LazyVGrid(columns: columns, spacing: 11) {
                         ForEach(model.projectGroups) { group in
                             NavigationLink(value: group.id) {
@@ -85,7 +109,7 @@ private struct ProjectCard: View {
                     .multilineTextAlignment(.leading)
                     .padding(.top, 9)
             } else {
-                Text("本周无任务")
+                Text("还没有任务")
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(Tokens.text3)
                     .padding(.top, 9)
@@ -110,6 +134,7 @@ struct ProjectDetailView: View {
     @Environment(IOSAppModel.self) private var model
     let groupID: String
     @State private var detailTask: JingliCore.Task?
+    @State private var showAddTask = false
 
     private var group: IOSAppModel.ProjectGroup? {
         model.projectGroups.first { $0.id == groupID }
@@ -121,6 +146,21 @@ struct ProjectDetailView: View {
                 if let group {
                     header(group)
                     taskList(group)
+                    Button {
+                        showAddTask = true
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "plus").font(.system(size: 12, weight: .semibold))
+                            Text("在这个项目里新建任务").font(.system(size: 13, weight: .medium))
+                        }
+                        .foregroundStyle(Tokens.accent)
+                        .frame(maxWidth: .infinity).frame(height: 44)
+                        .background(Tokens.accent.opacity(0.10), in: RoundedRectangle(cornerRadius: 13))
+                        .overlay(RoundedRectangle(cornerRadius: 13).stroke(Tokens.accent.opacity(0.26)))
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("project.addTask")
+                    .padding(.top, 12)
                     if model.snapshot?.dayStarted == true {
                         HStack(spacing: 6) {
                             Image(systemName: "lock.fill").font(.system(size: 10))
@@ -137,6 +177,9 @@ struct ProjectDetailView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $detailTask) { task in TaskDetailView(taskID: task.id) }
+        .sheet(isPresented: $showAddTask) {
+            AddTaskView(presetProjectID: group?.project?.id, presetProjectName: group?.name)
+        }
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Text(group?.name ?? "项目")

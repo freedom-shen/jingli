@@ -6,6 +6,10 @@ struct AddTaskView: View {
     @Environment(IOSAppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
 
+    /// 从项目详情进来时，类型和项目都锁到这个项目上
+    var presetProjectID: String?
+    var presetProjectName: String?
+
     @State private var title = ""
     @State private var lane = "temporary"
     @State private var projectID: String?
@@ -20,6 +24,13 @@ struct AddTaskView: View {
 
     private var canSave: Bool {
         !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    init(presetProjectID: String? = nil, presetProjectName: String? = nil) {
+        self.presetProjectID = presetProjectID
+        self.presetProjectName = presetProjectName
+        _lane = State(initialValue: presetProjectID == nil ? "temporary" : "main")
+        _projectID = State(initialValue: presetProjectID)
     }
 
     var body: some View {
