@@ -10,7 +10,10 @@
 		272F9FAE80A662AF8FC4CD1C /* JingliCore in Frameworks */ = {isa = PBXBuildFile; productRef = 00854301257684596A8AE39D /* JingliCore */; };
 		2E29B1746F39E1025D19C0F8 /* DayStartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7212BA70871C2AD4EA5768C /* DayStartView.swift */; };
 		390A0715593B0CD34313D61C /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92BC65678CFBDB340EB288 /* StatsView.swift */; };
+		39F6C0CCB79988C421F870B7 /* JingliWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 596365C37ACAE9360CD54339 /* JingliWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		61F3F442C6D9328BA025677F /* JingliCore in Frameworks */ = {isa = PBXBuildFile; productRef = 64D85BB90A9B840BB3651CF5 /* JingliCore */; };
 		691529F196F6FD5813FDCFE0 /* ProjectsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3C65F7C7DAB7596473E0DD5 /* ProjectsView.swift */; };
+		893AF3ED2BF9EC58A57B457F /* JingliWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2753D9DD0590DB36DBD5E7A /* JingliWidget.swift */; };
 		8CD57953E872AF7A6FAF691D /* IOSAppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7725BAEB1AECAA6F13EF9E9D /* IOSAppModel.swift */; };
 		A5465BE37DBAA78A1FB3C1A9 /* JingliApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC9618A2DBBE55DDF8631873 /* JingliApp.swift */; };
 		AE5E95FED3D3F8CFB42AA741 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E13E357DCCBD85D8BA129B9 /* TodayView.swift */; };
@@ -19,8 +22,34 @@
 		F7A54B477261A61BB05228BF /* Tokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67D83A0B37B580F15B3BA038 /* Tokens.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		DC6371A6974238274DEE453D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 48B4D54387B94D9F745F9A7B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8DDA6211066AA5B853F33FB6;
+			remoteInfo = JingliWidget;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F8ED37236AC97D38CE66FC34 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				39F6C0CCB79988C421F870B7 /* JingliWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		596365C37ACAE9360CD54339 /* JingliWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = JingliWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		67D83A0B37B580F15B3BA038 /* Tokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tokens.swift; sourceTree = "<group>"; };
+		689D9A00DB2D1D13C2BA8E55 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		7725BAEB1AECAA6F13EF9E9D /* IOSAppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IOSAppModel.swift; sourceTree = "<group>"; };
 		7E13E357DCCBD85D8BA129B9 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
 		83D70C90B6CB19BF9F0720D9 /* Jingli.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Jingli.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -30,10 +59,19 @@
 		A7D8943A027AE96346006510 /* FocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusView.swift; sourceTree = "<group>"; };
 		B3C65F7C7DAB7596473E0DD5 /* ProjectsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectsView.swift; sourceTree = "<group>"; };
 		CC9618A2DBBE55DDF8631873 /* JingliApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JingliApp.swift; sourceTree = "<group>"; };
+		D2753D9DD0590DB36DBD5E7A /* JingliWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JingliWidget.swift; sourceTree = "<group>"; };
 		E7212BA70871C2AD4EA5768C /* DayStartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayStartView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		0B02889E352F34624E8EFBF5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				61F3F442C6D9328BA025677F /* JingliCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		59095B66D694BD2F9EF1AA71 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -93,6 +131,15 @@
 			name = Packages;
 			sourceTree = "<group>";
 		};
+		B8565ED483BFC14554E9D633 /* Widget */ = {
+			isa = PBXGroup;
+			children = (
+				689D9A00DB2D1D13C2BA8E55 /* Info.plist */,
+				D2753D9DD0590DB36DBD5E7A /* JingliWidget.swift */,
+			);
+			path = Widget;
+			sourceTree = "<group>";
+		};
 		C3DC31CB89B564DFF523DCE5 /* Focus */ = {
 			isa = PBXGroup;
 			children = (
@@ -129,6 +176,7 @@
 			isa = PBXGroup;
 			children = (
 				83D70C90B6CB19BF9F0720D9 /* Jingli.app */,
+				596365C37ACAE9360CD54339 /* JingliWidget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -138,6 +186,7 @@
 			children = (
 				DBB32DD9EEC13BD511B4A2F0 /* Jingli */,
 				B3959EEEB3BA261B32889EE5 /* Packages */,
+				B8565ED483BFC14554E9D633 /* Widget */,
 				E57D9291E9C9FC423B254D6A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -153,16 +202,37 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		8DDA6211066AA5B853F33FB6 /* JingliWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D699305548125EB5F69EA8DE /* Build configuration list for PBXNativeTarget "JingliWidget" */;
+			buildPhases = (
+				67E3967B393C72EFF75E1B48 /* Sources */,
+				0B02889E352F34624E8EFBF5 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = JingliWidget;
+			packageProductDependencies = (
+				64D85BB90A9B840BB3651CF5 /* JingliCore */,
+			);
+			productName = JingliWidget;
+			productReference = 596365C37ACAE9360CD54339 /* JingliWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		CBE485763CEDEAA4377D83BB /* Jingli */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = ABCB7A4743A2E465C18594B3 /* Build configuration list for PBXNativeTarget "Jingli" */;
 			buildPhases = (
 				2DB4D529CCEA0E94A23E4DEA /* Sources */,
 				59095B66D694BD2F9EF1AA71 /* Frameworks */,
+				F8ED37236AC97D38CE66FC34 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				60E6267B7020ECFABD55512B /* PBXTargetDependency */,
 			);
 			name = Jingli;
 			packageProductDependencies = (
@@ -181,6 +251,10 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					8DDA6211066AA5B853F33FB6 = {
+						DevelopmentTeam = W695YL8UYY;
+						ProvisioningStyle = Automatic;
+					};
 					CBE485763CEDEAA4377D83BB = {
 						DevelopmentTeam = W695YL8UYY;
 						ProvisioningStyle = Automatic;
@@ -205,6 +279,7 @@
 			projectRoot = "";
 			targets = (
 				CBE485763CEDEAA4377D83BB /* Jingli */,
+				8DDA6211066AA5B853F33FB6 /* JingliWidget */,
 			);
 		};
 /* End PBXProject section */
@@ -226,13 +301,30 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		67E3967B393C72EFF75E1B48 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				893AF3ED2BF9EC58A57B457F /* JingliWidget.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		60E6267B7020ECFABD55512B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8DDA6211066AA5B853F33FB6 /* JingliWidget */;
+			targetProxy = DC6371A6974238274DEE453D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		076C4F1DB54B2FDEF152029B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Jingli/Jingli.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_KEY_CFBundleDisplayName = "精力管理";
@@ -249,6 +341,26 @@
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
+		};
+		0E1864723ADB67E872104175 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Jingli/Jingli.entitlements;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Widget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 0.7.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.freedom-shen.jingli.ios.widget";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
 		};
 		5AAB073A3DED64BFDBC44789 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -309,10 +421,31 @@
 			};
 			name = Release;
 		};
+		7047F1B5CA1E963612BCB990 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Jingli/Jingli.entitlements;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Widget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 0.7.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.freedom-shen.jingli.ios.widget";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
 		7A8754696B18B7E9DAA98FA8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Jingli/Jingli.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_KEY_CFBundleDisplayName = "精力管理";
@@ -408,6 +541,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
+		D699305548125EB5F69EA8DE /* Build configuration list for PBXNativeTarget "JingliWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0E1864723ADB67E872104175 /* Debug */,
+				7047F1B5CA1E963612BCB990 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		DCFA703EEA55213148D3F7C3 /* Build configuration list for PBXProject "Jingli" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -428,6 +570,10 @@
 
 /* Begin XCSwiftPackageProductDependency section */
 		00854301257684596A8AE39D /* JingliCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = JingliCore;
+		};
+		64D85BB90A9B840BB3651CF5 /* JingliCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = JingliCore;
 		};

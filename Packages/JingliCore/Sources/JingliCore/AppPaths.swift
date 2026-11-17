@@ -1,7 +1,14 @@
 import Foundation
 
 public enum AppPaths {
+    /// iOS 的 App Group 容器（Widget / Live Activity 要读同一个库）。
+    /// macOS 上保持 nil，仍走 ~/Library/Application Support/Jingli。
+    nonisolated(unsafe) public static var containerURL: URL?
+
     public static var supportDirectory: URL {
+        if let containerURL {
+            return containerURL.appendingPathComponent("Jingli", isDirectory: true)
+        }
         if let custom = ProcessInfo.processInfo.environment["JINGLI_SUPPORT_DIR"],
            !custom.isEmpty {
             return URL(fileURLWithPath: custom, isDirectory: true)

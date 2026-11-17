@@ -22,11 +22,16 @@ targets:
     platform: iOS
     sources:
       - path: Jingli
+        excludes:
+          - "*.entitlements"
     dependencies:
       - package: JingliCore
+      - target: JingliWidget
+        embed: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.freedom-shen.jingli.ios
+        CODE_SIGN_ENTITLEMENTS: Jingli/Jingli.entitlements
         PRODUCT_NAME: Jingli
         INFOPLIST_KEY_CFBundleDisplayName: 精力管理
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
@@ -34,6 +39,31 @@ targets:
         TARGETED_DEVICE_FAMILY: "1"
         MARKETING_VERSION: "0.7.0"
         CURRENT_PROJECT_VERSION: "1"
+
+  JingliWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: Widget
+    dependencies:
+      - package: JingliCore
+    info:
+      path: Widget/Info.plist
+      properties:
+        CFBundleDisplayName: 精力管理
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.freedom-shen.jingli.ios.widget
+        CODE_SIGN_ENTITLEMENTS: Jingli/Jingli.entitlements
+        GENERATE_INFOPLIST_FILE: NO
+        MARKETING_VERSION: "0.7.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SKIP_INSTALL: YES
+        TARGETED_DEVICE_FAMILY: "1"
 
 schemes:
   Jingli:
