@@ -42,6 +42,26 @@ public final class CloudKitTransport: SyncTransport, @unchecked Sendable {
 
     public func push(_ changes: [SyncChange]) async throws -> [String] {
         guard !changes.isEmpty else { return [] }
+        do {
+            return try await performPush(changes)
+        } catch {
+            throw Self.localize(error)
+        }
+    }
+
+    /// 把 CloudKit 的英文错误码翻成用户能看懂的话。
+    static func localize(_ error: Error) -> Error {
+        guard let ck = error as? CKError else { return SyncTransportError.other(error.localizedDescription) }
+        switch ck.code {
+        case .notAuthenticated: return SyncTransportError.notAuthenticated
+        case .networkUnavailable, .networkFailure: return SyncTransportError.offline
+        default:
+            return SyncTransportError.other(ck.localizedDescription)
+        }
+    }
+
+    private func performPush(_ changes: [SyncChange]) async throws -> [String] {
+        guard !changes.isEmpty else { return [] }
         try await ensureZone()
 
         var accepted: [String] = []
@@ -92,6 +112,14 @@ public final class CloudKitTransport: SyncTransport, @unchecked Sendable {
     // MARK: - pull
 
     public func pull(cursor: String?) async throws -> (changes: [SyncChange], cursor: String?) {
+        do {
+            return try await performPull(cursor: cursor)
+        } catch {
+            throw Self.localize(error)
+        }
+    }
+
+    private func performPull(cursor: String?) async throws -> (changes: [SyncChange], cursor: String?) {
         try await ensureZone()
 
         let box = CollectBox()

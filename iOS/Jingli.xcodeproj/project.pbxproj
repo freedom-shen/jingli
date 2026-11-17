@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		04CC883775E2713E7FCE2B43 /* voice-sample.m4a in Resources */ = {isa = PBXBuildFile; fileRef = AF91080BEE838D76644B2A15 /* voice-sample.m4a */; };
+		1326EC79E599093713EEC968 /* ModelConfigSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 762A39F2839BC314F5406A5B /* ModelConfigSheet.swift */; };
 		1DA6D4717A9EEA717A7EDD2D /* AddProjectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34E53179D1AC1ED3DE4F9855 /* AddProjectView.swift */; };
 		2007F8DBC31BCAFB9C9C2BC0 /* voice-sample.m4a in Resources */ = {isa = PBXBuildFile; fileRef = AF91080BEE838D76644B2A15 /* voice-sample.m4a */; };
 		272F9FAE80A662AF8FC4CD1C /* JingliCore in Frameworks */ = {isa = PBXBuildFile; productRef = 00854301257684596A8AE39D /* JingliCore */; };
@@ -78,6 +79,7 @@
 		67D83A0B37B580F15B3BA038 /* Tokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tokens.swift; sourceTree = "<group>"; };
 		689D9A00DB2D1D13C2BA8E55 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		6BF2BAA604BE26C901931B5B /* JingliLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JingliLiveActivity.swift; sourceTree = "<group>"; };
+		762A39F2839BC314F5406A5B /* ModelConfigSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelConfigSheet.swift; sourceTree = "<group>"; };
 		7725BAEB1AECAA6F13EF9E9D /* IOSAppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IOSAppModel.swift; sourceTree = "<group>"; };
 		7E13E357DCCBD85D8BA129B9 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
 		83D70C90B6CB19BF9F0720D9 /* Jingli.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Jingli.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -206,6 +208,7 @@
 		B4929375F98688F8ED405D5C /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				762A39F2839BC314F5406A5B /* ModelConfigSheet.swift */,
 				52259A025FBADDF236368319 /* SettingsView.swift */,
 			);
 			path = Settings;
@@ -433,6 +436,7 @@
 				8CD57953E872AF7A6FAF691D /* IOSAppModel.swift in Sources */,
 				A5465BE37DBAA78A1FB3C1A9 /* JingliApp.swift in Sources */,
 				E168534876EB5A9DD6B461B6 /* LLMConfigStore.swift in Sources */,
+				1326EC79E599093713EEC968 /* ModelConfigSheet.swift in Sources */,
 				55C99EBE4E9EBC61FE8A4BBB /* NotificationScheduler.swift in Sources */,
 				691529F196F6FD5813FDCFE0 /* ProjectsView.swift in Sources */,
 				CE4F61388333ED626B1C2209 /* RootView.swift in Sources */,

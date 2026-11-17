@@ -6,6 +6,7 @@ import JingliCore
 struct SettingsView: View {
     @Environment(IOSAppModel.self) private var model
     @State private var syncing = false
+    @State private var showModelConfig = false
 
     private var fileSize: String {
         let url = AppPaths.databaseURL
@@ -29,6 +30,7 @@ struct SettingsView: View {
                 ])
                 syncSection
                 hint.padding(.top, 16)
+                modelSection
                 section("关于", rows: [
                     ("app.badge", "版本", version),
                     ("iphone", "平台", "iOS"),
@@ -41,6 +43,38 @@ struct SettingsView: View {
             .padding(.bottom, 24)
         }
         .task { await model.refreshSyncStatus() }
+    }
+
+    private var modelSection: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("助手")
+                .font(.system(size: 10.5)).tracking(1.2)
+                .foregroundStyle(Tokens.text3)
+                .padding(.leading, 4).padding(.bottom, 8).padding(.top, 18)
+
+            VStack(spacing: 0) {
+                row("sparkles", "模型", model.assistantReady ? model.llmConfig.model : "未配置")
+                Divider().overlay(Tokens.line).padding(.leading, 46)
+                Button {
+                    showModelConfig = true
+                } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: "key")
+                            .font(.system(size: 12)).foregroundStyle(Tokens.accent).frame(width: 22)
+                        Text(model.assistantReady ? "修改配置" : "填 API Key")
+                            .font(.system(size: 13.5)).foregroundStyle(Tokens.accent)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 14).padding(.vertical, 13)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.modelConfig")
+            }
+            .background(Tokens.card, in: RoundedRectangle(cornerRadius: 14))
+            .overlay(RoundedRectangle(cornerRadius: 14).stroke(Tokens.line))
+        }
+        .sheet(isPresented: $showModelConfig) { ModelConfigSheet() }
     }
 
     private var syncSection: some View {

@@ -32,12 +32,18 @@ public actor FakeTransport: SyncTransport {
     public func count() -> Int { log.count }
 }
 
-public enum SyncTransportError: Error, LocalizedError {
+public enum SyncTransportError: Error, LocalizedError, Equatable {
     case unavailable
+    case notAuthenticated
+    case offline
+    case other(String)
 
     public var errorDescription: String? {
         switch self {
         case .unavailable: return "同步服务暂时不可用"
+        case .notAuthenticated: return "没有登录 iCloud 账号"
+        case .offline: return "网络不可用，稍后会自动重试"
+        case let .other(detail): return detail
         }
     }
 }
