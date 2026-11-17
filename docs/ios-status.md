@@ -116,7 +116,27 @@ idb ui text --udid <SIM_UDID> "text"
 - Widget 需要在桌面手动添加，命令行加不了
 - Mac 端还没接同步（见下）
 
-## 八、Mac 端同步的可行性结论
+## 八、Mac 端同步（已接通）
+
+2026-11-17 完成。三处关键改动：
+
+1. **签名**：`App/project.yml` 从 ad-hoc（`CODE_SIGN_IDENTITY: "-"`）改成自动签名 + 团队 `W695YL8UYY`
+2. **权限**：新增 `App/Jingli.entitlements`，含 `iCloud.com.freedom-shen.jingli` + CloudKit，
+   并且**必须**加 `com.apple.developer.icloud-container-environment = Development`
+   —— 没有这一项 macOS 默认走 Production，会报 `Invalid bundle ID for container`
+3. **调度**：`App/Jingli/MacSync.swift`，每 3 秒看一次待推送、每 15 秒拉一次远端
+
+还补了一个之前没意识到的问题：**老数据不会自己同步**。同步靠 SQLite 触发器记录变更，
+启用同步之前就存在的行没有任何变更记录，所以第一次同步时对面什么都收不到。
+`SyncSchema.backfill` 会把这些行按「行 × 字段」补登记一次（本机实测补了 1740 条）。
+
+实测：Mac 77 个任务 / 7 个项目 → iPhone 全部到位（经 1740 条变更、分 3 批推送）；
+iPhone 新建的任务也能被 Mac 拉到，删除能同步回去。
+
+<details>
+<summary>当年的可行性实验（保留）</summary>
+
+
 
 实验代码在 `Spikes/mac-cloudkit-probe/`。结论：
 
@@ -126,7 +146,11 @@ idb ui text --udid <SIM_UDID> "text"
 [MAC] zone failed: CKError 10/2007 "Invalid bundle ID for container"
 ```
 
-容器只授权给了 iOS 的 App ID。要接 Mac 得三步：注册 Mac App ID → 分配同一容器 → **把 Mac 工程从 ad-hoc 签名改成自动签名**。第三步会改变分发方式（现在 `scripts/package.sh` 是免签名 zip），需要产品侧决定。
+容器只授权给了 iOS 的 App ID。要接 Mac 得三步：注册 Mac App ID → 分配同一容器 → 把 Mac 工程从 ad-hoc 签名改成自动签名。
+
+</details>
+
+> 分发方式的影响：`scripts/package.sh` 现在会用自动签名产出带开发证书的包。要分发给别人仍需改成 Developer ID / App Store 签名。
 
 ## 九、还没做完的三件事（都需要人，不是代码）
 

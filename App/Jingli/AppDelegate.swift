@@ -16,6 +16,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // 「新的一天」的起点来自设置，DayKey 全局使用。
         DayKey.startHour = AppDefaults.current.object(forKey: "jingli.dayStartHour") as? Int ?? 8
 
+        if CommandLine.arguments.contains("-ckcheck") {
+            _Concurrency.Task { await CloudKitCheck.run() }
+        }
+
         if CommandLine.arguments.contains("--snapshot") {
             SnapshotRunner.runIfRequested()
             return
@@ -38,6 +42,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         startAgentServer()
         configureRemoteWeb()
         runDailyBackup()
+        MacSync.shared.configure(database: AppServices.shared.database)
         AppServices.shared.model.startTicking()
 
         if CommandLine.arguments.contains("--show-panel")
@@ -55,6 +60,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             where !(window is FloatingPanel) && !(window is CompletionPanel) {
             window.isReleasedWhenClosed = false
         }
+    }
+
+    func applicationDidBecomeActive(_ notification: Notification) {
+        // 回到前台补一次拉取：后台期间对端可能写过东西
+        MacSync.shared.syncNow()
     }
 
     func applicationWillTerminate(_ notification: Notification) {

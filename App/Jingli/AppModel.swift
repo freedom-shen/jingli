@@ -460,6 +460,7 @@ final class AppModel: ObservableObject {
     }
 
     func tickFocus() {
+        MacSync.shared.tick()
         syncActivity()
         rolloverIfDayChanged()
         if isOnBreak {

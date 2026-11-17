@@ -240,6 +240,25 @@ public final class SyncStore: @unchecked Sendable {
     }
 
     /// 拉取游标：由传输层解释，存在本地 sync_meta（设备本地，不上云）。
+    /// 老数据补录：只做一次，做完打标记。
+    @discardableResult
+    public func backfillIfNeeded() throws -> Int {
+        let done: String? = try database.queue.read { db in
+            try String.fetchOne(db, sql: "SELECT value FROM sync_meta WHERE key = 'backfill.v2'")
+        }
+        guard done == nil else { return 0 }
+        let count = try database.queue.write { db in
+            try SyncSchema.backfill(db)
+        }
+        try database.queue.write { db in
+            try db.execute(
+                sql: "INSERT OR REPLACE INTO sync_meta (key, value) VALUES ('backfill.v2', ?)",
+                arguments: [String(count)]
+            )
+        }
+        return count
+    }
+
     public func syncCursor() throws -> String? {
         try database.queue.read { db in
             try String.fetchOne(db, sql: "SELECT value FROM sync_meta WHERE key = 'pull_cursor'")

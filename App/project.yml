@@ -13,9 +13,8 @@ settings:
   base:
     SWIFT_VERSION: "6.0"
     MACOSX_DEPLOYMENT_TARGET: "15.0"
-    CODE_SIGN_IDENTITY: "-"
-    CODE_SIGN_STYLE: Manual
-    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: W695YL8UYY
 
 targets:
   Jingli:
@@ -27,10 +26,13 @@ targets:
       - package: JingliCore
       - package: JingliCore
         product: JingliAgentSocket
+      - package: JingliCore
+        product: JingliSync
     settings:
       base:
         PRODUCT_NAME: Jingli
         PRODUCT_BUNDLE_IDENTIFIER: com.freedom-shen.jingli
+        CODE_SIGN_ENTITLEMENTS: Jingli.entitlements
         MARKETING_VERSION: "0.6.51"
         CURRENT_PROJECT_VERSION: "56"
         GENERATE_INFOPLIST_FILE: YES

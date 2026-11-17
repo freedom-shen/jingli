@@ -19,6 +19,7 @@
 		345ABEDB01DE372C11B27639 /* AppServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E7406F01D0BA6A7FF9D04FA /* AppServices.swift */; };
 		346E040B805B94C0839FF95E /* TemporaryTasksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58AA984E404EC4C9BAFF4A53 /* TemporaryTasksView.swift */; };
 		390A0715593B0CD34313D61C /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92BC65678CFBDB340EB288 /* StatsView.swift */; };
+		3CD50276B18EC3A9C2FBBC04 /* JingliSync in Frameworks */ = {isa = PBXBuildFile; productRef = 68F5DE2D81D8C9C4EBC6B8B1 /* JingliSync */; };
 		40E19708FE03FABCE68B9048 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4986D70767EE189D31D4A82 /* AppModel.swift */; };
 		50DF0432443503B1D224B4E2 /* CompletionPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DE13761BE6BEB3CD41EFA0F /* CompletionPanel.swift */; };
 		52A23BD3CE1C7F2F7DC6CC11 /* FloatingPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0ABF6A9D1C7AB24D1BDC9F2 /* FloatingPanelView.swift */; };
@@ -37,8 +38,10 @@
 		B862C145333F68C7C2EF3F26 /* ProjectDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D8D22FCAA3726195BB9946 /* ProjectDetailView.swift */; };
 		BFBF0D6A490FBF4989631CA0 /* LaunchAtLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31FB7081008519F3A38A422 /* LaunchAtLogin.swift */; };
 		C8105E25A8F30B4F8D83B091 /* ProjectEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8FB027571F00346C816CA6B /* ProjectEditorView.swift */; };
+		CD591B29F114B1E6002FF7C5 /* CloudKitCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77918DE10460BAAAA3A17216 /* CloudKitCheck.swift */; };
 		CE4F61388333ED626B1C2209 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94DA84C0289342098B879CF7 /* RootView.swift */; };
 		CE9946856F92945520DA423F /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52259A025FBADDF236368319 /* SettingsView.swift */; };
+		D4BDCDD5988C94439021591D /* MacSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = C83A472429AD9810CBDA7853 /* MacSync.swift */; };
 		DAF84A1D562BD1BB41F2A8BA /* TaskDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A74B80342124F664E60A8A17 /* TaskDetailView.swift */; };
 		E28996E8F472B638EE36B8A5 /* TaskCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB8767B7A713D102C631EF4 /* TaskCard.swift */; };
 		F09691D382E6B33E87DDDAA4 /* JingliTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDD74A624DACE35D5575E551 /* JingliTests.swift */; };
@@ -70,6 +73,7 @@
 		69C109D6B349355695ABB984 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		71C1D692A0AB7C393EE3CCE0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		74D23A24681F9778A908DCD9 /* DetailedStatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailedStatsView.swift; sourceTree = "<group>"; };
+		77918DE10460BAAAA3A17216 /* CloudKitCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitCheck.swift; sourceTree = "<group>"; };
 		7DE13761BE6BEB3CD41EFA0F /* CompletionPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionPanel.swift; sourceTree = "<group>"; };
 		7E13E357DCCBD85D8BA129B9 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
 		81B1C4AAD464F2EE7768EFD7 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
@@ -86,6 +90,7 @@
 		BDD74A624DACE35D5575E551 /* JingliTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JingliTests.swift; sourceTree = "<group>"; };
 		C0ABF6A9D1C7AB24D1BDC9F2 /* FloatingPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingPanelView.swift; sourceTree = "<group>"; };
 		C3D8D22FCAA3726195BB9946 /* ProjectDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectDetailView.swift; sourceTree = "<group>"; };
+		C83A472429AD9810CBDA7853 /* MacSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacSync.swift; sourceTree = "<group>"; };
 		CC9618A2DBBE55DDF8631873 /* JingliApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JingliApp.swift; sourceTree = "<group>"; };
 		D31FB7081008519F3A38A422 /* LaunchAtLogin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLogin.swift; sourceTree = "<group>"; };
 		D4986D70767EE189D31D4A82 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
@@ -111,6 +116,7 @@
 			files = (
 				272F9FAE80A662AF8FC4CD1C /* JingliCore in Frameworks */,
 				F625D24EAAD9431C3DD34766 /* JingliAgentSocket in Frameworks */,
+				3CD50276B18EC3A9C2FBBC04 /* JingliSync in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -248,8 +254,10 @@
 				D4986D70767EE189D31D4A82 /* AppModel.swift */,
 				5E7406F01D0BA6A7FF9D04FA /* AppServices.swift */,
 				71C1D692A0AB7C393EE3CCE0 /* Assets.xcassets */,
+				77918DE10460BAAAA3A17216 /* CloudKitCheck.swift */,
 				CC9618A2DBBE55DDF8631873 /* JingliApp.swift */,
 				D31FB7081008519F3A38A422 /* LaunchAtLogin.swift */,
+				C83A472429AD9810CBDA7853 /* MacSync.swift */,
 				A7E71A52905BC5D389E48E54 /* RemoteWebController.swift */,
 				94DA84C0289342098B879CF7 /* RootView.swift */,
 				06EFC76773112BFFF4D4E668 /* Completion */,
@@ -323,6 +331,7 @@
 			packageProductDependencies = (
 				00854301257684596A8AE39D /* JingliCore */,
 				F2E67580ABAAD326E10FC7E8 /* JingliAgentSocket */,
+				68F5DE2D81D8C9C4EBC6B8B1 /* JingliSync */,
 			);
 			productName = Jingli;
 			productReference = 83D70C90B6CB19BF9F0720D9 /* Jingli.app */;
@@ -358,12 +367,12 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					CBE485763CEDEAA4377D83BB = {
-						DevelopmentTeam = "";
-						ProvisioningStyle = Manual;
+						DevelopmentTeam = W695YL8UYY;
+						ProvisioningStyle = Automatic;
 					};
 					D1937C75B46A7B6D5B48ECBB = {
-						DevelopmentTeam = "";
-						ProvisioningStyle = Manual;
+						DevelopmentTeam = W695YL8UYY;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -410,6 +419,7 @@
 				0B7B8F7EA2AE9DC695147F99 /* AppDelegate.swift in Sources */,
 				40E19708FE03FABCE68B9048 /* AppModel.swift in Sources */,
 				345ABEDB01DE372C11B27639 /* AppServices.swift in Sources */,
+				CD591B29F114B1E6002FF7C5 /* CloudKitCheck.swift in Sources */,
 				1D842E61FDA704D314CD69EA /* CommandBarView.swift in Sources */,
 				90303DFEFF8EC8C5ED6C6A96 /* CompletionNotifier.swift in Sources */,
 				5861A4B37B65732741CF75C8 /* CompletionOverlay.swift in Sources */,
@@ -420,6 +430,7 @@
 				52A23BD3CE1C7F2F7DC6CC11 /* FloatingPanelView.swift in Sources */,
 				A5465BE37DBAA78A1FB3C1A9 /* JingliApp.swift in Sources */,
 				BFBF0D6A490FBF4989631CA0 /* LaunchAtLogin.swift in Sources */,
+				D4BDCDD5988C94439021591D /* MacSync.swift in Sources */,
 				7BCF357191B3DEB13320C106 /* MenuBarView.swift in Sources */,
 				AD87D7CBEE663DBFCE120A0D /* PrimaryButtonStyle.swift in Sources */,
 				B862C145333F68C7C2EF3F26 /* ProjectDetailView.swift in Sources */,
@@ -464,6 +475,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Jingli.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 56;
 				ENABLE_HARDENED_RUNTIME = NO;
@@ -516,11 +528,10 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = W695YL8UYY;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -563,6 +574,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Jingli.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 56;
 				ENABLE_HARDENED_RUNTIME = NO;
@@ -615,11 +627,10 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = W695YL8UYY;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -708,6 +719,10 @@
 		00854301257684596A8AE39D /* JingliCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = JingliCore;
+		};
+		68F5DE2D81D8C9C4EBC6B8B1 /* JingliSync */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = JingliSync;
 		};
 		8B43A917917AD4BD75DF5D28 /* JingliCore */ = {
 			isa = XCSwiftPackageProductDependency;
