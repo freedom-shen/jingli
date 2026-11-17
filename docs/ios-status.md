@@ -42,7 +42,7 @@ xcrun devicectl device process launch --device <UDID> --console --terminate-exis
   com.freedom-shen.jingli.ios -- -ckcheck
 ```
 
-真机截图（`idevicescreenshot` 在 iOS 17+ 失效）：
+真机截图（`idevicescreenshot` 在 iOS 17+ 失效）。关闭系统通知弹窗：`DEVICECTL_CHILD_JINGLI_NO_NOTIFICATIONS=1` 放在 `devicectl` 前面。
 
 ```bash
 pymobiledevice3 developer dvt screenshot --udid <硬件UDID> --userspace shot.png
@@ -66,7 +66,9 @@ pymobiledevice3 developer dvt screenshot --udid <硬件UDID> --userspace shot.pn
 | `-cksync` | 用真实库跑一次完整同步 |
 | `-cktwodevice` | 用第二个内存库（独立 deviceID）验证双向收敛 |
 | `-syncwiring` | 验证「写入 → 去抖 → 自动推送」这条真实路径 |
-| `-cleanprobe` | 清掉自检产生的脏数据 |
+| `-cleanprobe` / `-cleandemo` | 清掉自检 / 演示数据 |
+| `-seedcheck` | 写入带 `·演示` 标记的演示任务 |
+| `-startday` / `-endfocus` | 自动开启一天 / 结束当前计时（截图用） |
 | `-ask=…` | 打开助手并直接发送这句话 |
 
 环境变量 `JINGLI_NO_NOTIFICATIONS=1` 关闭真实通知（截图/自检时用，避免系统弹窗挡住界面）。

@@ -95,6 +95,36 @@ final class IOSAppModel {
         syncStatus = await syncService.status()
     }
 
+    /// 真机演示数据（都带 `·演示` 标记，`-cleandemo` 可整组删除）。
+    func seedCheckData() async {
+        guard ((try? store.listTasks()) ?? []).isEmpty else {
+            NSLog("[SEED] 已有数据，跳过")
+            return
+        }
+        let lynx = try? store.createProject(name: "Lynx 支持鸿蒙·演示", description: "", color: "blue")
+        let ttt = try? store.createProject(name: "TTT 业务包·演示", description: "", color: "amber")
+        _ = try? store.createTask(title: "合并现有代码给鸿蒙·演示", projectID: lynx?.id, lane: "main", estimate: 3)
+        _ = try? store.createTask(title: "对齐 TTT 包绑定方案·演示", projectID: ttt?.id, lane: "main", estimate: 2)
+        _ = try? store.createTask(title: "补一次回归用例·演示", projectID: ttt?.id, lane: "main", estimate: 1)
+        _ = try? store.createTask(title: "回邮件·演示", lane: "temporary")
+        refresh()
+        noteSyncChange()
+        NSLog("[SEED] 演示数据已写入，任务数=\((try? store.taskCount()) ?? -1)")
+    }
+
+    /// 删掉 `·演示` 标记的任务与项目。
+    func cleanCheckData() async {
+        for task in (try? store.listTasks(includeDone: true)) ?? [] where task.title.contains("·演示") {
+            _ = try? store.deleteTask(id: task.id)
+        }
+        for project in (try? store.listProjects()) ?? [] where project.name.contains("·演示") {
+            _ = try? store.deleteProject(id: project.id)
+        }
+        refresh()
+        noteSyncChange()
+        NSLog("[SEED] 演示数据已清理，任务数=\((try? store.taskCount()) ?? -1)")
+    }
+
     /// 自检用：把现有任务排进今天并开启（跳过点击）。
     func startDayForCheck() async {
         guard let snapshot, !snapshot.dayStarted else { NSLog("[DAY] 已经开启或没有数据"); return }
@@ -248,8 +278,22 @@ final class IOSAppModel {
         if CommandLine.arguments.contains("-syncwiring") {
             _Concurrency.Task { await self.testSyncWiring() }
         }
+        if CommandLine.arguments.contains("-endfocus") {
+            timer = nil
+            try? timerStore.clearActive()
+            NotificationScheduler.cancelFocusEnd()
+            FocusActivityManager.shared.end()
+            refresh()
+            NSLog("[DAY] 已结束本地计时")
+        }
+        if CommandLine.arguments.contains("-seedcheck") {
+            _Concurrency.Task { await self.seedCheckData() }
+        }
         if CommandLine.arguments.contains("-startday") {
             _Concurrency.Task { await self.startDayForCheck() }
+        }
+        if CommandLine.arguments.contains("-cleandemo") {
+            _Concurrency.Task { await self.cleanCheckData() }
         }
         if CommandLine.arguments.contains("-cleanprobe") {
             _Concurrency.Task { await self.cleanProbeData() }
