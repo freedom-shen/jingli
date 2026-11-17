@@ -169,6 +169,13 @@ private struct SummaryStrip: View {
     let stats: TodayStats
     let mainCount: Int
 
+    private var toLongBreak: String {
+        let remaining = FocusStreak.threshold - stats.pomodoros % FocusStreak.threshold
+        return stats.pomodoros > 0 && remaining == FocusStreak.threshold
+            ? "该长休了"
+            : "再 \(remaining) 个长休"
+    }
+
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 3) {
@@ -178,12 +185,18 @@ private struct SummaryStrip: View {
                     .font(.system(size: 11)).foregroundStyle(Tokens.text3)
             }
             Spacer()
-            HStack(spacing: 3) {
-                ForEach(0..<4, id: \.self) { i in
-                    Circle()
-                        .fill(i < stats.pomodoros ? Tokens.tomato : Color.white.opacity(0.14))
-                        .frame(width: 5, height: 5)
+            VStack(alignment: .trailing, spacing: 4) {
+                HStack(spacing: 3) {
+                    ForEach(0..<4, id: \.self) { i in
+                        Circle()
+                            .fill(i < stats.pomodoros ? Tokens.tomato : Color.white.opacity(0.14))
+                            .frame(width: 5, height: 5)
+                    }
                 }
+                // 光有圆点会被误读成「更多」菜单，补一句说明它的含义
+                Text(toLongBreak)
+                    .font(.system(size: 9))
+                    .foregroundStyle(Tokens.text3)
             }
         }
         .padding(14)
