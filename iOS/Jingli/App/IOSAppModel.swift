@@ -1,6 +1,7 @@
 import Foundation
 import Observation
 import JingliCore
+import JingliAgent
 
 /// iOS 端的应用状态。业务规则全部走 JingliCore，这里只负责「读出来给 UI、写回去刷新」。
 @MainActor
@@ -18,6 +19,61 @@ final class IOSAppModel {
     private(set) var today: String = DayKey.make()
     private(set) var timer: FocusTimer?
     var errorText: String?
+
+    // MARK: - 助手
+
+    struct ChatItem: Identifiable {
+        enum Role { case user, assistant }
+        let id = UUID()
+        let role: Role
+        let text: String
+        let tools: [ExecutedTool]
+    }
+
+    private(set) var chat: [ChatItem] = []
+    private(set) var assistantBusy = false
+    var llmConfig: LLMConfig = LLMConfigStore.fromEnvironment() ?? LLMConfigStore.load()
+
+    var assistantReady: Bool { llmConfig.isReady }
+
+    var provider: OpenAICompatibleProvider? {
+        guard llmConfig.isReady, let url = URL(string: llmConfig.baseURL) else { return nil }
+        var headers: [String: String] = [:]
+        if !llmConfig.session.isEmpty { headers["x-opencode-session"] = llmConfig.session }
+        return OpenAICompatibleProvider(config: .init(
+            baseURL: url,
+            model: llmConfig.model,
+            apiKey: llmConfig.apiKey,
+            extraHeaders: headers
+        ))
+    }
+
+    func send(_ text: String) async {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty, !assistantBusy else { return }
+        chat.append(ChatItem(role: .user, text: trimmed, tools: []))
+        assistantBusy = true
+        defer { assistantBusy = false }
+
+        guard let provider else {
+            chat.append(ChatItem(role: .assistant, text: "还没有配置模型，去「设置 → 助手」填一下 Key。", tools: []))
+            return
+        }
+        let router = AgentCommandRouter(database: database, focus: nil, onChange: nil, actor: "ios-agent")
+        let agent = JingliAgent(provider: provider, runner: ToolRunner(router: router))
+        do {
+            let reply = try await agent.send(trimmed)
+            chat.append(ChatItem(role: .assistant, text: reply.text, tools: reply.toolCalls))
+            refresh()
+        } catch {
+            chat.append(ChatItem(role: .assistant, text: "出错了：\(error.localizedDescription)", tools: []))
+        }
+    }
+
+    func updateLLMConfig(_ config: LLMConfig) {
+        llmConfig = config
+        LLMConfigStore.save(config)
+    }
 
     init() {
         do {

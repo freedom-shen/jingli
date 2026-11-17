@@ -4,6 +4,7 @@ import JingliCore
 /// 统计：只看今天。历史回顾交给助手 / 详细统计，不在这里堆图表。
 struct StatsView: View {
     @Environment(IOSAppModel.self) private var model
+    @State private var showAssistant = false
 
     private var stats: TodayStats? { model.stats }
 
@@ -119,7 +120,8 @@ struct StatsView: View {
     }
 
     private var hint: some View {
-        HStack(spacing: 10) {
+        Button { showAssistant = true } label: {
+            HStack(spacing: 10) {
             Image(systemName: "sparkles")
                 .font(.system(size: 13))
                 .foregroundStyle(Tokens.accent)
@@ -132,9 +134,12 @@ struct StatsView: View {
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(Tokens.text3)
         }
-        .padding(14)
-        .background(Tokens.accent.opacity(0.07), in: RoundedRectangle(cornerRadius: 14))
-        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Tokens.accent.opacity(0.20)))
+            .padding(14)
+            .background(Tokens.accent.opacity(0.07), in: RoundedRectangle(cornerRadius: 14))
+            .overlay(RoundedRectangle(cornerRadius: 14).stroke(Tokens.accent.opacity(0.20)))
+        }
+        .buttonStyle(.plain)
+        .sheet(isPresented: $showAssistant) { AssistantView() }
     }
 
     // MARK: - 格式化

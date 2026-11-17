@@ -26,6 +26,8 @@ targets:
           - "*.entitlements"
     dependencies:
       - package: JingliCore
+      - package: JingliCore
+        product: JingliAgent
       - target: JingliWidget
         embed: true
     settings:

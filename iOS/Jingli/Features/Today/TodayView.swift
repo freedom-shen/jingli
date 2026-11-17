@@ -5,6 +5,7 @@ struct TodayView: View {
     @Environment(IOSAppModel.self) private var model
     @State private var showAdd = false
     @State private var detailTask: JingliCore.Task?
+    @State private var showAssistant = false
 
     private var mainTasks: [JingliCore.Task] {
         (model.snapshot?.todayTasks.filter { $0.lane == "main" } ?? [])
@@ -59,8 +60,10 @@ struct TodayView: View {
         .safeAreaInset(edge: .top) { Color.clear.frame(height: 0) }
         .sheet(isPresented: $showAdd) { AddTaskView() }
         .sheet(item: $detailTask) { task in TaskDetailView(taskID: task.id) }
+        .sheet(isPresented: $showAssistant) { AssistantView() }
         .task {
             if CommandLine.arguments.contains("-addsheet") { showAdd = true }
+            if CommandLine.arguments.contains(where: { $0.hasPrefix("-ask=") }) { showAssistant = true }
             if CommandLine.arguments.contains("-detail") {
                 detailTask = mainTasks.first { !$0.done } ?? mainTasks.first
             }
@@ -75,10 +78,10 @@ struct TodayView: View {
             }
             Spacer()
             HStack(spacing: 8) {
-                iconButton("mic.fill", tint: Tokens.accent)
                 Button { showAdd = true } label: { iconButton("plus") }
                     .buttonStyle(.plain)
-                iconButton("ellipsis")
+                Button { showAssistant = true } label: { iconButton("sparkles", tint: Tokens.accent) }
+                    .buttonStyle(.plain)
             }
         }
         .padding(.top, 8)

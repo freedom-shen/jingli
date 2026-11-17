@@ -21,8 +21,11 @@
 		A5465BE37DBAA78A1FB3C1A9 /* JingliApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC9618A2DBBE55DDF8631873 /* JingliApp.swift */; };
 		AE5E95FED3D3F8CFB42AA741 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E13E357DCCBD85D8BA129B9 /* TodayView.swift */; };
 		B800971455EFD789C087E55D /* FocusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7D8943A027AE96346006510 /* FocusView.swift */; };
+		C5C7BD4840CF8D4C26A5BAAE /* AssistantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4CA4D40EEE596681D7D2A0D /* AssistantView.swift */; };
 		CE4F61388333ED626B1C2209 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94DA84C0289342098B879CF7 /* RootView.swift */; };
 		CE9946856F92945520DA423F /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52259A025FBADDF236368319 /* SettingsView.swift */; };
+		E168534876EB5A9DD6B461B6 /* LLMConfigStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6F49F42964661894DFC6505 /* LLMConfigStore.swift */; };
+		F625D24EAAD9431C3DD34766 /* JingliAgent in Frameworks */ = {isa = PBXBuildFile; productRef = EAA9E68DDA2E88E9D6B0FB5E /* JingliAgent */; };
 		F7A54B477261A61BB05228BF /* Tokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67D83A0B37B580F15B3BA038 /* Tokens.swift */; };
 /* End PBXBuildFile section */
 
@@ -64,11 +67,13 @@
 		94DA84C0289342098B879CF7 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		999E063A1C0C38F59C897B70 /* TaskDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDetailView.swift; sourceTree = "<group>"; };
 		9F92BC65678CFBDB340EB288 /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
+		A6F49F42964661894DFC6505 /* LLMConfigStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMConfigStore.swift; sourceTree = "<group>"; };
 		A7D8943A027AE96346006510 /* FocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusView.swift; sourceTree = "<group>"; };
 		B3C65F7C7DAB7596473E0DD5 /* ProjectsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectsView.swift; sourceTree = "<group>"; };
 		CC9618A2DBBE55DDF8631873 /* JingliApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JingliApp.swift; sourceTree = "<group>"; };
 		D2753D9DD0590DB36DBD5E7A /* JingliWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JingliWidget.swift; sourceTree = "<group>"; };
 		E7212BA70871C2AD4EA5768C /* DayStartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayStartView.swift; sourceTree = "<group>"; };
+		F4CA4D40EEE596681D7D2A0D /* AssistantView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssistantView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,6 +90,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				272F9FAE80A662AF8FC4CD1C /* JingliCore in Frameworks */,
+				F625D24EAAD9431C3DD34766 /* JingliAgent in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -113,6 +119,14 @@
 				67D83A0B37B580F15B3BA038 /* Tokens.swift */,
 			);
 			path = Design;
+			sourceTree = "<group>";
+		};
+		5A29C37D424F415944E62B65 /* Assistant */ = {
+			isa = PBXGroup;
+			children = (
+				F4CA4D40EEE596681D7D2A0D /* AssistantView.swift */,
+			);
+			path = Assistant;
 			sourceTree = "<group>";
 		};
 		5D96B945E1E3D71F036CB901 /* Today */ = {
@@ -197,6 +211,7 @@
 			isa = PBXGroup;
 			children = (
 				D7DE3C305CA8B869FCA29794 /* AddTask */,
+				5A29C37D424F415944E62B65 /* Assistant */,
 				862195377975CB8FA2846EB2 /* DayStart */,
 				C3DC31CB89B564DFF523DCE5 /* Focus */,
 				9F058E590D1133D562B7792A /* Projects */,
@@ -231,6 +246,7 @@
 			isa = PBXGroup;
 			children = (
 				7725BAEB1AECAA6F13EF9E9D /* IOSAppModel.swift */,
+				A6F49F42964661894DFC6505 /* LLMConfigStore.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -273,6 +289,7 @@
 			name = Jingli;
 			packageProductDependencies = (
 				00854301257684596A8AE39D /* JingliCore */,
+				EAA9E68DDA2E88E9D6B0FB5E /* JingliAgent */,
 			);
 			productName = Jingli;
 			productReference = 83D70C90B6CB19BF9F0720D9 /* Jingli.app */;
@@ -327,10 +344,12 @@
 			files = (
 				1DA6D4717A9EEA717A7EDD2D /* AddProjectView.swift in Sources */,
 				323BE329083FD84C434877F4 /* AddTaskView.swift in Sources */,
+				C5C7BD4840CF8D4C26A5BAAE /* AssistantView.swift in Sources */,
 				2E29B1746F39E1025D19C0F8 /* DayStartView.swift in Sources */,
 				B800971455EFD789C087E55D /* FocusView.swift in Sources */,
 				8CD57953E872AF7A6FAF691D /* IOSAppModel.swift in Sources */,
 				A5465BE37DBAA78A1FB3C1A9 /* JingliApp.swift in Sources */,
+				E168534876EB5A9DD6B461B6 /* LLMConfigStore.swift in Sources */,
 				691529F196F6FD5813FDCFE0 /* ProjectsView.swift in Sources */,
 				CE4F61388333ED626B1C2209 /* RootView.swift in Sources */,
 				CE9946856F92945520DA423F /* SettingsView.swift in Sources */,
@@ -616,6 +635,10 @@
 		64D85BB90A9B840BB3651CF5 /* JingliCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = JingliCore;
+		};
+		EAA9E68DDA2E88E9D6B0FB5E /* JingliAgent */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = JingliAgent;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
