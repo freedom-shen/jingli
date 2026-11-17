@@ -427,6 +427,12 @@ final class IOSAppModel {
         return updated
     }
 
+    func deleteProject(id: String) throws {
+        try store.deleteProject(id: id)
+        refresh()
+        noteSyncChange()
+    }
+
     func deleteTask(id: String) throws {
         _ = try store.deleteTask(id: id)
         refresh()

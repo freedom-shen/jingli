@@ -135,6 +135,8 @@ struct ProjectDetailView: View {
     let groupID: String
     @State private var detailTask: JingliCore.Task?
     @State private var showAddTask = false
+    @State private var confirmDeleteProject = false
+    @Environment(\.dismiss) private var dismissDetail
 
     private var group: IOSAppModel.ProjectGroup? {
         model.projectGroups.first { $0.id == groupID }
@@ -161,6 +163,22 @@ struct ProjectDetailView: View {
                     .buttonStyle(.plain)
                     .accessibilityIdentifier("project.addTask")
                     .padding(.top, 12)
+                    if group.project != nil {
+                        Button {
+                            confirmDeleteProject = true
+                        } label: {
+                            Text("删除项目")
+                                .font(.system(size: 13.5, weight: .medium))
+                                .foregroundStyle(Tokens.tomato)
+                                .frame(maxWidth: .infinity).frame(height: 44)
+                                .background(Tokens.tomato.opacity(0.10), in: RoundedRectangle(cornerRadius: 13))
+                                .overlay(RoundedRectangle(cornerRadius: 13).stroke(Tokens.tomato.opacity(0.26)))
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityIdentifier("project.delete")
+                        .padding(.top, 18)
+                    }
+
                     if model.snapshot?.dayStarted == true {
                         HStack(spacing: 6) {
                             Image(systemName: "lock.fill").font(.system(size: 10))
@@ -177,6 +195,17 @@ struct ProjectDetailView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $detailTask) { task in TaskDetailView(taskID: task.id) }
+        .alert("删除这个项目？", isPresented: $confirmDeleteProject) {
+            Button("取消", role: .cancel) {}
+            Button("删除", role: .destructive) {
+                if let id = group?.project?.id {
+                    try? model.deleteProject(id: id)
+                }
+                dismissDetail()
+            }
+        } message: {
+            Text("项目会被删除，里面的任务变成「未分类」并保留下来。")
+        }
         .sheet(isPresented: $showAddTask) {
             AddTaskView(presetProjectID: group?.project?.id, presetProjectName: group?.name)
         }
