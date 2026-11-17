@@ -4,6 +4,7 @@ import JingliCore
 struct TodayView: View {
     @Environment(IOSAppModel.self) private var model
     @State private var showAdd = false
+    @State private var detailTask: JingliCore.Task?
 
     private var mainTasks: [JingliCore.Task] {
         (model.snapshot?.todayTasks.filter { $0.lane == "main" } ?? [])
@@ -28,6 +29,8 @@ struct TodayView: View {
                 sectionTitle("主线任务", trailing: "\(mainTasks.count) / 4")
                 ForEach(mainTasks) { task in
                     MainTaskCard(task: task, project: projectName(for: task))
+                        .contentShape(Rectangle())
+                        .onTapGesture { detailTask = task }
                         .padding(.bottom, 10)
                 }
 
@@ -55,8 +58,12 @@ struct TodayView: View {
         }
         .safeAreaInset(edge: .top) { Color.clear.frame(height: 0) }
         .sheet(isPresented: $showAdd) { AddTaskView() }
+        .sheet(item: $detailTask) { task in TaskDetailView(taskID: task.id) }
         .task {
             if CommandLine.arguments.contains("-addsheet") { showAdd = true }
+            if CommandLine.arguments.contains("-detail") {
+                detailTask = mainTasks.first { !$0.done } ?? mainTasks.first
+            }
         }
     }
 

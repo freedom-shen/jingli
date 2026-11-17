@@ -13,6 +13,7 @@
 		323BE329083FD84C434877F4 /* AddTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C0E4E24117278D4F3BDF3A0 /* AddTaskView.swift */; };
 		390A0715593B0CD34313D61C /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92BC65678CFBDB340EB288 /* StatsView.swift */; };
 		39F6C0CCB79988C421F870B7 /* JingliWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 596365C37ACAE9360CD54339 /* JingliWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		4F270223BD4E02FBF433A5D8 /* TaskDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 999E063A1C0C38F59C897B70 /* TaskDetailView.swift */; };
 		61F3F442C6D9328BA025677F /* JingliCore in Frameworks */ = {isa = PBXBuildFile; productRef = 64D85BB90A9B840BB3651CF5 /* JingliCore */; };
 		691529F196F6FD5813FDCFE0 /* ProjectsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3C65F7C7DAB7596473E0DD5 /* ProjectsView.swift */; };
 		893AF3ED2BF9EC58A57B457F /* JingliWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2753D9DD0590DB36DBD5E7A /* JingliWidget.swift */; };
@@ -59,6 +60,7 @@
 		83D70C90B6CB19BF9F0720D9 /* Jingli.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Jingli.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8ECA132F9266F52FDF28D189 /* JingliCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = JingliCore; path = ../Packages/JingliCore; sourceTree = SOURCE_ROOT; };
 		94DA84C0289342098B879CF7 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		999E063A1C0C38F59C897B70 /* TaskDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDetailView.swift; sourceTree = "<group>"; };
 		9F92BC65678CFBDB340EB288 /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
 		A7D8943A027AE96346006510 /* FocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusView.swift; sourceTree = "<group>"; };
 		B3C65F7C7DAB7596473E0DD5 /* ProjectsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectsView.swift; sourceTree = "<group>"; };
@@ -93,6 +95,14 @@
 				9F92BC65678CFBDB340EB288 /* StatsView.swift */,
 			);
 			path = Stats;
+			sourceTree = "<group>";
+		};
+		23B5CF5C8C64965C3EAF00B1 /* TaskDetail */ = {
+			isa = PBXGroup;
+			children = (
+				999E063A1C0C38F59C897B70 /* TaskDetailView.swift */,
+			);
+			path = TaskDetail;
 			sourceTree = "<group>";
 		};
 		55E4ADA9813DD50298B67C62 /* Design */ = {
@@ -181,6 +191,7 @@
 				C3DC31CB89B564DFF523DCE5 /* Focus */,
 				9F058E590D1133D562B7792A /* Projects */,
 				04808A9719535D36A0BC07E3 /* Stats */,
+				23B5CF5C8C64965C3EAF00B1 /* TaskDetail */,
 				5D96B945E1E3D71F036CB901 /* Today */,
 			);
 			path = Features;
@@ -312,6 +323,7 @@
 				691529F196F6FD5813FDCFE0 /* ProjectsView.swift in Sources */,
 				CE4F61388333ED626B1C2209 /* RootView.swift in Sources */,
 				390A0715593B0CD34313D61C /* StatsView.swift in Sources */,
+				4F270223BD4E02FBF433A5D8 /* TaskDetailView.swift in Sources */,
 				AE5E95FED3D3F8CFB42AA741 /* TodayView.swift in Sources */,
 				F7A54B477261A61BB05228BF /* Tokens.swift in Sources */,
 			);

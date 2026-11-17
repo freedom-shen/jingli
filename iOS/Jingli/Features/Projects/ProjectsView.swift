@@ -108,6 +108,7 @@ private struct ProjectCard: View {
 struct ProjectDetailView: View {
     @Environment(IOSAppModel.self) private var model
     let groupID: String
+    @State private var detailTask: JingliCore.Task?
 
     private var group: IOSAppModel.ProjectGroup? {
         model.projectGroups.first { $0.id == groupID }
@@ -134,6 +135,7 @@ struct ProjectDetailView: View {
             .padding(.bottom, 24)
         }
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(item: $detailTask) { task in TaskDetailView(taskID: task.id) }
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Text(group?.name ?? "项目")
@@ -197,6 +199,8 @@ struct ProjectDetailView: View {
                         .foregroundStyle(Tokens.text3)
                 }
                 .padding(.vertical, 13)
+                .contentShape(Rectangle())
+                .onTapGesture { detailTask = task }
 
                 if index < group.tasks.count - 1 {
                     Divider().overlay(Tokens.line)

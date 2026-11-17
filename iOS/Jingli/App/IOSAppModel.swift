@@ -110,6 +110,18 @@ final class IOSAppModel {
         refresh()
     }
 
+    @discardableResult
+    func updateTask(id: String, title: String, note: String, estimate: Int?) throws -> JingliCore.Task? {
+        let updated = try store.updateTask(id: id, title: title, note: note, estimate: estimate)
+        refresh()
+        return updated
+    }
+
+    func deleteTask(id: String) throws {
+        _ = try store.deleteTask(id: id)
+        refresh()
+    }
+
     func toggle(_ task: JingliCore.Task) {
         do {
             _ = try store.toggleTask(id: task.id)
