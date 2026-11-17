@@ -27,6 +27,9 @@ final class IOSAppModel {
     private(set) var pendingCompletion: FocusCompletion?
     private(set) var breakEndsAt: Date?
     private(set) var breakMinutes: Int = 0
+
+    private static let breakEndsAtKey = "jingli.ios.break.endsAt"
+    private static let breakMinutesKey = "jingli.ios.break.minutes"
     var errorText: String?
 
     // MARK: - 助手
@@ -284,6 +287,7 @@ final class IOSAppModel {
         )
 
         seedDemoIfNeeded()
+        restoreBreakIfNeeded()
         refresh()
 
         if CommandLine.arguments.contains("-ckcheck") {
@@ -553,11 +557,27 @@ final class IOSAppModel {
         breakEndsAt = Date().addingTimeInterval(TimeInterval(minutes * 60))
         NotificationScheduler.scheduleBreakEnd(after: minutes * 60)
         pendingCompletion = nil
+        // 休息跨进程也要还在：杀进程回来能看到剩余时间
+        UserDefaults.standard.set(breakEndsAt, forKey: Self.breakEndsAtKey)
+        UserDefaults.standard.set(minutes, forKey: Self.breakMinutesKey)
     }
 
     func skipBreak() {
         breakEndsAt = nil
         NotificationScheduler.cancelBreakEnd()
+        UserDefaults.standard.removeObject(forKey: Self.breakEndsAtKey)
+        UserDefaults.standard.removeObject(forKey: Self.breakMinutesKey)
+    }
+
+    /// 启动时恢复未结束的休息。
+    private func restoreBreakIfNeeded() {
+        guard let end = UserDefaults.standard.object(forKey: Self.breakEndsAtKey) as? Date else { return }
+        if end > Date() {
+            breakEndsAt = end
+            breakMinutes = UserDefaults.standard.integer(forKey: Self.breakMinutesKey)
+        } else {
+            skipBreak()
+        }
     }
 
     func dismissCompletion() {
