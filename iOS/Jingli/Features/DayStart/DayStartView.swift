@@ -86,6 +86,8 @@ struct DayStartView: View {
                         .background(Tokens.card, in: Circle())
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel("清空已选")
+                .accessibilityIdentifier("daystart.reset")
             }
             HStack {
                 Text("从项目里挑今天要推进的，主线最多 4 件")

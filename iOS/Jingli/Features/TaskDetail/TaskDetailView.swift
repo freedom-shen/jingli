@@ -113,6 +113,7 @@ struct TaskDetailView: View {
                             .frame(width: 26, height: 26)
                             .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 8))
                     }
+                    .accessibilityLabel("减少预估")
                     if let estimate {
                         Text("\(estimate)").font(.system(size: 15, weight: .medium))
                             .monospacedDigit().foregroundStyle(Tokens.text).frame(minWidth: 22)
@@ -126,6 +127,7 @@ struct TaskDetailView: View {
                             .frame(width: 26, height: 26)
                             .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 8))
                     }
+                    .accessibilityLabel("增加预估")
                     Text("个番茄").font(.system(size: 11.5)).foregroundStyle(Tokens.text3)
                 }
             }
