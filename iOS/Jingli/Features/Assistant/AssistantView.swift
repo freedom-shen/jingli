@@ -6,6 +6,7 @@ struct AssistantView: View {
     @Environment(IOSAppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
     @State private var draft = ""
+    @State private var transcriber = SpeechTranscriber()
 
     private let suggestions = ["今天还剩几件", "把评审设计稿加进今天，两个番茄", "昨天专注了多久"]
 
@@ -51,8 +52,14 @@ struct AssistantView: View {
             }
         }
         .preferredColorScheme(.dark)
+        .onChange(of: transcriber.transcript) { _, value in
+            if transcriber.isRecording { draft = value }
+        }
         .task {
             let args = CommandLine.arguments
+            if args.contains("-voice") {
+                await transcriber.start()
+            }
             if let raw = args.first(where: { $0.hasPrefix("-ask=") }) {
                 await model.send(String(raw.dropFirst("-ask=".count)))
             }
@@ -145,7 +152,15 @@ struct AssistantView: View {
     }
 
     private var inputBar: some View {
-        HStack(spacing: 8) {
+        VStack(spacing: 6) {
+            if let error = transcriber.errorText {
+                Text(error)
+                    .font(.system(size: 10.5))
+                    .foregroundStyle(Tokens.tomato)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 4)
+            }
+            HStack(spacing: 8) {
             TextField("", text: $draft, prompt: Text("说点什么…").foregroundStyle(Tokens.text3))
                 .font(.system(size: 13.5))
                 .foregroundStyle(Tokens.text)
@@ -154,6 +169,20 @@ struct AssistantView: View {
                 .overlay(Capsule().stroke(Tokens.line))
                 .submitLabel(.send)
                 .onSubmit(send)
+
+            Button {
+                _Concurrency.Task { await toggleVoice() }
+            } label: {
+                Image(systemName: transcriber.isRecording ? "waveform" : "mic.fill")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(transcriber.isRecording ? Tokens.tomato : Tokens.text2)
+                    .frame(width: 36, height: 36)
+                    .background(
+                        (transcriber.isRecording ? Tokens.tomato : Color.white).opacity(0.10),
+                        in: Circle()
+                    )
+            }
+            .buttonStyle(.plain)
 
             Button(action: send) {
                 Image(systemName: "arrow.up")
@@ -164,12 +193,23 @@ struct AssistantView: View {
             }
             .buttonStyle(.plain)
             .disabled(draft.isEmpty || model.assistantBusy)
+            }
         }
         .padding(.horizontal, 16)
         .padding(.top, 8)
         .padding(.bottom, 10)
         .background(Tokens.bg)
         .overlay(alignment: .top) { Rectangle().fill(Tokens.line).frame(height: 1) }
+    }
+
+    private func toggleVoice() async {
+        if transcriber.isRecording {
+            transcriber.stop()
+            if !transcriber.transcript.isEmpty { draft = transcriber.transcript }
+        } else {
+            draft = ""
+            await transcriber.start()
+        }
     }
 
     private func send() {

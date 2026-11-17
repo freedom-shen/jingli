@@ -25,6 +25,7 @@
 		CE4F61388333ED626B1C2209 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94DA84C0289342098B879CF7 /* RootView.swift */; };
 		CE9946856F92945520DA423F /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52259A025FBADDF236368319 /* SettingsView.swift */; };
 		E168534876EB5A9DD6B461B6 /* LLMConfigStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6F49F42964661894DFC6505 /* LLMConfigStore.swift */; };
+		E42CDDC5445BFF8A92F861F1 /* SpeechTranscriber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E8578DB1995AD591E503C7E /* SpeechTranscriber.swift */; };
 		F625D24EAAD9431C3DD34766 /* JingliAgent in Frameworks */ = {isa = PBXBuildFile; productRef = EAA9E68DDA2E88E9D6B0FB5E /* JingliAgent */; };
 		F7A54B477261A61BB05228BF /* Tokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67D83A0B37B580F15B3BA038 /* Tokens.swift */; };
 /* End PBXBuildFile section */
@@ -56,6 +57,7 @@
 /* Begin PBXFileReference section */
 		2C0E4E24117278D4F3BDF3A0 /* AddTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTaskView.swift; sourceTree = "<group>"; };
 		34E53179D1AC1ED3DE4F9855 /* AddProjectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddProjectView.swift; sourceTree = "<group>"; };
+		3E8578DB1995AD591E503C7E /* SpeechTranscriber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechTranscriber.swift; sourceTree = "<group>"; };
 		52259A025FBADDF236368319 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		596365C37ACAE9360CD54339 /* JingliWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = JingliWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		67D83A0B37B580F15B3BA038 /* Tokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tokens.swift; sourceTree = "<group>"; };
@@ -145,6 +147,14 @@
 			path = DayStart;
 			sourceTree = "<group>";
 		};
+		9D1E0D752A44D9B54EEE19DE /* Voice */ = {
+			isa = PBXGroup;
+			children = (
+				3E8578DB1995AD591E503C7E /* SpeechTranscriber.swift */,
+			);
+			path = Voice;
+			sourceTree = "<group>";
+		};
 		9F058E590D1133D562B7792A /* Projects */ = {
 			isa = PBXGroup;
 			children = (
@@ -203,6 +213,7 @@
 				EEE9F7D87ABF1B555C08AAB7 /* App */,
 				55E4ADA9813DD50298B67C62 /* Design */,
 				E0E0FE5946D5209CDB131C46 /* Features */,
+				9D1E0D752A44D9B54EEE19DE /* Voice */,
 			);
 			path = Jingli;
 			sourceTree = "<group>";
@@ -353,6 +364,7 @@
 				691529F196F6FD5813FDCFE0 /* ProjectsView.swift in Sources */,
 				CE4F61388333ED626B1C2209 /* RootView.swift in Sources */,
 				CE9946856F92945520DA423F /* SettingsView.swift in Sources */,
+				E42CDDC5445BFF8A92F861F1 /* SpeechTranscriber.swift in Sources */,
 				390A0715593B0CD34313D61C /* StatsView.swift in Sources */,
 				4F270223BD4E02FBF433A5D8 /* TaskDetailView.swift in Sources */,
 				AE5E95FED3D3F8CFB42AA741 /* TodayView.swift in Sources */,
@@ -387,6 +399,8 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_KEY_CFBundleDisplayName = "精力管理";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "录一段语音，直接变成任务标题，不需要手打。";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "把你说的话转成文字，只用于填写任务。";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -508,6 +522,8 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_KEY_CFBundleDisplayName = "精力管理";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "录一段语音，直接变成任务标题，不需要手打。";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "把你说的话转成文字，只用于填写任务。";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
