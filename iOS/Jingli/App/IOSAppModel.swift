@@ -58,10 +58,9 @@ final class IOSAppModel {
         }
     }
 
-    func startDay() {
+    func startDay(taskIDs: [String]) {
         do {
-            let ids = (snapshot?.groups.flatMap(\.tasks) ?? []).map(\.id)
-            try store.startDay(taskIDs: ids, today: today)
+            try store.startDay(taskIDs: taskIDs, today: today)
             refresh()
         } catch {
             errorText = error.localizedDescription
@@ -71,8 +70,10 @@ final class IOSAppModel {
     // MARK: - Demo 数据（只在 -demo 启动参数下写入一次）
 
     private func seedDemoIfNeeded() {
-        guard CommandLine.arguments.contains("-demo"),
-              (try? store.taskCount()) == 0 else { return }
+        let args = CommandLine.arguments
+        let isDemo = args.contains("-demo") || args.contains("-demo-fresh")
+        let shouldStartDay = args.contains("-demo") && !args.contains("-demo-fresh")
+        guard isDemo, (try? store.taskCount()) == 0 else { return }
         let today = DayKey.make()
         guard let lynx = try? store.createProject(name: "Lynx 支持鸿蒙", color: "blue") else { return }
 
@@ -87,6 +88,7 @@ final class IOSAppModel {
             try? store.createTask(title: "业务包关联 TTT 插件", lane: "temporary", estimate: 1),
         ].compactMap { $0 }
 
+        guard shouldStartDay else { return }
         try? store.startDay(taskIDs: (main + temp).map(\.id), today: today)
 
         // 两轮已完成的番茄：第一轮单独，第二轮两件共享

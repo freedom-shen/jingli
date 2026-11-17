@@ -24,7 +24,11 @@ struct RootView: View {
             Group {
                 switch tab {
                 case .today:
-                    TodayView()
+                    if model.snapshot?.dayStarted == true {
+                        TodayView()
+                    } else {
+                        DayStartView()
+                    }
                 default:
                     PlaceholderView(title: tab.rawValue)
                 }
