@@ -1,0 +1,27 @@
+name: MacProbe
+options:
+  bundleIdPrefix: com.freedom-shen
+  deploymentTarget:
+    macOS: "15.0"
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: W695YL8UYY
+targets:
+  MacProbe:
+    type: application
+    platform: macOS
+    sources: [Sources]
+    entitlements:
+      path: MacProbe.entitlements
+      properties:
+        com.apple.developer.icloud-container-identifiers:
+          - iCloud.com.freedom-shen.jingli
+        com.apple.developer.icloud-services:
+          - CloudKit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.freedom-shen.jingli.macprobe
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
+        GENERATE_INFOPLIST_FILE: YES
