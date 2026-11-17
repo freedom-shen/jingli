@@ -237,6 +237,8 @@ private struct MainTaskCard: View {
                             .background(Tokens.accent.opacity(0.14), in: Circle())
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel("开始专注")
+                    .accessibilityIdentifier("today.task.play")
                 }
             }
             HStack(spacing: 8) {
@@ -264,6 +266,8 @@ private struct MainTaskCard: View {
                         .overlay(Circle().stroke(Color.white.opacity(task.done ? 0 : 0.22)))
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel(task.done ? "标记未完成" : "标记完成")
+                .accessibilityIdentifier("today.task.toggle")
             }
             .padding(.top, 11)
         }
@@ -304,6 +308,8 @@ private struct TempRow: View {
                     }
             }
             .buttonStyle(.plain)
+            .accessibilityLabel(task.done ? "标记未完成" : "标记完成")
+            .accessibilityIdentifier("today.temp.toggle")
 
             Text(task.title)
                 .font(.system(size: 14))
