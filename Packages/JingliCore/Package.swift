@@ -8,6 +8,7 @@ let package = Package(
         .library(name: "JingliCore", targets: ["JingliCore"]),
         .library(name: "JingliAgentSocket", targets: ["JingliAgentSocket"]),
         .library(name: "JingliSync", targets: ["JingliSync"]),
+        .library(name: "JingliAgent", targets: ["JingliAgent"]),
         .executable(name: "jingli-snapshot-diff", targets: ["SnapshotDiff"]),
         .executable(name: "jingli", targets: ["jingli"])
     ],
@@ -29,9 +30,13 @@ let package = Package(
             name: "JingliSync",
             dependencies: ["JingliCore"]
         ),
+        .target(
+            name: "JingliAgent",
+            dependencies: ["JingliCore"]
+        ),
         .testTarget(
             name: "JingliCoreTests",
-            dependencies: ["JingliCore", "JingliAgentSocket", "JingliSync"]
+            dependencies: ["JingliCore", "JingliAgentSocket", "JingliSync", "JingliAgent"]
         ),
         .executableTarget(
             name: "SnapshotDiff",
