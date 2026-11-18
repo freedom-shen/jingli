@@ -49,13 +49,14 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.freedom-shen.jingli.ios
         CODE_SIGN_ENTITLEMENTS: Jingli/Jingli.entitlements
         PRODUCT_NAME: Jingli
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         GENERATE_INFOPLIST_FILE: NO
-        MARKETING_VERSION: "0.7.4"
-        CURRENT_PROJECT_VERSION: "5"
+        MARKETING_VERSION: "0.7.5"
+        CURRENT_PROJECT_VERSION: "6"
 
         TARGETED_DEVICE_FAMILY: "1"
-        MARKETING_VERSION: "0.7.4"
-        CURRENT_PROJECT_VERSION: "5"
+        MARKETING_VERSION: "0.7.5"
+        CURRENT_PROJECT_VERSION: "6"
 
   JingliWidget:
     type: app-extension
@@ -78,8 +79,8 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.freedom-shen.jingli.ios.widget
         CODE_SIGN_ENTITLEMENTS: Jingli/Jingli.entitlements
         GENERATE_INFOPLIST_FILE: NO
-        MARKETING_VERSION: "0.7.4"
-        CURRENT_PROJECT_VERSION: "5"
+        MARKETING_VERSION: "0.7.5"
+        CURRENT_PROJECT_VERSION: "6"
         SKIP_INSTALL: YES
         TARGETED_DEVICE_FAMILY: "1"
 

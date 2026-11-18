@@ -25,6 +25,7 @@
 		691529F196F6FD5813FDCFE0 /* ProjectsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3C65F7C7DAB7596473E0DD5 /* ProjectsView.swift */; };
 		798A5D3E613C5B55F839FC81 /* CloudKitDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55714AEEEE8B49D57E21ED9B /* CloudKitDiagnostics.swift */; };
 		893AF3ED2BF9EC58A57B457F /* JingliWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2753D9DD0590DB36DBD5E7A /* JingliWidget.swift */; };
+		8BD20B4455E057AB5D7E093D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 71C1D692A0AB7C393EE3CCE0 /* Assets.xcassets */; };
 		8CD57953E872AF7A6FAF691D /* IOSAppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7725BAEB1AECAA6F13EF9E9D /* IOSAppModel.swift */; };
 		8D81B80BBACB9F7FE02CBF92 /* FocusActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 236C6DAD310EB896A92CA1A7 /* FocusActivityAttributes.swift */; };
 		9B29CD751F025FED34A87846 /* JingliLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BF2BAA604BE26C901931B5B /* JingliLiveActivity.swift */; };
@@ -83,6 +84,7 @@
 		67D83A0B37B580F15B3BA038 /* Tokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tokens.swift; sourceTree = "<group>"; };
 		689D9A00DB2D1D13C2BA8E55 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		6BF2BAA604BE26C901931B5B /* JingliLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JingliLiveActivity.swift; sourceTree = "<group>"; };
+		71C1D692A0AB7C393EE3CCE0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		762A39F2839BC314F5406A5B /* ModelConfigSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelConfigSheet.swift; sourceTree = "<group>"; };
 		7725BAEB1AECAA6F13EF9E9D /* IOSAppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IOSAppModel.swift; sourceTree = "<group>"; };
 		7E13E357DCCBD85D8BA129B9 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
@@ -256,6 +258,7 @@
 		DBB32DD9EEC13BD511B4A2F0 /* Jingli */ = {
 			isa = PBXGroup;
 			children = (
+				71C1D692A0AB7C393EE3CCE0 /* Assets.xcassets */,
 				D4B9CB4F1A08E2D08B7772F2 /* Info.plist */,
 				CC9618A2DBBE55DDF8631873 /* JingliApp.swift */,
 				94DA84C0289342098B879CF7 /* RootView.swift */,
@@ -411,6 +414,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8BD20B4455E057AB5D7E093D /* Assets.xcassets in Resources */,
 				2007F8DBC31BCAFB9C9C2BC0 /* voice-sample.m4a in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -485,14 +489,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Jingli/Jingli.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Jingli/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.7.4;
+				MARKETING_VERSION = 0.7.5;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.freedom-shen.jingli.ios";
 				PRODUCT_NAME = Jingli;
 				SDKROOT = iphoneos;
@@ -504,7 +508,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Jingli/Jingli.entitlements;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Widget/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -512,7 +516,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.7.4;
+				MARKETING_VERSION = 0.7.5;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.freedom-shen.jingli.ios.widget";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -583,7 +587,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Jingli/Jingli.entitlements;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Widget/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -591,7 +595,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.7.4;
+				MARKETING_VERSION = 0.7.5;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.freedom-shen.jingli.ios.widget";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -605,14 +609,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Jingli/Jingli.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Jingli/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.7.4;
+				MARKETING_VERSION = 0.7.5;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.freedom-shen.jingli.ios";
 				PRODUCT_NAME = Jingli;
 				SDKROOT = iphoneos;

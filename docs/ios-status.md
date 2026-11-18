@@ -109,6 +109,7 @@ idb ui text --udid <SIM_UDID> "text"
 | 项目增删改 | 实点：新建 / 改名 / 删除（任务转未分类）/ 项目内建任务 |
 | 重来今天 | 实点：设置里重置 → 回到「开启一天」，任务退回项目池，番茄记录保留 |
 | Widget / App Group | 共享容器直查 sqlite；Widget 编译嵌入安装成功 |
+| App 图标 | `devicectl device info appIcon` 直接从手机取回 1024 图标，番茄表盘正常显示 |
 | 生产环境发送 | 真机日志 `[CK] push 批次 …` → `pushed=9`、待推送归零；Mac 侧 `[MACCK] push accepted=1` |
 | 生产环境接收 | Mac 首次拉取 `pull 结束 记录=3172`；真机 `pulled=3195 applied=3195 skipped=0` |
 | 生产环境跨端 | iOS 建的任务出现在 Mac 库（「真机同步验证 150608」）；Mac 删的任务真机侧归零 |
