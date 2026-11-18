@@ -84,6 +84,7 @@ idb ui text --udid <SIM_UDID> "text"
 | `-ckcheck` / `-cksync` / `-cktwodevice` | CloudKit 自检 / 完整同步 / 双端收敛 |
 | `-syncwiring` | 验证「写入 → 去抖 → 自动推送」 |
 | `-cleanprobe` | 清掉自检脏数据 |
+| `-syncreset` | 换 CloudKit 环境后清游标 + 整库重推（一次性） |
 
 环境变量 `JINGLI_NO_NOTIFICATIONS=1` 关闭真实通知（截图/自检用，避免系统弹窗挡界面）；`devicectl` 前面加 `DEVICECTL_CHILD_` 前缀即可传入。
 
@@ -108,6 +109,10 @@ idb ui text --udid <SIM_UDID> "text"
 | 项目增删改 | 实点：新建 / 改名 / 删除（任务转未分类）/ 项目内建任务 |
 | 重来今天 | 实点：设置里重置 → 回到「开启一天」，任务退回项目池，番茄记录保留 |
 | Widget / App Group | 共享容器直查 sqlite；Widget 编译嵌入安装成功 |
+| 生产环境发送 | 真机日志 `[CK] push 批次 …` → `pushed=9`、待推送归零；Mac 侧 `[MACCK] push accepted=1` |
+| 生产环境接收 | Mac 首次拉取 `pull 结束 记录=3172`；真机 `pulled=3195 applied=3195 skipped=0` |
+| 生产环境跨端 | iOS 建的任务出现在 Mac 库（「真机同步验证 150608」）；Mac 删的任务真机侧归零 |
+| 空库全量还原 | 第二实例（`JINGLI_SUPPORT_DIR` 空库）首次同步后任务数与主库一致（100/100） |
 
 **没验证的**：真人对着麦克风说话（硬件采集）、动态岛渲染（模拟器不绘制，真机未单独确认）、Widget 添加到桌面。
 
@@ -119,14 +124,14 @@ idb ui text --udid <SIM_UDID> "text"
 - Widget 需要在桌面手动添加，命令行加不了
 - Mac 端还没接同步（见下）
 
-## 八、Mac 端同步（已接通）
+## 八、Mac 端同步（已接通，跑在 Production）
 
-2026-11-17 完成。三处关键改动：
+三处关键改动：
 
 1. **签名**：`App/project.yml` 从 ad-hoc（`CODE_SIGN_IDENTITY: "-"`）改成自动签名 + 团队 `W695YL8UYY`
-2. **权限**：新增 `App/Jingli.entitlements`，含 `iCloud.com.freedom-shen.jingli` + CloudKit，
-   并且**必须**加 `com.apple.developer.icloud-container-environment = Development`
-   —— 没有这一项 macOS 默认走 Production，会报 `Invalid bundle ID for container`
+2. **权限**：`App/Jingli.entitlements`，含 `iCloud.com.freedom-shen.jingli` + CloudKit，
+   并且**必须**显式写 `com.apple.developer.icloud-container-environment`
+   —— 没有这一项 macOS 报 `Invalid bundle ID for container`
 3. **调度**：`App/Jingli/MacSync.swift`，每 3 秒看一次待推送、每 15 秒拉一次远端
 
 还补了一个之前没意识到的问题：**老数据不会自己同步**。同步靠 SQLite 触发器记录变更，
@@ -136,8 +141,7 @@ idb ui text --udid <SIM_UDID> "text"
 端上还有两处补强：iOS 每 15 秒跑一次同步节拍（之前只在专注页的 TimelineView 里 tick，
 不专注就永远不拉），助手执行完工具也会立即触发一次推送（agent 直接写库，绕过了模型层）。
 
-实测：Mac 77 个任务 / 7 个项目 → iPhone 全部到位（经 1740 条变更、分 3 批推送）；
-iPhone 新建的任务也能被 Mac 拉到，删除能同步回去。
+实测：Mac 100 个任务 → iPhone 全部到位；iPhone 新建的任务也能被 Mac 拉到，删除能同步回去。
 
 <details>
 <summary>当年的可行性实验（保留）</summary>
@@ -158,9 +162,9 @@ iPhone 新建的任务也能被 Mac 拉到，删除能同步回去。
 
 > 分发方式的影响：`scripts/package.sh` 现在会用自动签名产出带开发证书的包。要分发给别人仍需改成 Developer ID / App Store 签名。
 
-## 九、还没做完的三件事（都需要人，不是代码）
+## 九、还没做完的两件事（都需要人，不是代码）
 
-三件都不阻塞日常使用，但做完才算完全收口。
+都不阻塞日常使用。
 
 ### 1. 动态岛看一眼（约 5 秒）
 
@@ -173,19 +177,7 @@ iPhone 新建的任务也能被 Mac 拉到，删除能同步回去。
 现状：真机日志已确认 `Live Activity 已开始，当前活动数=1`、`activityState=active`；
 但命令行截图抓不全系统 UI 层，无法自证。
 
-### 2. Mac 端同步（要拍板）
-
-实验结论（`Spikes/mac-cloudkit-probe/`）：
-
-```
-[MAC] accountStatus=1
-[MAC] zone failed: CKError 10/2007 "Invalid bundle ID for container"
-```
-
-要接三步：注册 Mac App ID → 分配同一容器 → **把 Mac 工程从 ad-hoc 签名改成自动签名**。
-第三步会改变分发方式（现在 `scripts/package.sh` 是免签名 zip），所以需要产品侧决定。
-
-### 3. 真人语音（约 5 秒）
+### 2. 真人语音（约 5 秒）
 
 ```bash
 # 手机上：今天 → 右上角 + → 标题栏麦克风 → 说一句话
@@ -193,3 +185,48 @@ iPhone 新建的任务也能被 Mac 拉到，删除能同步回去。
 
 预期：说的话实时变成任务标题。
 现状：识别链路已用 TTS 音频在真机验证过；只差「人声进麦克风」这一段硬件采集。
+
+## 十、Production 环境（2026-11-18 已切换）
+
+CloudKit 的开发环境和生产环境是两套**独立的 schema 和数据**。开发环境里跑通、
+生产环境没部署过 schema 的话，写入会被拒（`push accepted=0`）而 App 只表现为
+「同步不生效」—— 这类失败最容易被当成网络问题放过。
+
+### 部署这一步做了什么
+
+CloudKit Console（团队 `xiaomin shen` / `W695YL8UYY`）→ 容器 `iCloud.com.freedom-shen.jingli`
+→ 左下 `Deploy Schema Changes…` → 确认。本次部署的内容：
+
+```
+Record Types (2)  Probe · SyncChange
+Indexes (2)       Probe 3 个 · SyncChange 22 个
+Security Roles    _world 角色调整
+```
+
+部署后 Production 侧 `Deploy Schema Changes…` 变灰，说明两侧 schema 已一致。
+
+### 切换到生产环境的改动
+
+| 位置 | 改动 |
+|---|---|
+| `App/Jingli.entitlements` | `icloud-container-environment` → `Production` |
+| `iOS/Jingli/Jingli.entitlements` | 新增同名 key = `Production`（开发描述文件同时允许两个值，所以仍能正常签名安装） |
+| `SyncStore.resetForNewEnvironment()` | 清 `pull_cursor` / `last_sync_at` / `sync_retry`，并把所有 `pushed_at` 置空 |
+| 两端启动参数 `-syncreset` | 切环境后跑一次，把整库重推到空的生产库 |
+
+生产库是空的，**不清游标**的话：拉取带着开发环境的 token（报错或被忽略），
+推送则因为 `pushed_at` 有值而永远不再发，数据一条都过不去。
+
+### 顺带修掉的两个「静默失效」
+
+1. **拉取用了废弃的回调 API**：`CKFetchRecordZoneChangesOperation` 在 Production 里
+   完成回调根本不触发，`withCheckedThrowingContinuation` 永不 resume，`SyncEngine`
+   这个 actor 就永久卡住；`SyncService.syncing` 一直是 true，之后每次同步都被 `guard`
+   挡掉，日志只有「同步完成 错误=nil」。改成 async 版 `recordZoneChanges` + 120 秒超时。
+2. **补录只做一次**：`backfill.v2` 标记让备份恢复 / 批量导入进来的行永远补不上
+   （本机实测有 22 个任务一条变更记录都没有，所以另一台设备上根本不存在）。
+   现在每次启动都跑补录，判据从「有没有变更记录」改成「这个字段有没有 rev」，
+   避免把从对端拉下来的数据误当成新数据再推一遍（那样会带着全新 rev 覆盖对端）。
+
+另外给 `modifyRecords` 也加了 60 秒超时，并把真正跑网络的那次 sync 放进 detached 任务，
+免得去抖任务被新写入 cancel 时把同步半路掐断（表现为 `CancellationError`）。

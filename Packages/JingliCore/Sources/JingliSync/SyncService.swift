@@ -51,7 +51,11 @@ public actor SyncService {
     /// 立即同步（下拉刷新 / 回到前台 / 手动按钮）。
     @discardableResult
     public func syncNow() async -> Status {
-        debounceTask?.cancel()
+        // 只有还在去抖等待的那次才值得取消；已经在跑的那次如果被 cancel，
+        // 拉取会以 CancellationError 半途而废，还会把错误写进状态栏。
+        if !syncing {
+            debounceTask?.cancel()
+        }
         await performSync()
         return makeStatus()
     }
@@ -63,14 +67,22 @@ public actor SyncService {
         syncing = true
         defer { syncing = false }
 
+        // 真正跑网络的那次放到 detached 任务里：去抖任务随时可能被新的写入
+        // cancel 掉，如果同步跟着被取消，拉取会半途抛 CancellationError，
+        // 游标不保存、状态栏还挂着一条假失败。
+        let engine = self.engine
         do {
-            _ = try await engine.syncOnce()
+            _ = try await _Concurrency.Task.detached(priority: .utility) {
+                try await engine.syncOnce()
+            }.value
             lastSyncAt = Date()
             lastError = nil
             retryAttempt = 0
             retryTask?.cancel()
             retryTask = nil
             try? store.setLastSyncAt(lastSyncAt)
+        } catch is CancellationError {
+            // 被新的同步周期打断（去抖任务被取消），不是真失败，下一轮会重来。
         } catch {
             lastError = error.localizedDescription
             scheduleRetry()

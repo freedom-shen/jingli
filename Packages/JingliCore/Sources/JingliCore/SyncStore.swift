@@ -240,23 +240,32 @@ public final class SyncStore: @unchecked Sendable {
     }
 
     /// 拉取游标：由传输层解释，存在本地 sync_meta（设备本地，不上云）。
-    /// 老数据补录：只做一次，做完打标记。
+    ///
+    /// 补录：每次启动都跑一遍，只补「本地有、却一条变更记录都没有」的行。
+    /// 早期用一次性标记控制（backfill.v2），结果备份恢复 / 批量导入进来的行永远
+    /// 补不上，那些数据在别的设备上根本不存在。`NOT EXISTS` 让重复执行等于空转。
     @discardableResult
     public func backfillIfNeeded() throws -> Int {
-        let done: String? = try database.queue.read { db in
-            try String.fetchOne(db, sql: "SELECT value FROM sync_meta WHERE key = 'backfill.v2'")
-        }
-        guard done == nil else { return 0 }
-        let count = try database.queue.write { db in
+        try database.queue.write { db in
             try SyncSchema.backfill(db)
         }
+    }
+
+    /// 换 CloudKit 环境（Development → Production）后必须调一次。
+    ///
+    /// 开发环境里推过的记录在生产环境不存在，游标也是另一套 serverChangeToken。
+    /// 不清掉的话：拉取会带着旧游标（服务端报错或直接空），推送则因为
+    /// `pushed_at` 已有值而永远不再发，表现为「同步静默失效」。
+    ///
+    /// 返回重新入队的变更条数。
+    @discardableResult
+    public func resetForNewEnvironment() throws -> Int {
         try database.queue.write { db in
-            try db.execute(
-                sql: "INSERT OR REPLACE INTO sync_meta (key, value) VALUES ('backfill.v2', ?)",
-                arguments: [String(count)]
-            )
+            try db.execute(sql: "DELETE FROM sync_meta WHERE key IN ('pull_cursor', 'last_sync_at')")
+            try db.execute(sql: "DELETE FROM sync_retry")
+            try db.execute(sql: "UPDATE sync_change SET pushed_at = NULL")
+            return try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM sync_change") ?? 0
         }
-        return count
     }
 
     public func syncCursor() throws -> String? {

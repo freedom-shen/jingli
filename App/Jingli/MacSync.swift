@@ -37,6 +37,11 @@ final class MacSync {
         if backfilled > 0 {
             NSLog("[SYNC] 首次补录变更=\(backfilled)")
         }
+        // 换了 CloudKit 环境后，旧游标和「已推送」标记全部作废，整库重推一次。
+        if ProcessInfo.processInfo.arguments.contains("-syncreset") {
+            let requeued = (try? store.resetForNewEnvironment()) ?? 0
+            NSLog("[SYNC] 环境重置：游标清空、重推变更=\(requeued)")
+        }
         NSLog("[SYNC] 已配置，待推送=\((try? store.pendingCount()) ?? -1)")
     }
 

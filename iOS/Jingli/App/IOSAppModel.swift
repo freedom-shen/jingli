@@ -323,6 +323,16 @@ final class IOSAppModel {
             ),
             debounceSeconds: 2
         )
+        // 本地有、但一条变更都没有的行（备份恢复 / 批量导入）补进队列
+        let backfilled = (try? syncStore.backfillIfNeeded()) ?? 0
+        if backfilled > 0 {
+            NSLog("[SYNC] 补录变更=\(backfilled)")
+        }
+        // 换 CloudKit 环境后旧游标 / 已推送标记都作废，整库重推一次
+        if CommandLine.arguments.contains("-syncreset") {
+            let requeued = (try? syncStore.resetForNewEnvironment()) ?? 0
+            NSLog("[SYNC] 环境重置：游标清空、重推变更=\(requeued)")
+        }
 
         seedDemoIfNeeded()
         restoreBreakIfNeeded()

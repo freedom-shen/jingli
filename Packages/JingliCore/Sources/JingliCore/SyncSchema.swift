@@ -333,8 +333,12 @@ enum SyncSchema {
 
     /// 把库里已有的行登记成同步变更。
     ///
-    /// 触发器只在**写入**时记录变更，所以启用同步之前就存在的数据不会自己进队列。
-    /// 这里按「已有行 + 还没有任何变更」的条件补一次；补完由调用方打标记，不重复执行。
+    /// 触发器只在**写入**时记录变更，所以启用同步之前就存在的数据不会自己进队列
+    /// （备份恢复、批量导入同理）。这里按「本地有这行、但这个字段还没有 rev」补一条。
+    ///
+    /// 判据用 `sync_field_rev` 而不是 `sync_change`：远端应用下来的字段也会写 rev，
+    /// 用它做判据才不会把「从对端拉下来的数据」当成「本地独有的新数据」再推一遍
+    /// —— 那种重复推送会带着全新的 rev，把对端更新的值盖掉。
     static func backfill(_ db: Database) throws -> Int {
         var total = 0
         for spec in tables {
@@ -351,10 +355,10 @@ enum SyncSchema {
                            strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
                     FROM \(spec.table) t
                     WHERE NOT EXISTS (
-                        SELECT 1 FROM sync_change c
-                        WHERE c.entity = \(sqlString(spec.entity))
-                          AND c.entity_id = \(spec.idSQL("t"))
-                          AND c.field = \(sqlString(column.field))
+                        SELECT 1 FROM sync_field_rev r
+                        WHERE r.entity = \(sqlString(spec.entity))
+                          AND r.entity_id = \(spec.idSQL("t"))
+                          AND r.field = \(sqlString(column.field))
                     );
                     """
                 try db.execute(sql: sql)
