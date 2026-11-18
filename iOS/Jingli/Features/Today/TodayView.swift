@@ -30,8 +30,10 @@ struct TodayView: View {
                         .padding(.top, 14)
                 }
 
+                assistantEntry.padding(.top, 14)
+
                 if mainTasks.isEmpty && tempTasks.isEmpty {
-                    emptyToday.padding(.top, 26)
+                    emptyToday.padding(.top, 20)
                 }
 
                 sectionTitle("主线任务", trailing: "\(mainTasks.count) / 4")
@@ -77,6 +79,40 @@ struct TodayView: View {
         }
     }
 
+    /// 首页最显眼的入口：一句话交给助手去改计划。
+    private var assistantEntry: some View {
+        Button {
+            showAssistant = true
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "sparkles")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(Color(red: 0.04, green: 0.05, blue: 0.08))
+                    .frame(width: 34, height: 34)
+                    .background(Tokens.accent, in: Circle())
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("跟助手说一句话").font(.system(size: 14.5, weight: .semibold))
+                        .foregroundStyle(Tokens.text)
+                    Text("加任务、改计划、查今天").font(.system(size: 11)).foregroundStyle(Tokens.text3)
+                }
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(Tokens.text3)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .frame(maxWidth: .infinity)
+            .background(Tokens.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
+            .overlay(RoundedRectangle(cornerRadius: 16).stroke(Tokens.accent.opacity(0.28)))
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("today.assistant")
+    }
+
     private var header: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 2) {
@@ -88,9 +124,6 @@ struct TodayView: View {
                 Button { showAdd = true } label: { iconButton("plus") }
                     .buttonStyle(.plain)
                     .accessibilityIdentifier("today.header.add")
-                Button { showAssistant = true } label: { iconButton("sparkles", tint: Tokens.accent) }
-                    .buttonStyle(.plain)
-                    .accessibilityIdentifier("today.header.assistant")
             }
         }
         .padding(.top, 8)

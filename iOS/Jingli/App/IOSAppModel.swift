@@ -64,11 +64,13 @@ final class IOSAppModel {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty, !assistantBusy else { return }
         chat.append(ChatItem(role: .user, text: trimmed, tools: []))
+        persistChatHistory()
         assistantBusy = true
         defer { assistantBusy = false }
 
         guard let provider else {
             chat.append(ChatItem(role: .assistant, text: "还没有配置模型，去「设置 → 助手」填一下 Key。", tools: []))
+            persistChatHistory()
             return
         }
         let router = AgentCommandRouter(database: database, focus: nil, onChange: nil, actor: "ios-agent")
@@ -76,11 +78,46 @@ final class IOSAppModel {
         do {
             let reply = try await agent.send(trimmed)
             chat.append(ChatItem(role: .assistant, text: reply.text, tools: reply.toolCalls))
+            persistChatHistory()
             refresh()
             if !reply.toolCalls.isEmpty { noteSyncChange() }
         } catch {
             chat.append(ChatItem(role: .assistant, text: "出错了：\(error.localizedDescription)", tools: []))
+            persistChatHistory()
         }
+    }
+
+    /// 聊天记录本地持久化：启动时读回来，每次追加后写回。
+    private func loadChatHistory() {
+        let items = ChatHistoryStore.load()
+        guard !items.isEmpty else { return }
+        chat = items.map { item in
+            ChatItem(
+                role: item.role == "user" ? .user : .assistant,
+                text: item.text,
+                tools: item.tools.map {
+                    ExecutedTool(name: $0.name, argumentsJSON: "", ok: $0.ok, output: "")
+                }
+            )
+        }
+    }
+
+    private func persistChatHistory() {
+        ChatHistoryStore.save(
+            chat.map { item in
+                ChatHistoryStore.Item(
+                    role: item.role == .user ? "user" : "assistant",
+                    text: item.text,
+                    tools: item.tools.map { ChatHistoryStore.Tool(name: $0.name, ok: $0.ok) },
+                    at: Date()
+                )
+            }
+        )
+    }
+
+    func clearChatHistory() {
+        chat.removeAll()
+        ChatHistoryStore.clear()
     }
 
     /// 本地写入完成后调用：去抖 2 秒再同步。
@@ -290,6 +327,7 @@ final class IOSAppModel {
         seedDemoIfNeeded()
         restoreBreakIfNeeded()
         refresh()
+        loadChatHistory()
         startSyncTimer()
 
         if CommandLine.arguments.contains("-ckcheck") {

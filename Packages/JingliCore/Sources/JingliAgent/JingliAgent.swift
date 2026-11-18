@@ -6,6 +6,13 @@ public struct ExecutedTool: Sendable, Equatable {
     public let argumentsJSON: String
     public let ok: Bool
     public let output: String
+
+    public init(name: String, argumentsJSON: String, ok: Bool, output: String) {
+        self.name = name
+        self.argumentsJSON = argumentsJSON
+        self.ok = ok
+        self.output = output
+    }
 }
 
 public struct AgentReply: Sendable {

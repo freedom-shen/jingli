@@ -10,7 +10,6 @@ struct AssistantView: View {
     @State private var draft = ""
     /// 换一个 id 就重建输入框，用来清掉输入法还在组合中的文字
     @State private var fieldID = UUID()
-    @State private var transcriber = SpeechTranscriber()
 
     private let suggestions = ["今天还剩几件", "把评审设计稿加进今天，两个番茄", "昨天专注了多久"]
 
@@ -49,15 +48,9 @@ struct AssistantView: View {
             }
         }
         .preferredColorScheme(.dark)
-        .onChange(of: transcriber.transcript) { _, value in
-            if transcriber.isRecording { draft = value }
-        }
         .task {
             if let prefill, draft.isEmpty { draft = prefill }
             let args = CommandLine.arguments
-            if args.contains("-voice") {
-                await transcriber.start()
-            }
             if let raw = args.first(where: { $0.hasPrefix("-ask=") }) {
                 await model.send(String(raw.dropFirst("-ask=".count)))
             }
@@ -151,13 +144,6 @@ struct AssistantView: View {
 
     private var inputBar: some View {
         VStack(spacing: 6) {
-            if let error = transcriber.errorText {
-                Text(error)
-                    .font(.system(size: 10.5))
-                    .foregroundStyle(Tokens.tomato)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 4)
-            }
             HStack(spacing: 8) {
             TextField("", text: $draft, prompt: Text("说点什么…").foregroundStyle(Tokens.text3))
                 .id(fieldID)
@@ -168,21 +154,6 @@ struct AssistantView: View {
                 .overlay(Capsule().stroke(Tokens.line))
                 .submitLabel(.send)
                 .onSubmit(send)
-
-            Button {
-                _Concurrency.Task { await toggleVoice() }
-            } label: {
-                Image(systemName: transcriber.isRecording ? "waveform" : "mic.fill")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(transcriber.isRecording ? Tokens.tomato : Tokens.text2)
-                    .frame(width: 36, height: 36)
-                    .background(
-                        (transcriber.isRecording ? Tokens.tomato : Color.white).opacity(0.10),
-                        in: Circle()
-                    )
-            }
-            .buttonStyle(.plain)
-            .accessibilityIdentifier("assistant.mic")
 
             Button(action: send) {
                 Image(systemName: "arrow.up")
@@ -203,21 +174,9 @@ struct AssistantView: View {
         .overlay(alignment: .top) { Rectangle().fill(Tokens.line).frame(height: 1) }
     }
 
-    private func toggleVoice() async {
-        if transcriber.isRecording {
-            transcriber.stop()
-            if !transcriber.transcript.isEmpty { draft = transcriber.transcript }
-        } else {
-            draft = ""
-            await transcriber.start()
-        }
-    }
-
     private func send() {
         let text = draft.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else { return }
-        // 先停录音：否则识别结果会继续往 draft 里写，看起来像"发完没清空"
-        if transcriber.isRecording { transcriber.stop() }
         draft = ""
         // 中文输入法里没上屏的拼音靠改 binding 清不掉，重建一次输入框
         fieldID = UUID()
