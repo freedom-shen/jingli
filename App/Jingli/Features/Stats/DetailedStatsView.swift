@@ -25,11 +25,31 @@ struct DetailedStatsView: View {
                 Text("看见时间的去向，让下一次投入更有方向。")
                     .font(.system(size: 12)).foregroundStyle(Theme.textSecondary)
                 HStack {
-                    Picker("时间范围", selection: $range) {
-                        ForEach(ranges, id: \.self) { Text($0).tag($0) }
+                    // 自己画分段控件：系统的 NSSegmentedControl 选中色取决于窗口是不是 key window，
+                    // 截图基线会因此来回抖，换掉之后和焦点无关。
+                    HStack(spacing: 4) {
+                        ForEach(ranges, id: \.self) { item in
+                            Button {
+                                range = item
+                            } label: {
+                                Text(item)
+                                    .font(.system(size: 12, weight: range == item ? .semibold : .regular))
+                                    .foregroundStyle(range == item ? Theme.background : Theme.textSecondary)
+                                    .padding(.horizontal, 12)
+                                    .frame(height: 26)
+                                    .background(
+                                        range == item ? Theme.accent : Color.clear,
+                                        in: RoundedRectangle(cornerRadius: 7)
+                                    )
+                                    .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityIdentifier("stats-detail-range-\(item)")
+                        }
                     }
-                    .pickerStyle(.segmented).frame(maxWidth: 440)
-                    .accessibilityIdentifier("stats-detail-range")
+                    .padding(3)
+                    .background(Theme.card, in: RoundedRectangle(cornerRadius: 9))
+                    .frame(maxWidth: 440, alignment: .leading)
                     Spacer()
                     if let summary, let first = summary.days.last, let last = summary.days.first {
                         Text("\(first.date) — \(last.date) · \(summary.days.count) 天")

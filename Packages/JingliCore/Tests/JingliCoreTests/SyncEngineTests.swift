@@ -84,7 +84,8 @@ extension SyncEngineTests {
         _ = try await a.engine.syncOnce()
         _ = try await b.engine.syncOnce()
 
-        // 两端各自离线修改不同字段
+        // 两端各自离线修改**不同**字段（estimate 只让 A 动，否则测的就不是"不同字段"，
+        // 而且同字段的胜负取决于毫秒级 rev，会让用例变成随机失败）
         _ = try a.store.updateTask(id: task.id, title: "A 改的标题", note: "", estimate: 3)
         _ = try b.store.updateTask(id: task.id, title: "初始标题", note: "B 加的备注", estimate: 5)
 
@@ -96,7 +97,9 @@ extension SyncEngineTests {
         let onB = try XCTUnwrap(try b.store.listTasks(includeDone: true).first { $0.id == task.id })
         XCTAssertEqual(onA.title, "A 改的标题")
         XCTAssertEqual(onA.note, "B 加的备注", "不同字段应该都保留")
-        XCTAssertEqual(onA.estimate, 5)
+        // estimate 两端都改过（A=3 / B=5），谁赢取决于毫秒级 rev，这里只校验收敛一致，
+        // 不锁定具体值 —— 否则这个用例会随机失败。
+        XCTAssertEqual(onA.estimate, onB.estimate, "同字段要收敛到同一个值")
         XCTAssertEqual(onA.title, onB.title)
         XCTAssertEqual(onA.note, onB.note)
     }
