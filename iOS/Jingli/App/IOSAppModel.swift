@@ -27,6 +27,8 @@ final class IOSAppModel {
     private(set) var pendingCompletion: FocusCompletion?
     private(set) var breakEndsAt: Date?
     private(set) var breakMinutes: Int = 0
+    /// 非 nil 时弹「新建任务」，值作为预填标题（快捷指令 / 深链 jingli://add）
+    private(set) var quickAddTitle: String?
 
     private static let breakEndsAtKey = "jingli.ios.break.endsAt"
     private static let breakMinutesKey = "jingli.ios.break.minutes"
@@ -339,6 +341,8 @@ final class IOSAppModel {
         refresh()
         loadChatHistory()
         startSyncTimer()
+        observeQuickAdd()
+        consumeQuickAddIfNeeded()
 
         if CommandLine.arguments.contains("-ckcheck") {
             _Concurrency.Task { await CloudKitDiagnostics.run() }
@@ -693,6 +697,37 @@ final class IOSAppModel {
 
     func dismissCompletion() {
         pendingCompletion = nil
+    }
+
+    // MARK: - 快捷添加（快捷指令 / 深链）
+
+    /// 深链 `jingli://add[?title=…]` 或零参数快捷指令调用它：弹出新建任务页。
+    func requestQuickAdd(title: String? = nil) {
+        quickAddTitle = title ?? ""
+    }
+
+    /// 零参数快捷指令可能是「冷启动」跑的，intent 先落一个标记，起来后消费掉。
+    private func consumeQuickAddIfNeeded() {
+        let defaults = UserDefaults.standard
+        guard defaults.bool(forKey: "jingli.quickadd.pending") else { return }
+        defaults.set(false, forKey: "jingli.quickadd.pending")
+        requestQuickAdd()
+    }
+
+    private func observeQuickAdd() {
+        NotificationCenter.default.addObserver(
+            forName: .jingliQuickAdd,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                self?.quickAddTitle = ""
+            }
+        }
+    }
+
+    func dismissQuickAdd() {
+        quickAddTitle = nil
     }
 
     // MARK: - Demo 数据（只在 -demo 启动参数下写入一次）

@@ -67,6 +67,16 @@ struct RootView: View {
                 .opacity(model.timer == nil ? 1 : 0)
         }
         .preferredColorScheme(.dark)
+        .onChange(of: model.quickAddTitle) { _, value in
+            // 快捷指令随时能唤起，落到「今天」更符合意图
+            if value != nil { tab = .today }
+        }
+        .sheet(isPresented: Binding(
+            get: { model.quickAddTitle != nil },
+            set: { if !$0 { model.dismissQuickAdd() } }
+        )) {
+            AddTaskView(presetTitle: model.quickAddTitle ?? "")
+        }
         .sheet(isPresented: Binding(
             get: { model.pendingCompletion != nil },
             set: { if !$0 { model.dismissCompletion() } }

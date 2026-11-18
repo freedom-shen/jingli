@@ -64,16 +64,44 @@ enum TaskLane: String, AppEnum {
     }
 }
 
+/// 零参数版本：给 Siri / 快捷指令卡片 / 操作按钮用的「一键加任务」。
+///
+/// 有必填参数的 intent 在快捷指令库里点卡片是跑不起来的（没有地方填参数），
+/// 所以卡片这条路只做一件事：打开 App 的新建任务页，键盘就绪，直接打字。
+struct OpenAddTaskIntent: AppIntent {
+    /// 由 App 侧读取：true 时打开新建任务页
+    static let pendingKey = "jingli.quickadd.pending"
+
+    static var title: LocalizedStringResource { "快速加任务" }
+    static var description: IntentDescription {
+        IntentDescription("打开「精力管理」的新建任务页，写完标题就进今天。")
+    }
+    static var openAppWhenRun: Bool { true }
+
+    init() {}
+
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        UserDefaults.standard.set(true, forKey: Self.pendingKey)
+        NotificationCenter.default.post(name: .jingliQuickAdd, object: nil)
+        return .result(dialog: "写个标题就行，回车加进今天。")
+    }
+}
+
 struct JingliShortcuts: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
         AppShortcut(
-            intent: AddTaskIntent(),
+            intent: OpenAddTaskIntent(),
             phrases: [
                 "用\(.applicationName)加个任务",
                 "在\(.applicationName)记一笔",
             ],
-            shortTitle: "加任务",
-            systemImageName: "plus.circle"
+            shortTitle: "快速加任务",
+            systemImageName: "plus.circle.fill"
         )
     }
+}
+
+extension Notification.Name {
+    /// 零参数快捷指令唤起新建任务页
+    static let jingliQuickAdd = Notification.Name("jingli.quickAdd")
 }

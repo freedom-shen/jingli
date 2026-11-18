@@ -9,6 +9,8 @@ struct AddTaskView: View {
     /// 从项目详情进来时，类型和项目都锁到这个项目上
     var presetProjectID: String?
     var presetProjectName: String?
+    /// 快捷指令 / 深链带过来的标题，打开就已填好
+    var presetTitle: String?
 
     @State private var title = ""
     @State private var lane = "temporary"
@@ -26,11 +28,17 @@ struct AddTaskView: View {
         !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
-    init(presetProjectID: String? = nil, presetProjectName: String? = nil) {
+    init(
+        presetProjectID: String? = nil,
+        presetProjectName: String? = nil,
+        presetTitle: String? = nil
+    ) {
         self.presetProjectID = presetProjectID
         self.presetProjectName = presetProjectName
+        self.presetTitle = presetTitle
         _lane = State(initialValue: presetProjectID == nil ? "temporary" : "main")
         _projectID = State(initialValue: presetProjectID)
+        _title = State(initialValue: presetTitle ?? "")
     }
 
     var body: some View {
