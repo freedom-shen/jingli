@@ -141,7 +141,7 @@ idb ui text --udid <SIM_UDID> "text"
 端上还有两处补强：iOS 每 15 秒跑一次同步节拍（之前只在专注页的 TimelineView 里 tick，
 不专注就永远不拉），助手执行完工具也会立即触发一次推送（agent 直接写库，绕过了模型层）。
 
-实测：Mac 100 个任务 → iPhone 全部到位；iPhone 新建的任务也能被 Mac 拉到，删除能同步回去。
+实测：Mac 全量数据（98 个任务 / 8 个项目，首次 3172 条变更）→ iPhone 全部到位；iPhone 新建的任务也能被 Mac 拉到，删除能同步回去。
 
 <details>
 <summary>当年的可行性实验（保留）</summary>
