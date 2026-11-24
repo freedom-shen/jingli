@@ -33,8 +33,8 @@ targets:
         PRODUCT_NAME: Jingli
         PRODUCT_BUNDLE_IDENTIFIER: com.freedom-shen.jingli
         CODE_SIGN_ENTITLEMENTS: Jingli.entitlements
-        MARKETING_VERSION: "0.6.59"
-        CURRENT_PROJECT_VERSION: "64"
+        MARKETING_VERSION: "0.6.60"
+        CURRENT_PROJECT_VERSION: "65"
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: 精力管理
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity

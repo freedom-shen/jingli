@@ -37,3 +37,30 @@ final class CloudKitMappingTests: XCTestCase {
         XCTAssertNil(CloudKitTransport.change(from: record), "缺字段应丢弃而不是崩")
     }
 }
+
+// MARK: - 增量拉失败后的自恢复动作
+
+extension CloudKitMappingTests {
+    func testExpiredTokenTriggersFullReload() {
+        let error = CKError(.changeTokenExpired)
+        XCTAssertEqual(CloudKitTransport.pullRecovery(for: error), .fullReload)
+    }
+
+    func testNestedExpiredTokenInPartialFailureTriggersFullReload() {
+        let error = CKError(
+            .partialFailure,
+            userInfo: [CKPartialErrorsByItemIDKey: ["zone": CKError(.changeTokenExpired)]]
+        )
+        XCTAssertEqual(CloudKitTransport.pullRecovery(for: error), .fullReload)
+    }
+
+    func testMissingZoneTriggersZoneRecreate() {
+        let error = CKError(.zoneNotFound)
+        XCTAssertEqual(CloudKitTransport.pullRecovery(for: error), .recreateZone)
+    }
+
+    func testNetworkErrorIsNotSwallowed() {
+        let error = CKError(.networkUnavailable)
+        XCTAssertEqual(CloudKitTransport.pullRecovery(for: error), .none, "网络错误不能当游标失效处理")
+    }
+}

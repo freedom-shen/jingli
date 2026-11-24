@@ -409,3 +409,59 @@ extension SyncTests {
         XCTAssertEqual(try b.sync.pendingRetryCount(), planOnly.count, "失败的记录要留着")
     }
 }
+
+// MARK: - 建行需要的 NOT NULL 字段还没到时不能被整批回滚
+
+extension SyncTests {
+    /// 真机踩到的坑：`task_completion` 的 `task_id` 那条先被外键挡进重试队列，
+    /// 随后单独到达的 `completed_at` 变更会去建行，`task_id` 只能是 NULL →
+    /// NOT NULL 约束抛错 → 整批 apply 回滚 → 游标永不推进 → 设备永久卡死，
+    /// 表现为「同步完成 错误=…」但库一直是旧的。
+    func testCompletedAtBeforeTaskIDIsStashedInsteadOfAbortingBatch() throws {
+        let a = try makeDevice()
+        let b = try makeDevice()
+        let task = try a.store.createTask(title: "打卡", lane: "temporary")
+        try a.store.toggleTask(id: task.id)
+
+        let changes = try a.sync.allChanges()
+        let completion = changes.filter { $0.entity == "taskCompletion" }
+        let taskIDChange = try XCTUnwrap(completion.first { $0.field == "task_id" })
+        let completedAtChange = try XCTUnwrap(completion.first { $0.field == "completed_at" })
+        let completedAt = try XCTUnwrap(
+            try JSONDecoder().decode(String.self, from: Data(completedAtChange.valueJSON.utf8))
+        )
+
+        // B 已经有任务本体，但 task_completion 的 task_id 那条还没到。
+        try b.sync.apply(changes.filter { $0.entity == "task" })
+
+        // 只有 completed_at 到达：这条应该被压进重试队列，而不是把整批打回去。
+        let skipped = try b.sync.apply([completedAtChange])
+        XCTAssertEqual(skipped.map(\.changeID), [completedAtChange.changeID])
+        XCTAssertEqual(try b.sync.pendingRetryCount(), 1)
+
+        // 事务没被毒死：紧接着的 task_id 变更要能正常落地，游标才有机会推进。
+        let after = try b.sync.apply([taskIDChange])
+        XCTAssertTrue(after.isEmpty)
+        let row = try b.database.queue.read { db in
+            try Row.fetchOne(
+                db,
+                sql: "SELECT task_id, completed_at FROM task_completion WHERE id = ?",
+                arguments: [completedAtChange.entityID]
+            )
+        }
+        XCTAssertEqual(row?["task_id"] as String?, task.id)
+
+        // 字段补齐后重放，把真实完成时间补回去。
+        XCTAssertEqual(try b.sync.retryPending(), 1)
+        XCTAssertEqual(try b.sync.pendingRetryCount(), 0)
+        let fixed = try b.database.queue.read { db in
+            try Row.fetchOne(
+                db,
+                sql: "SELECT task_id, completed_at FROM task_completion WHERE id = ?",
+                arguments: [completedAtChange.entityID]
+            )
+        }
+        XCTAssertEqual(fixed?["task_id"] as String?, task.id)
+        XCTAssertEqual(fixed?["completed_at"] as String?, completedAt)
+    }
+}

@@ -133,7 +133,27 @@ public final class CloudKitTransport: SyncTransport, @unchecked Sendable {
     /// 都被挡住 —— 日志里只有「同步完成 错误=nil」，同步静默失效。
     private func performPull(cursor: String?) async throws -> (changes: [SyncChange], cursor: String?) {
         try await ensureZone()
+        do {
+            return try await pullOnce(cursor: cursor)
+        } catch {
+            // 游标失效 / zone 丢失都属于「增量拉永远拉不动」，以前直接把错误抛给上层，
+            // 游标本机还留着 → 每次同步都拿同一个废 token 重试，设备永久收不到任何数据，
+            // 界面上只有一行错误。这里退回全量：远端是字段级状态 + rev，重放是幂等的。
+            switch Self.pullRecovery(for: error) {
+            case .none:
+                throw error
+            case .fullReload:
+                NSLog("[CK] 变更游标已失效，改为全量重拉")
+                return try await pullOnce(cursor: nil)
+            case .recreateZone:
+                NSLog("[CK] 同步 zone 不存在，重建后全量重拉")
+                try? await recreateZone()
+                return try await pullOnce(cursor: nil)
+            }
+        }
+    }
 
+    private func pullOnce(cursor: String?) async throws -> (changes: [SyncChange], cursor: String?) {
         let started = Date()
         NSLog("[CK] pull 开始 cursor=\(cursor == nil ? "nil" : "有")")
 
@@ -211,6 +231,17 @@ public final class CloudKitTransport: SyncTransport, @unchecked Sendable {
         }
     }
 
+    /// 强制重建 zone：服务端把 zone 清掉（换环境 / 后台清理）后 `zoneNotFound`，
+    /// 只重建 zone 不动其它状态，然后让调用方退回全量拉。
+    private func recreateZone() async throws {
+        do {
+            _ = try await database.save(CKRecordZone(zoneID: zoneID))
+        } catch let error as CKError where error.code == .serverRecordChanged {
+            // 已存在，忽略
+        }
+        try? await _Concurrency.Task.sleep(nanoseconds: 800_000_000)
+    }
+
     /// 返回 true 表示需要建 zone；同时把标记置上，避免并发重复创建。
     private func needsZoneCreation() -> Bool {
         lock.lock()
@@ -223,6 +254,22 @@ public final class CloudKitTransport: SyncTransport, @unchecked Sendable {
     private static func isAlreadySynced(_ error: Error) -> Bool {
         guard let ckError = error as? CKError else { return false }
         return ckError.code == .serverRecordChanged || ckError.code == .batchRequestFailed
+    }
+
+    /// 增量拉失败后的自恢复动作。
+    enum PullRecovery: Equatable {
+        /// 不是可自愈的错误，照常抛给上层（网络、账号、超时…）。
+        case none
+        /// serverChangeToken 过期：丢掉游标全量拉一遍。
+        case fullReload
+        /// 服务端没有这个 zone（换环境 / 被清理）：重建后全量拉。
+        case recreateZone
+    }
+
+    static func pullRecovery(for error: Error) -> PullRecovery {
+        if isTokenExpired(error) { return .fullReload }
+        if isZoneMissing(error) { return .recreateZone }
+        return .none
     }
 
     /// 游标失效（含 partialFailure 里包着的那个）。

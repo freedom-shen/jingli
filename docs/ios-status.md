@@ -277,3 +277,69 @@ jingli://add?title=写周报   打开并预填标题
 
 `AppShortcutsProvider` 的卡片在资料库里点击时没有参数输入界面，带必填参数的 intent 会直接失败。
 所以卡片用零参数的 `OpenAddTaskIntent`（打开输入页），参数化的 `AddTaskIntent` 留给「添加操作」和 Siri。
+
+## 十二、同步静默停摆（2026-11-24 修）
+
+现象：Mac 上「开启一天」，8 件任务进了今天的计划，Mac 的 `sync_change` 全部 `pushed_at`
+都写上了；手机打开 App 依然看不到。
+
+### 怎么定位的
+
+不看 Mac 侧（它只有「推成功了没有」这一个视角），而是**起一个空库的第二实例**去拉生产库：
+
+```bash
+JINGLI_SUPPORT_DIR=/tmp/jingli-verify3 \
+  /tmp/jingli-dd/Build/Products/Debug/Jingli.app/Contents/MacOS/Jingli
+```
+
+空库实例每轮拉 6584 条记录、耗时 12 秒，然后一秒都不落地：
+
+```
+[SYNC] 同步完成 错误=Optional("SQLite error 19: NOT NULL constraint failed: task_completion.task_id")
+[CK] pull 开始 cursor=nil      ← 游标永远存不下来，下一轮还是全量
+```
+
+也就是说：**Mac 推没问题、生产库里的数据也在**（修好后同一个实例把今天那 8 件全拉回来了），
+坏在「拉到之后应用」这一步。而且坏一次就永久坏：apply 抛错 → 游标不推进 → 每 15 秒重试
+同一个坏位置 → 设备再也收不到任何新数据，界面上只留一行错误。
+
+两个独立根因，都会造成同一种「同步静默停摆」：
+
+1. **建行时字段还没到 → NOT NULL 炸整批。**
+   `task_completion` 的 `task_id` 是 NOT NULL 且没有默认值。外键重试机制本来就是为了
+   「依赖还没到」，但 `completed_at` 单独到达时会走 `ensureRow` 用 NULL 插入 `task_id`，
+   SQLite 报的是 NOT NULL（不是外键），异常直接冒到 `apply` 顶层把**整批**回滚。
+2. **change token 过期没有自恢复。** `isTokenExpired` / `isZoneMissing` 是重写 async 拉取时
+   留下的死代码（没人调用）。CloudKit 的 `serverChangeToken` 会过期，一旦过期，每次同步都
+   拿同一个废游标重试，同样永久停摆。
+
+### 修了什么
+
+| 位置 | 改动 |
+|---|---|
+| `SyncStore.apply` | 逐条兜底：外键 / NOT NULL 都压进 `sync_retry` 等字段补齐再重放；主键格式坏掉的记录跳过并留日志。**任何单条坏记录都不再回滚整批**，游标照常推进 |
+| `SyncStore.retryPending` | 所有失败都累计 `attempts`（以前只累计外键失败，会导致一条永远排最前面饿死别人），第 20/40/60… 次打日志 |
+| `CloudKitTransport.pull` | 增量拉失败按 `pullRecovery` 自愈：游标失效 → 丢掉游标全量重拉；zone 不存在 → 重建 zone 后全量重拉。全量重放是幂等的（字段级状态 + rev） |
+
+### 验证
+
+```
+空库第二实例：6584 条记录一次落地
+  103 个任务 / 8 个项目 / 28 天计划 / 150 条计划成员
+  今天 2026-11-24 started=1，8 件任务与 Mac 完全一致
+  sync_retry = 0（暂缓的那条 `taskCompletion/147531A8… completed_at` 随后重放成功）
+  第二轮 pull：cursor=有，128ms，0 条
+```
+
+回归测试：`testCompletedAtBeforeTaskIDIsStashedInsteadOfAbortingBatch`（复现原崩溃并验证重放），
+`pullRecovery` 四个用例（直接 / partialFailure 包着的 token 过期、zone 丢失、网络错误不吞）。
+
+### 现场结论
+
+生产库里的数据是好的，Mac 推得也没问题；手机是拉到之后应用失败卡住了。装上新包后，
+下一次同步会自己恢复（**不需要** `-syncreset`）。如果手机还不动，按顺序看：
+
+1. App 内 设置 → 同步，看「上次同步 / 错误」；
+2. 连机取日志：`log collect --device-name "Shenxiaominpro" --output /tmp/ios.logarchive`，
+   过滤 `[CK]` / `[SYNC]`；
+3. 仍不行再 `-syncreset` 启动一次（整库重推 + 游标清空）。

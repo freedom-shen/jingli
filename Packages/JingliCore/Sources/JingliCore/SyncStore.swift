@@ -187,6 +187,25 @@ public final class SyncStore: @unchecked Sendable {
                         // CloudKit 的 change token 不会重投，所以这里必须自己留底。
                         skipped.append(change)
                         try SyncSchema.enqueueRetry(db, change, at: Self.timestamp())
+                    } catch let error as DatabaseError
+                        where error.extendedResultCode == .SQLITE_CONSTRAINT_NOTNULL {
+                        // 建行需要的 NOT NULL 字段还没到（典型：task_completion 先收到
+                        // completed_at，而 task_id 那条还卡在重试队列里）。压进重试队列
+                        // 等字段补齐 —— **不能往上抛**：整批回滚会导致游标永不推进，
+                        // 设备就永久停在同一条记录上，表现为「同步完成 错误=…」但库不动。
+                        NSLog(
+                            "[SYNC] 字段未到，暂缓应用 \(change.entity)/\(change.entityID) "
+                                + "field=\(change.field) rev=\(change.rev): \(error)"
+                        )
+                        skipped.append(change)
+                        try SyncSchema.enqueueRetry(db, change, at: Self.timestamp())
+                    } catch let error as SyncApplyError {
+                        // 主键格式坏掉（远端数据损坏）这类永远修不好，跳过并留痕，
+                        // 别让它把整批变更一起拖死。
+                        NSLog(
+                            "[SYNC] 跳过无法应用变更 \(change.entity)/\(change.entityID) "
+                                + "field=\(change.field): \(error)"
+                        )
                     }
                 }
             }
@@ -224,16 +243,27 @@ public final class SyncStore: @unchecked Sendable {
                     )
                 }
                 succeeded += 1
-            } catch let error as DatabaseError
-                where error.extendedResultCode == .SQLITE_CONSTRAINT_FOREIGNKEY {
-                try database.queue.write { db in
+            } catch {
+                // 依赖（外键）或必需的 NOT NULL 字段还没到：留着下一轮再试。
+                // 所有失败都要累计 attempts，否则永远只有它排在最前面，把别的可重放
+                // 记录饿死。攒到一定次数打一条日志，方便真机排查「重试一直不收敛」。
+                let attempts = try database.queue.write { db -> Int in
                     try db.execute(
                         sql: "UPDATE sync_retry SET attempts = attempts + 1, last_tried_at = ? WHERE change_id = ?",
                         arguments: [Self.timestamp(), change.changeID]
                     )
+                    return try Int.fetchOne(
+                        db,
+                        sql: "SELECT attempts FROM sync_retry WHERE change_id = ?",
+                        arguments: [change.changeID]
+                    ) ?? 0
                 }
-            } catch {
-                // 其他错误先留着，下一轮再试
+                if attempts % 20 == 0 {
+                    NSLog(
+                        "[SYNC] 重放仍失败（第 \(attempts) 次）"
+                            + " \(change.entity)/\(change.entityID) field=\(change.field): \(error)"
+                    )
+                }
             }
         }
         return succeeded
