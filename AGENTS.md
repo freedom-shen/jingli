@@ -47,6 +47,7 @@ scripts/dogfood.sh
 - `JINGLI_TIMER_SECONDS` / `JINGLI_BREAK_SECONDS`：缩短计时。
 - `JINGLI_NO_NOTIFICATIONS=1`：关闭真实通知。
 - `JINGLI_NO_BACKUP=1`：关闭每日备份。
+- `JINGLI_NO_SYNC=1`：**测试脚本必须带**。关掉 CloudKit 同步；否则独立数据目录里的测试数据会被推进生产库，再被真机拉回来（2026-11-24 出过一次）。
 - `JINGLI_SHORTCUTS_BIN`：替换 `/usr/bin/shortcuts`。
 - `JINGLI_FAKE_NOW_MS`：固定当前时间（截图）。
 

@@ -18,6 +18,7 @@ fi
 )
 
 export JINGLI_SUPPORT_DIR="$TMP"
+export JINGLI_NO_SYNC=1
 
 cleanup() {
   if [ -n "${APP_PID:-}" ]; then

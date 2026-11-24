@@ -42,9 +42,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         startAgentServer()
         configureRemoteWeb()
         runDailyBackup()
-        MacSync.shared.configure(database: AppServices.shared.database) {
-            // 手机端改/删的东西被拉回来之后，主界面要重新读库才会变。
-            AppServices.shared.model.reload()
+        if ProcessInfo.processInfo.environment["JINGLI_NO_SYNC"] == "1" {
+            // 测试隔离：dogfood / agent-spike / snapshot 用的是独立数据目录，但它们连的
+            // 还是同一个 iCloud 生产库。不开这个开关的话，测试数据会被推进去、再被真机
+            // 拉回来（2026-11-24 真出过一次：测试的「写周报/回邮件」和 3 个 2 秒番茄
+            // 落进了真实库，还把今天的 day_plan 删了）。测试脚本必须带上它。
+            NSLog("[SYNC] JINGLI_NO_SYNC=1，跳过同步（测试隔离）")
+        } else {
+            MacSync.shared.configure(database: AppServices.shared.database) {
+                // 手机端改/删的东西被拉回来之后，主界面要重新读库才会变。
+                AppServices.shared.model.reload()
+            }
         }
         AppServices.shared.model.startTicking()
 

@@ -54,7 +54,7 @@ run_scenario() {
     args+=(--snapshot-panel-out "$dir/$fixture-panel.png")
   fi
 
-  JINGLI_SUPPORT_DIR="$dir/support-$fixture" "$APP/Contents/MacOS/Jingli" "${args[@]}" \
+  JINGLI_SUPPORT_DIR="$dir/support-$fixture" JINGLI_NO_SYNC=1 "$APP/Contents/MacOS/Jingli" "${args[@]}" \
     > "$dir/$fixture-run.log" 2>&1 &
   local pid=$!
   for _ in $(seq 1 60); do

@@ -319,20 +319,26 @@ final class IOSAppModel {
         store = WorkspaceStore(database: database)
         timerStore = FocusTimerStore(database: database)
         syncStore = SyncStore(database: database)
-        let service = SyncService(
-            store: syncStore,
-            engine: SyncEngine(
+        if ProcessInfo.processInfo.environment["JINGLI_NO_SYNC"] == "1" {
+            // 测试隔离：别把调试数据推进生产库。
+            syncService = nil
+            NSLog("[SYNC] JINGLI_NO_SYNC=1，跳过同步（测试隔离）")
+        } else {
+            let service = SyncService(
                 store: syncStore,
-                transport: CloudKitTransport(config: .init(containerIdentifier: CloudKitDiagnostics.containerID))
-            ),
-            debounceSeconds: 2
-        )
-        syncService = service
-        // 远端变更落地后必须主动 refresh：界面状态（snapshot）不会跟着库自己变，
-        // 不刷新的话数据已经到了、屏幕上还是旧计划，看起来就是「没同步」。
-        _Concurrency.Task { [weak self] in
-            await service.setOnRemoteChanges { [weak self] _ in
-                self?.refresh()
+                engine: SyncEngine(
+                    store: syncStore,
+                    transport: CloudKitTransport(config: .init(containerIdentifier: CloudKitDiagnostics.containerID))
+                ),
+                debounceSeconds: 2
+            )
+            syncService = service
+            // 远端变更落地后必须主动 refresh：界面状态（snapshot）不会跟着库自己变，
+            // 不刷新的话数据已经到了、屏幕上还是旧计划，看起来就是「没同步」。
+            _Concurrency.Task { [weak self] in
+                await service.setOnRemoteChanges { [weak self] _ in
+                    self?.refresh()
+                }
             }
         }
         // 本地有、但一条变更都没有的行（备份恢复 / 批量导入）补进队列
