@@ -576,6 +576,9 @@ final class IOSAppModel {
         newTimer.start(now: nowMs(), sessionID: UUID().uuidString)
         timer = newTimer
         try? timerStore.saveActive(newTimer)
+        // 计时状态镜像进 focus_session 后要尽快推出去：Mac 那边靠按轮询拉，
+        // 不主动推的话「手机上开始专注」要等十几秒才出现在 Mac 上。
+        noteSyncChange()
         let title = snapshot?.todayTasks.first { $0.id == taskID }?.title ?? "专注"
         NotificationScheduler.cancelBreakEnd()
         _Concurrency.Task { await NotificationScheduler.requestAuthorizationIfNeeded() }
@@ -597,17 +600,17 @@ final class IOSAppModel {
     /// 结果手机放着不动就永远收不到对端的数据。
     private func startSyncTimer() {
         guard syncTimer == nil else { return }
-        let timer = Timer(timeInterval: 15, repeats: true) { [weak self] _ in
+        let timer = Timer(timeInterval: 8, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated { self?.syncTick() }
         }
         RunLoop.main.add(timer, forMode: .common)
         syncTimer = timer
     }
 
-    /// 每 15 秒最多跑一次：有未推送就推，没有就拉。
+    /// 每 8 秒最多跑一次：有未推送就推，没有就拉。
     private func syncTick() {
         let now = Date()
-        guard now.timeIntervalSince(lastSyncTick) > 15 else { return }
+        guard now.timeIntervalSince(lastSyncTick) > 8 else { return }
         lastSyncTick = now
         let pending = (try? syncStore.pendingCount()) ?? 0
         if pending > 0 {
@@ -633,6 +636,7 @@ final class IOSAppModel {
         current.pause(now: nowMs())
         timer = current
         try? timerStore.saveActive(current)
+        noteSyncChange()
         NotificationScheduler.cancelFocusEnd()
         FocusActivityManager.shared.update(
             isPaused: true,
@@ -646,6 +650,7 @@ final class IOSAppModel {
         current.resume(now: nowMs())
         timer = current
         try? timerStore.saveActive(current)
+        noteSyncChange()
         NotificationScheduler.scheduleFocusEnd(
             after: current.remaining(now: nowMs()) / 1000,
             taskTitle: snapshot?.todayTasks.first { $0.id == current.taskIDs.first }?.title ?? "专注"

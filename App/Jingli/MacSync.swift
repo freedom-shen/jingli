@@ -68,8 +68,9 @@ final class MacSync {
             return
         }
         // 没有待推送也要定期拉取：App 在后台时不会触发 didBecomeActive，
-        // 只靠激活事件会一直收不到对端的新数据。
-        if now.timeIntervalSince(lastPull) > 15 {
+        // 只靠激活事件会一直收不到对端的新数据。5 秒一轮是为了「手机上开始专注 →
+        // Mac 上几秒内看到」这类即时性要求；CloudKit 每分钟十几次请求不算负担。
+        if now.timeIntervalSince(lastPull) > 5 {
             lastPull = now
             syncNow()
         }
