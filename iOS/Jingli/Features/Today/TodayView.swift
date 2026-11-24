@@ -30,6 +30,10 @@ struct TodayView: View {
                         .padding(.top, 14)
                 }
 
+                if let remote = model.remoteFocus {
+                    remoteFocusBanner(remote).padding(.top, 14)
+                }
+
                 assistantEntry.padding(.top, 14)
 
                 if mainTasks.isEmpty && tempTasks.isEmpty {
@@ -77,6 +81,39 @@ struct TodayView: View {
                 detailTask = mainTasks.first { !$0.done } ?? mainTasks.first
             }
         }
+    }
+
+    /// 另一台设备（Mac）正在专注什么 —— 计时器本身不同步，靠 focus_session 的镜像行。
+    private func remoteFocusBanner(_ remote: RemoteFocusSession) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: "desktopcomputer")
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(Tokens.accent)
+                .frame(width: 32, height: 32)
+                .background(Tokens.accent.opacity(0.12), in: Circle())
+
+            VStack(alignment: .leading, spacing: 3) {
+                HStack(spacing: 8) {
+                    Text("Mac 上正在专注")
+                        .font(.system(size: 13.5, weight: .semibold))
+                        .foregroundStyle(Tokens.text)
+                    Text(remote.remainingText())
+                        .font(.system(size: 11.5))
+                        .foregroundStyle(Tokens.text3)
+                }
+                Text(remote.titleText)
+                    .font(.system(size: 11.5))
+                    .foregroundStyle(Tokens.text3)
+                    .lineLimit(1)
+            }
+            Spacer()
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 11)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Tokens.card, in: RoundedRectangle(cornerRadius: 14))
+        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Tokens.accent.opacity(0.20)))
+        .accessibilityIdentifier("today.remoteFocus")
     }
 
     /// 首页最显眼的入口：一句话交给助手去改计划。

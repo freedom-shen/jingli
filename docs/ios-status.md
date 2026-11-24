@@ -347,3 +347,50 @@ JINGLI_SUPPORT_DIR=/tmp/jingli-verify3 \
 2. 连机取日志：`log collect --device-name "Shenxiaominpro" --output /tmp/ios.logarchive`，
    过滤 `[CK]` / `[SYNC]`；
 3. 仍不行再 `-syncreset` 启动一次（整库重推 + 游标清空）。
+
+## 十三、跨端看到「正在进行」（2026-11-24）
+
+Mac 上开始一轮番茄之后，手机上「今天」页看不到你在专注什么 —— 这不是 bug 修坏了，是原先就没有：
+
+- 计时器状态存在 `setting.active_timer`，`setting` 表**不参与同步**（设备本地状态）；
+- `focus_session` 只在**完成后**才写一行，进行中的这一轮在云端根本不存在。
+
+所以另一台设备既没有"正在进行"的数据，也没有地方显示。设计文档里其实留过这个位置
+（`Presence` 心跳：`platform` / `activeTaskIDs` / `endsAt`，见 `ios-icloud-design.md` §6.6），
+只是一直没实现。这次按更轻的方式补上：
+
+### 做法：把进行中的一轮镜像进 `focus_session`
+
+| 时机 | 写入 |
+|---|---|
+| 开始 / 暂停 / 恢复 | `focus_session` 行，`status = running / paused`，`ended_at` 先写"预计结束时间"，`credited = 0`；`focus_session_task` 重建参与任务与分摊 |
+| 正常完成 | 沿用原来的 `complete()`：同一行改成 `status = completed`、`ended_at` = 实际结束、`credited = 1` |
+| 放弃 / 换一轮 | 旧行收成 `status = aborted`（不计入任何统计） |
+
+**统计口径不受影响**：今日番茄、历史、小组件、任务分摊全部只读 `status = 'completed'`，
+进行中的行对它们不可见（已有单测覆盖）。
+
+读取侧新增 `WorkspaceStore.remoteFocusSession(today:excluding:)`：
+
+- 只看今天的 `running / paused` 行，排除本机自己的 session；
+- 预计结束超过 15 分钟还没收尾的（对面崩溃 / 卸载）当作不存在；
+- 返回任务标题、预计结束时间、是否暂停。
+
+两端各自在 `reload()` / `refresh()` 里读它（本机正在计时时不显示，避免"自己看自己"）：
+
+- iPhone「今天」页顶部：**「Mac 上正在专注 · 剩 23 分钟 / 任务名」**
+- Mac「今天」页顶部：**「iPhone 上正在专注 · …」**
+
+![跨端正在进行](artifacts/ios/remote-focus-banner.png)
+
+### 验证
+
+- 真机 / 模拟器上都靠**注入一条 running 行**验证过渲染（截图上面的就是模拟器）；
+- `RemoteFocusTests` 5 个用例：开始→对面可见且今日番茄仍为 0；完成后对面消失且正好 +1 番茄；
+  暂停显示「已暂停」、恢复又有倒计时；放弃后对面消失；本机自己的 session 被排除；过期 running 行会隐藏。
+
+### 边界（v1 不做）
+
+- **只读**：手机上看到的是 Mac 在专注，不能在手机上暂停/结束那一轮；
+- 两端同时计时：各记各的，界面上以本机为准（另一台的显示让位给本机的计时器）；
+- 秒级倒计时没有同步：对面按分钟显示，靠 15 秒一轮的同步刷新。

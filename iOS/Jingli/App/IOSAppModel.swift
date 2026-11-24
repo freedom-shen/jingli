@@ -24,6 +24,8 @@ final class IOSAppModel {
     private(set) var projectGroups: [ProjectGroup] = []
     private(set) var today: String = DayKey.make()
     private(set) var timer: FocusTimer?
+    /// 另一台设备正在进行的番茄钟（本机没在计时时才显示）。
+    private(set) var remoteFocus: RemoteFocusSession?
     private(set) var pendingCompletion: FocusCompletion?
     private(set) var breakEndsAt: Date?
     private(set) var breakMinutes: Int = 0
@@ -453,6 +455,9 @@ final class IOSAppModel {
                 )
             }
             timer = try timerStore.loadActive(today: today)
+            remoteFocus = timer == nil
+                ? (try? store.remoteFocusSession(excluding: timer?.sessionID))
+                : nil
         } catch {
             errorText = error.localizedDescription
         }

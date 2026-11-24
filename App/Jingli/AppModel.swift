@@ -24,6 +24,8 @@ final class AppModel: ObservableObject {
     @Published private(set) var projectTaskCounts: [String: Int] = [:]
     /// 今天已完成（收工）的番茄数，浮窗待机态用。
     @Published private(set) var todayPomodoroCount = 0
+    /// 另一台设备正在进行的番茄钟（本机没在计时时才显示）。
+    @Published private(set) var remoteFocus: RemoteFocusSession?
     @Published var detailTask: Task?
     @Published private(set) var stats: TodayStats?
     @Published var isCommandBarPresented = false
@@ -144,6 +146,9 @@ final class AppModel: ObservableObject {
             } else {
                 selected = Set(next.selection)
             }
+            remoteFocus = timer == nil
+                ? (try? store.remoteFocusSession(excluding: timer?.sessionID))
+                : nil
             if case let .project(id) = page,
                !next.projects.contains(where: { $0.id == id }) {
                 page = .projects
