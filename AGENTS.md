@@ -14,7 +14,10 @@
 
 - 改完代码必须跑 `scripts/self-test.sh --fast`；提交前跑 `--full`。
 - 每个阶段结束 `commit` + `push` 到 `main`；不要只本地提交。
-- 每个打包版本必须有 tag：`scripts/package.sh` 会在打包成功后自动创建并推送 `v<版本号>` tag。手工打包也要补 tag（`git tag -a vX.Y.Z -m "Jingli X.Y.Z" && git push origin vX.Y.Z`）。
+- 每个打包版本必须有 tag：`scripts/package.sh` 会在打包成功后自动创建并推送 Mac 的 `v<版本号>` tag。
+  手工打包也要补 tag（`git tag -a vX.Y.Z -m "Jingli X.Y.Z" && git push origin vX.Y.Z`）。
+- iOS 装到真机后补 tag：`scripts/tag-ios.sh`（读 `iOS/project.yml` 的版本号，打 `v<版本号>` 并推送；
+  补历史版本用 `scripts/tag-ios.sh <commit>`）。仓库里没有安卓端，只有 macOS App + iOS App + `Packages/JingliCore`。
 - UI 文案改动后先 `scripts/snapshot.sh --update`，基线图随 commit 一起提交。
 - 不提交数据库、备份、真实任务数据、token。
 - 不改动用户系统设置：勿扰只走用户创建的 Shortcuts，不碰私有 API、不做 Control Center UI 脚本。
