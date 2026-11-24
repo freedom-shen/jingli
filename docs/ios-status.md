@@ -312,6 +312,9 @@ JINGLI_SUPPORT_DIR=/tmp/jingli-verify3 \
 2. **change token 过期没有自恢复。** `isTokenExpired` / `isZoneMissing` 是重写 async 拉取时
    留下的死代码（没人调用）。CloudKit 的 `serverChangeToken` 会过期，一旦过期，每次同步都
    拿同一个废游标重试，同样永久停摆。
+3. **数据进库了界面不刷新。** 两端的 `snapshot` 都是主动 `reload()` 出来的，不是响应式
+   observation：iOS 每 15 秒拉一次，拉回来的变更只落库，屏幕上还是旧的 `snapshot`。
+   这种情况最容易被当成「没同步」——库里有、界面没有，直到切页面 / 重启 App 才突然出现。
 
 ### 修了什么
 
@@ -320,6 +323,7 @@ JINGLI_SUPPORT_DIR=/tmp/jingli-verify3 \
 | `SyncStore.apply` | 逐条兜底：外键 / NOT NULL 都压进 `sync_retry` 等字段补齐再重放；主键格式坏掉的记录跳过并留日志。**任何单条坏记录都不再回滚整批**，游标照常推进 |
 | `SyncStore.retryPending` | 所有失败都累计 `attempts`（以前只累计外键失败，会导致一条永远排最前面饿死别人），第 20/40/60… 次打日志 |
 | `CloudKitTransport.pull` | 增量拉失败按 `pullRecovery` 自愈：游标失效 → 丢掉游标全量重拉；zone 不存在 → 重建 zone 后全量重拉。全量重放是幂等的（字段级状态 + rev） |
+| `SyncService.setOnRemoteChanges` | 真有远端变更落地时回调；iOS 回调 `refresh()`、Mac 回调 `reload()`。以前两端拉回来都不刷新界面 |
 
 ### 验证
 

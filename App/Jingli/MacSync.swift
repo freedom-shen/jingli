@@ -20,11 +20,11 @@ final class MacSync {
 
     private init() {}
 
-    func configure(database: JingliDatabase) {
+    func configure(database: JingliDatabase, onRemoteChanges: (@MainActor @Sendable () -> Void)? = nil) {
         guard service == nil else { return }
         let store = SyncStore(database: database)
         self.store = store
-        service = SyncService(
+        let service = SyncService(
             store: store,
             engine: SyncEngine(
                 store: store,
@@ -32,6 +32,13 @@ final class MacSync {
             ),
             debounceSeconds: 1.5
         )
+        self.service = service
+        if let onRemoteChanges {
+            // 拉回来的变更只进了库，不会自动出现在界面上（AppModel.snapshot 是主动 reload 的）。
+            _Concurrency.Task {
+                await service.setOnRemoteChanges { _ in onRemoteChanges() }
+            }
+        }
         // 启用同步之前就有的任务不会自己进队列，第一次跑时补一遍
         let backfilled = (try? store.backfillIfNeeded()) ?? 0
         if backfilled > 0 {

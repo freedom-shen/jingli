@@ -180,3 +180,33 @@ extension SyncEngineTests {
         )
     }
 }
+
+// MARK: - 远端变更落地后要通知界面刷新
+
+extension SyncEngineTests {
+    /// 两端都不是「库一变界面就变」的响应式 UI，拉回来的变更必须主动通知 reload，
+    /// 否则数据进库了、屏幕还是旧计划（真机上表现成「没同步」）。
+    func testRemoteChangesNotifyUIOncePerAppliedBatch() async throws {
+        let transport = FakeTransport()
+        let a = try makeDevice(transport)
+        let b = try makeDevice(transport)
+
+        _ = try a.store.createTask(title: "从 A 来", lane: "temporary")
+        _ = try await a.engine.syncOnce()
+
+        let notified = expectation(description: "远端变更落地后回调一次")
+        notified.assertForOverFulfill = true
+        let service = SyncService(store: b.sync, engine: b.engine, debounceSeconds: 0)
+        await service.setOnRemoteChanges { report in
+            XCTAssertGreaterThan(report.applied, 0)
+            notified.fulfill()
+        }
+
+        _ = await service.syncNow()
+        await fulfillment(of: [notified], timeout: 3)
+
+        // 第二轮没有新变更，不该再刷新（否则每 15 秒白重建一次界面）。
+        _ = await service.syncNow()
+        try await _Concurrency.Task.sleep(nanoseconds: 150_000_000)
+    }
+}

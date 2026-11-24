@@ -42,7 +42,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         startAgentServer()
         configureRemoteWeb()
         runDailyBackup()
-        MacSync.shared.configure(database: AppServices.shared.database)
+        MacSync.shared.configure(database: AppServices.shared.database) {
+            // 手机端改/删的东西被拉回来之后，主界面要重新读库才会变。
+            AppServices.shared.model.reload()
+        }
         AppServices.shared.model.startTicking()
 
         if CommandLine.arguments.contains("--show-panel")

@@ -21,6 +21,12 @@ public actor SyncService {
     private var lastSyncAt: Date?
     private var lastError: String?
     private var syncing = false
+    /// 远端变更落地后回调，让界面重新读库。
+    ///
+    /// 两端都不是「数据库一变就自动刷新」的响应式 UI：iOS 的 `snapshot` 和 Mac 的
+    /// `snapshot` 都是主动 reload 出来的。不回调的话，数据已经进库了，界面还停在旧状态，
+    /// 看起来就像「没同步」。
+    private var onRemoteChanges: (@MainActor @Sendable (SyncReport) -> Void)?
 
     public init(
         store: SyncStore,
@@ -33,6 +39,13 @@ public actor SyncService {
         self.debounceSeconds = max(0, debounceSeconds)
         self.retryBaseSeconds = max(0, retryBaseSeconds)
         self.lastSyncAt = try? store.lastSyncAt()
+    }
+
+    /// 设置「远端变更已落地」的回调（界面 reload 用）。
+    public func setOnRemoteChanges(
+        _ handler: (@MainActor @Sendable (SyncReport) -> Void)?
+    ) {
+        onRemoteChanges = handler
     }
 
     /// 本地有写入时调用（可以高频，去抖兜住）。
@@ -72,7 +85,7 @@ public actor SyncService {
         // 游标不保存、状态栏还挂着一条假失败。
         let engine = self.engine
         do {
-            _ = try await _Concurrency.Task.detached(priority: .utility) {
+            let report = try await _Concurrency.Task.detached(priority: .utility) {
                 try await engine.syncOnce()
             }.value
             lastSyncAt = Date()
@@ -81,6 +94,10 @@ public actor SyncService {
             retryTask?.cancel()
             retryTask = nil
             try? store.setLastSyncAt(lastSyncAt)
+            // 只有真有变更落地才刷新，避免每 15 秒无谓地重建一次界面状态。
+            if report.applied > 0 || report.retried > 0, let onRemoteChanges {
+                await onRemoteChanges(report)
+            }
         } catch is CancellationError {
             // 被新的同步周期打断（去抖任务被取消），不是真失败，下一轮会重来。
         } catch {
