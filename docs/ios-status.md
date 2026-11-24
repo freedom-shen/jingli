@@ -50,6 +50,9 @@ xcodebuild -project iOS/Jingli.xcodeproj -scheme Jingli -configuration Debug \
 xcodebuild -project iOS/Jingli.xcodeproj -scheme Jingli -configuration Debug \
   -destination 'id=<硬件UDID>' -derivedDataPath /tmp/jingli-ios-dd -allowProvisioningUpdates build
 xcrun devicectl device install app --device <UDID> /tmp/jingli-ios-dd/Build/Products/Debug-iphoneos/Jingli.app
+
+# 装完补 tag（Mac 的 tag 由 package.sh 自动打）：
+scripts/tag-ios.sh
 ```
 
 真机截图（`idevicescreenshot` 在 iOS 17+ 失效）：
