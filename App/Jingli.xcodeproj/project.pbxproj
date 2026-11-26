@@ -28,7 +28,6 @@
 		52A23BD3CE1C7F2F7DC6CC11 /* FloatingPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0ABF6A9D1C7AB24D1BDC9F2 /* FloatingPanelView.swift */; };
 		5861A4B37B65732741CF75C8 /* CompletionOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01AAF237ABC51D878145362B /* CompletionOverlay.swift */; };
 		6640A7A6D24035C87D88E994 /* SnapshotRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB557493D0233C0F0F8F7769 /* SnapshotRunner.swift */; };
-		672B2D4851A9273583E51AF0 /* MenuBarLookTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42D0430A6219D15990BB3D67 /* MenuBarLookTests.swift */; };
 		7285AC638AED9542BE2AEDEB /* AssistantHistoryPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 366F5362F5A9D822BF20ADC1 /* AssistantHistoryPersistenceTests.swift */; };
 		75E586C7AA8F2C9A6B240CB4 /* DetailedStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D23A24681F9778A908DCD9 /* DetailedStatsView.swift */; };
 		7BCF357191B3DEB13320C106 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81B1C4AAD464F2EE7768EFD7 /* MenuBarView.swift */; };
@@ -43,6 +42,7 @@
 		AE5E95FED3D3F8CFB42AA741 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E13E357DCCBD85D8BA129B9 /* TodayView.swift */; };
 		B407DA8F60F40AA58E0A9AC2 /* ProjectListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 938ED09AFAC7425161A796E1 /* ProjectListView.swift */; };
 		B862C145333F68C7C2EF3F26 /* ProjectDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D8D22FCAA3726195BB9946 /* ProjectDetailView.swift */; };
+		BAE42AA881902A9DB3F1548F /* MenuBarIconTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9219CFE0712EE730DFD7CD /* MenuBarIconTests.swift */; };
 		BFBF0D6A490FBF4989631CA0 /* LaunchAtLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31FB7081008519F3A38A422 /* LaunchAtLogin.swift */; };
 		C5C7BD4840CF8D4C26A5BAAE /* AssistantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4CA4D40EEE596681D7D2A0D /* AssistantView.swift */; };
 		C8105E25A8F30B4F8D83B091 /* ProjectEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8FB027571F00346C816CA6B /* ProjectEditorView.swift */; };
@@ -75,7 +75,6 @@
 		23282FBCAAF704EFB886502E /* ModelConfigSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelConfigSheet.swift; sourceTree = "<group>"; };
 		366F5362F5A9D822BF20ADC1 /* AssistantHistoryPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssistantHistoryPersistenceTests.swift; sourceTree = "<group>"; };
 		42B8EFE26C4003553A17C101 /* AssistantModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssistantModel.swift; sourceTree = "<group>"; };
-		42D0430A6219D15990BB3D67 /* MenuBarLookTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarLookTests.swift; sourceTree = "<group>"; };
 		4B4E251DE0C315724C6D9C37 /* FloatingPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingPanel.swift; sourceTree = "<group>"; };
 		4BB8767B7A713D102C631EF4 /* TaskCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskCard.swift; sourceTree = "<group>"; };
 		52259A025FBADDF236368319 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -102,6 +101,7 @@
 		B292D7657F8360D9F3BCFA4A /* RemoteWebSettingsContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteWebSettingsContent.swift; sourceTree = "<group>"; };
 		BC9132AD735BBAC0E9757EBB /* AssistantPasteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssistantPasteTests.swift; sourceTree = "<group>"; };
 		BDD74A624DACE35D5575E551 /* JingliTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JingliTests.swift; sourceTree = "<group>"; };
+		BF9219CFE0712EE730DFD7CD /* MenuBarIconTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarIconTests.swift; sourceTree = "<group>"; };
 		C0ABF6A9D1C7AB24D1BDC9F2 /* FloatingPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingPanelView.swift; sourceTree = "<group>"; };
 		C3D8D22FCAA3726195BB9946 /* ProjectDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectDetailView.swift; sourceTree = "<group>"; };
 		C83A472429AD9810CBDA7853 /* MacSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacSync.swift; sourceTree = "<group>"; };
@@ -217,7 +217,7 @@
 				BC9132AD735BBAC0E9757EBB /* AssistantPasteTests.swift */,
 				ED92CD930859807E237E8141 /* FocusStreakAppTests.swift */,
 				BDD74A624DACE35D5575E551 /* JingliTests.swift */,
-				42D0430A6219D15990BB3D67 /* MenuBarLookTests.swift */,
+				BF9219CFE0712EE730DFD7CD /* MenuBarIconTests.swift */,
 			);
 			path = JingliTests;
 			sourceTree = "<group>";
@@ -495,7 +495,7 @@
 				2C317F7F9F8919C54C7E38AB /* AssistantPasteTests.swift in Sources */,
 				132EEDD3F864BE1F8EEA7F16 /* FocusStreakAppTests.swift in Sources */,
 				F09691D382E6B33E87DDDAA4 /* JingliTests.swift in Sources */,
-				672B2D4851A9273583E51AF0 /* MenuBarLookTests.swift in Sources */,
+				BAE42AA881902A9DB3F1548F /* MenuBarIconTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -516,7 +516,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Jingli.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 71;
+				CURRENT_PROJECT_VERSION = 72;
 				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "精力管理";
@@ -527,7 +527,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.6.66;
+				MARKETING_VERSION = 0.6.67;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.freedom-shen.jingli";
 				PRODUCT_NAME = Jingli;
 				SDKROOT = macosx;
@@ -615,7 +615,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Jingli.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 71;
+				CURRENT_PROJECT_VERSION = 72;
 				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "精力管理";
@@ -626,7 +626,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.6.66;
+				MARKETING_VERSION = 0.6.67;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.freedom-shen.jingli";
 				PRODUCT_NAME = Jingli;
 				SDKROOT = macosx;
