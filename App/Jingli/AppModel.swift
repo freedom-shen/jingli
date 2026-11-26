@@ -832,6 +832,10 @@ final class AppModel: ObservableObject {
         page = .settings
     }
 
+    func openAssistant() {
+        page = .assistant
+    }
+
     func openCommandBar() {
         commandText = ""
         commandMessage = nil
@@ -1055,6 +1059,7 @@ enum AppPage: Equatable {
     case temporaryTasks
     case stats
     case settings
+    case assistant
 }
 
 enum TaskFocusState {

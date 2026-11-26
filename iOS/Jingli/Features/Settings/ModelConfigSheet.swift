@@ -1,5 +1,6 @@
 import SwiftUI
 import JingliCore
+import JingliAgent
 
 /// 模型配置：Key 存 Keychain，其余存 UserDefaults。
 struct ModelConfigSheet: View {

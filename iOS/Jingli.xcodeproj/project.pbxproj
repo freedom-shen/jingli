@@ -39,7 +39,6 @@
 		CCDCDCAF3E3F7B69ACCB414E /* AddTaskIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3971FCA657FFF3EC4AAEFB17 /* AddTaskIntent.swift */; };
 		CE4F61388333ED626B1C2209 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94DA84C0289342098B879CF7 /* RootView.swift */; };
 		CE9946856F92945520DA423F /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52259A025FBADDF236368319 /* SettingsView.swift */; };
-		E168534876EB5A9DD6B461B6 /* LLMConfigStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6F49F42964661894DFC6505 /* LLMConfigStore.swift */; };
 		E42CDDC5445BFF8A92F861F1 /* SpeechTranscriber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E8578DB1995AD591E503C7E /* SpeechTranscriber.swift */; };
 		F625D24EAAD9431C3DD34766 /* JingliAgent in Frameworks */ = {isa = PBXBuildFile; productRef = EAA9E68DDA2E88E9D6B0FB5E /* JingliAgent */; };
 		F7A54B477261A61BB05228BF /* Tokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67D83A0B37B580F15B3BA038 /* Tokens.swift */; };
@@ -94,7 +93,6 @@
 		999E063A1C0C38F59C897B70 /* TaskDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDetailView.swift; sourceTree = "<group>"; };
 		9EC5DD3FEF40C5D4840C361A /* NotificationScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationScheduler.swift; sourceTree = "<group>"; };
 		9F92BC65678CFBDB340EB288 /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
-		A6F49F42964661894DFC6505 /* LLMConfigStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMConfigStore.swift; sourceTree = "<group>"; };
 		A7D8943A027AE96346006510 /* FocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusView.swift; sourceTree = "<group>"; };
 		AD7A6112EF268FFFA3842620 /* CompletionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionSheet.swift; sourceTree = "<group>"; };
 		AF91080BEE838D76644B2A15 /* voice-sample.m4a */ = {isa = PBXFileReference; path = "voice-sample.m4a"; sourceTree = "<group>"; };
@@ -314,7 +312,6 @@
 				55714AEEEE8B49D57E21ED9B /* CloudKitDiagnostics.swift */,
 				3E21D64797BDA89522113657 /* FocusActivityManager.swift */,
 				7725BAEB1AECAA6F13EF9E9D /* IOSAppModel.swift */,
-				A6F49F42964661894DFC6505 /* LLMConfigStore.swift */,
 				9EC5DD3FEF40C5D4840C361A /* NotificationScheduler.swift */,
 			);
 			path = App;
@@ -447,7 +444,6 @@
 				B800971455EFD789C087E55D /* FocusView.swift in Sources */,
 				8CD57953E872AF7A6FAF691D /* IOSAppModel.swift in Sources */,
 				A5465BE37DBAA78A1FB3C1A9 /* JingliApp.swift in Sources */,
-				E168534876EB5A9DD6B461B6 /* LLMConfigStore.swift in Sources */,
 				1326EC79E599093713EEC968 /* ModelConfigSheet.swift in Sources */,
 				55C99EBE4E9EBC61FE8A4BBB /* NotificationScheduler.swift in Sources */,
 				691529F196F6FD5813FDCFE0 /* ProjectsView.swift in Sources */,

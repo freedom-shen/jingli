@@ -5,6 +5,11 @@ import JingliCore
 struct RootView: View {
     @ObservedObject private var model = AppServices.shared.model
     @ObservedObject private var floatingPanel = FloatingPanelController.shared
+    @StateObject private var assistant: AssistantModel
+
+    init(assistant: AssistantModel? = nil) {
+        _assistant = StateObject(wrappedValue: assistant ?? AssistantModel())
+    }
 
     var body: some View {
         ZStack {
@@ -68,6 +73,8 @@ struct RootView: View {
             StatsView(model: model)
         case .settings:
             SettingsView(model: model)
+        case .assistant:
+            AssistantView(model: assistant, app: model)
         case .day:
             if let snapshot = model.snapshot {
                 if snapshot.dayStarted {
@@ -93,6 +100,9 @@ struct RootView: View {
             }
             navigationButton("临时任务", icon: "bolt", selected: model.page == .temporaryTasks, identifier: "temporary-navigation") {
                 model.openTemporaryTasks()
+            }
+            navigationButton("助手", icon: "sparkles", selected: model.page == .assistant, identifier: "assistant-navigation") {
+                model.openAssistant()
             }
             Spacer()
             navigationButton("统计", icon: "chart.bar", selected: model.page == .stats, identifier: "stats-button") {
@@ -135,7 +145,7 @@ struct RootView: View {
 
     private var topBar: some View {
         HStack(alignment: .firstTextBaseline, spacing: 12) {
-            if model.page != .day {
+            if model.page != .day, model.page != .assistant {
                 Button {
                     model.goBack()
                 } label: {
@@ -200,7 +210,7 @@ struct RootView: View {
                 iconButton("plus", label: "新建临时任务", identifier: "new-temporary-task-button") {
                     model.openTaskEditor(lane: "temporary")
                 }
-            case .stats, .settings:
+            case .stats, .settings, .assistant:
                 EmptyView()
             }
 
@@ -278,6 +288,8 @@ struct RootView: View {
             return "统计"
         case .settings:
             return "设置"
+        case .assistant:
+            return "助手"
         case .day:
             return model.dayStarted ? "今日任务" : "开启一天"
         }

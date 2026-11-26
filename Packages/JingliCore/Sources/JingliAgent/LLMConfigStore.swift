@@ -1,27 +1,46 @@
 import Foundation
 import Security
 
-struct LLMConfig: Sendable, Equatable {
-    var baseURL: String
-    var model: String
-    var session: String
-    var apiKey: String
+/// 模型配置。Key 只进 Keychain，其余进 UserDefaults —— 仓库和配置文件里永远没有密钥。
+public struct LLMConfig: Sendable, Equatable {
+    public var baseURL: String
+    public var model: String
+    public var session: String
+    public var apiKey: String
 
-    static let defaultBase = "https://api.deepseek.com/v1"
-    static let defaultModel = "deepseek-chat"
+    public static let defaultBase = "https://api.deepseek.com/v1"
+    public static let defaultModel = "deepseek-chat"
 
-    var isReady: Bool { !apiKey.isEmpty && !baseURL.isEmpty && !model.isEmpty }
+    public init(baseURL: String, model: String, session: String, apiKey: String) {
+        self.baseURL = baseURL
+        self.model = model
+        self.session = session
+        self.apiKey = apiKey
+    }
+
+    public var isReady: Bool { !apiKey.isEmpty && !baseURL.isEmpty && !model.isEmpty }
+
+    /// 发给 OpenAI 兼容接口的 provider；没配好返回 nil。
+    public func makeProvider() -> OpenAICompatibleProvider? {
+        guard isReady, let url = URL(string: baseURL) else { return nil }
+        var headers: [String: String] = [:]
+        if !session.isEmpty { headers["x-opencode-session"] = session }
+        return OpenAICompatibleProvider(config: .init(
+            baseURL: url,
+            model: model,
+            apiKey: apiKey,
+            extraHeaders: headers
+        ))
+    }
 }
 
-/// Key 存 Keychain，其余（baseURL / model / session）存 UserDefaults。
-/// 仓库里永远没有任何密钥。
-enum LLMConfigStore {
+public enum LLMConfigStore {
     private static let keychainKey = "com.freedom-shen.jingli.llm.apikey"
     private static let baseDefaultsKey = "llm.baseURL"
     private static let modelDefaultsKey = "llm.model"
     private static let sessionDefaultsKey = "llm.session"
 
-    static func load() -> LLMConfig {
+    public static func load() -> LLMConfig {
         let defaults = UserDefaults.standard
         return LLMConfig(
             baseURL: defaults.string(forKey: baseDefaultsKey) ?? LLMConfig.defaultBase,
@@ -31,7 +50,7 @@ enum LLMConfigStore {
         )
     }
 
-    static func save(_ config: LLMConfig) {
+    public static func save(_ config: LLMConfig) {
         let defaults = UserDefaults.standard
         defaults.set(config.baseURL, forKey: baseDefaultsKey)
         defaults.set(config.model, forKey: modelDefaultsKey)
@@ -44,7 +63,7 @@ enum LLMConfigStore {
     }
 
     /// 调试/联调：用环境变量覆盖，不写进任何存储。
-    static func fromEnvironment() -> LLMConfig? {
+    public static func fromEnvironment() -> LLMConfig? {
         let env = ProcessInfo.processInfo.environment
         guard let key = env["JINGLI_LLM_KEY"], !key.isEmpty else { return nil }
         return LLMConfig(

@@ -27,14 +27,16 @@ targets:
       - package: JingliCore
         product: JingliAgentSocket
       - package: JingliCore
+        product: JingliAgent
+      - package: JingliCore
         product: JingliSync
     settings:
       base:
         PRODUCT_NAME: Jingli
         PRODUCT_BUNDLE_IDENTIFIER: com.freedom-shen.jingli
         CODE_SIGN_ENTITLEMENTS: Jingli.entitlements
-        MARKETING_VERSION: "0.6.63"
-        CURRENT_PROJECT_VERSION: "68"
+        MARKETING_VERSION: "0.6.64"
+        CURRENT_PROJECT_VERSION: "69"
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: 精力管理
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity

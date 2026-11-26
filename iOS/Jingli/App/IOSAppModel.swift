@@ -60,17 +60,7 @@ final class IOSAppModel {
 
     var assistantReady: Bool { llmConfig.isReady }
 
-    var provider: OpenAICompatibleProvider? {
-        guard llmConfig.isReady, let url = URL(string: llmConfig.baseURL) else { return nil }
-        var headers: [String: String] = [:]
-        if !llmConfig.session.isEmpty { headers["x-opencode-session"] = llmConfig.session }
-        return OpenAICompatibleProvider(config: .init(
-            baseURL: url,
-            model: llmConfig.model,
-            apiKey: llmConfig.apiKey,
-            extraHeaders: headers
-        ))
-    }
+    var provider: OpenAICompatibleProvider? { llmConfig.makeProvider() }
 
     func send(_ text: String, images: [ImageAttachment] = []) async {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)

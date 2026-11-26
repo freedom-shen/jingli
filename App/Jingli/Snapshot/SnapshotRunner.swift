@@ -72,6 +72,9 @@ enum SnapshotRunner {
                 try seedStandby()
                 AppServices.shared.model.reload()
                 captureMainAndPanel(mainPath: mainPath, panelPath: panelPath)
+            case "assistant":
+                let assistant = try seedAssistant()
+                captureMainAndPanel(mainPath: mainPath, panelPath: nil, assistant: assistant)
             case "task-detail":
                 let task = try seedTaskDetail()
                 captureTaskDetail(task: task, to: mainPath)
@@ -84,9 +87,13 @@ enum SnapshotRunner {
         }
     }
 
-    private static func captureMainAndPanel(mainPath: String, panelPath: String?) {
+    private static func captureMainAndPanel(
+        mainPath: String,
+        panelPath: String?,
+        assistant: AssistantModel? = nil
+    ) {
         let window = makeWindow(rootView: AnyView(
-            RootView()
+            RootView(assistant: assistant)
                 .environment(\.controlActiveState, .key)
                 .frame(width: 1440, height: 900)
                 .preferredColorScheme(.dark)
@@ -177,6 +184,24 @@ enum SnapshotRunner {
             }
             exit(0)
         }
+    }
+
+    private static func seedAssistant() throws -> AssistantModel {
+        let store = AppServices.shared.store
+        let today = DayKey.make()
+        let project = try store.createProject(name: "工作", description: "本周重点")
+        let first = try store.createTask(title: "FMP改造", projectID: project.id, lane: "main")
+        let second = try store.createTask(title: "自定义组件的调试查看", projectID: project.id, lane: "main")
+        let third = try store.createTask(title: "评审设计稿", projectID: nil, lane: "temporary")
+        try store.startDay(taskIDs: [first.id, second.id, third.id], today: today)
+        _ = try store.updateTask(id: second.id, title: second.title, note: second.note, estimate: 2)
+        _ = try store.updateTask(id: third.id, title: third.title, note: third.note, estimate: 2)
+
+        let assistant = AssistantModel()
+        assistant.seedSnapshotConversation()
+        AppServices.shared.model.reload()
+        AppServices.shared.model.openAssistant()
+        return assistant
     }
 
     private static func seedToday() throws -> Task {
