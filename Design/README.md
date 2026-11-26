@@ -50,8 +50,8 @@ done
 
 | 屏 | 锚点 | 产物 |
 |---|---|---|
-| 助手（对话 + 今日上下文 + 模型状态） | `#assistant` | `preview/05-assistant.png` |
-| 模型配置（Key 进 Keychain） | `#config` | `preview/06-model-config.png` |
+| 助手（对话 + 图片输入 + 今日上下文 + 模型状态） | `#assistant` | `preview/05-assistant.png` |
+| 模型配置（Key 进 Keychain，标注模型是否吃图） | `#config` | `preview/06-model-config.png` |
 
 ```bash
 CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
@@ -64,6 +64,8 @@ CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 ```
 
 `#config` 靠 `:target` 隐藏另一屏——Chrome 的 `--screenshot` 不会自己跳锚点。
+
+图片输入的口径：`⌘V` 粘贴、拖文件进窗口、点回形针三个入口都进同一个附件区；单张 10 MB 上限，超过先缩到 1024 px 再发（只缩发出去的那份，原图不动）；一次最多 4 张。能不能贴图取决于模型——`ModelProvider` 的 `ChatMessage` 需要一种带图片的 content，配置页用一个「支持图片」标记告诉用户当前模型吃不吃图，不吃就在输入框拦住。
 
 设计口径：助手调的是 iOS 那套 `JingliAgent`（同一份 `ToolCatalog`、同一个 `AgentCommandRouter`），所以每条写操作都落成可查看 / 可撤销的卡片；模型配置只多一个「测试连接」，规则（4 件主线、临时不挂项目、预估 1–32）仍然在代码里兜底，不靠提示词。
 

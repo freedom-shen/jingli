@@ -56,7 +56,7 @@
   /* ---------- 主体 ---------- */
   .content {
     height: calc(900px - 28px);
-    padding: 44px 64px 40px;
+    padding: 40px 64px 34px;
     display: flex;
     flex-direction: column;
   }
@@ -93,19 +93,19 @@
     display: grid;
     grid-template-columns: 1fr 336px;
     gap: 40px;
-    margin-top: 26px;
+    margin-top: 22px;
     flex: 1;
     min-height: 0;
   }
 
   /* ---------- 对话 ---------- */
-  .chat { display: flex; flex-direction: column; gap: 14px; min-height: 0; }
+  .chat { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
   /* 对话贴着输入框往下排，历史往上滚 */
-  .scroll { display: flex; flex-direction: column; gap: 14px; margin-top: auto; }
+  .scroll { display: flex; flex-direction: column; gap: 12px; margin-top: auto; }
 
   .me, .ai {
     max-width: 560px;
-    padding: 12px 16px;
+    padding: 11px 15px;
     border-radius: 14px;
     font-size: 13.5px;
     line-height: 1.6;
@@ -126,6 +126,24 @@
     border-bottom-left-radius: 6px;
   }
   .ai .strong { color: var(--text); }
+
+  /* 消息里的图片 */
+  .shot {
+    display: block;
+    width: 268px;
+    border-radius: 9px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    margin-bottom: 9px;
+  }
+  .shot { background: #f4f4f5; }
+  .shot .bar { display: flex; align-items: center; gap: 5px; height: 14px; background: #dcdce0; padding: 0 8px; }
+  .shot .bar i { width: 5px; height: 5px; border-radius: 50%; background: #b9b9c0; display: block; }
+  .shot .canvas { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 11px; height: calc(150px - 15px); }
+  .shot .ring { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #e3e3e7; border-top-color: #c4c4cd; }
+  .shot .shotnote { font-size: 7.5px; color: #b0b0ba; letter-spacing: 0.2px; }
+  .me .cap { font-size: 13px; display: block; }
+  .me .shot { margin: -3px 0 9px; }
 
   .tool {
     align-self: flex-start;
@@ -163,7 +181,7 @@
 
   .divider {
     display: flex; align-items: center; gap: 12px;
-    margin: 4px 0 2px;
+    margin: 2px 0;
     font-size: 10.5px; color: var(--text3); letter-spacing: 0.3px;
   }
   .divider::before, .divider::after { content: ""; height: 1px; background: rgba(255, 255, 255, 0.06); flex: 1; }
@@ -178,24 +196,66 @@
     background: rgba(255, 255, 255, 0.015);
   }
 
-  .inputbar {
-    height: 54px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 0 8px 0 16px;
+  /* ---------- 输入区（支持粘贴图片） ---------- */
+  .composer {
+    margin-top: 4px;
     background: var(--card-2);
     border: 1px solid var(--line-strong);
     border-radius: 14px;
+    padding: 10px 8px 10px 10px;
   }
-  .inputbar .ph { font-size: 13px; color: var(--text3); }
-  .inputbar .cmd { margin-left: auto; font-size: 10.5px; color: var(--text3); letter-spacing: 0.4px; }
+  .attach {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px 10px;
+  }
+  .attach .thumb {
+    width: 42px; height: 42px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    overflow: hidden;
+    flex: none;
+    background: #24242a;
+  }
+  .attach .thumb { background: #f4f4f5; position: relative; }
+  .attach .thumb::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 7px; background: #dcdce0; }
+  .attach .thumb::after {
+    content: ""; position: absolute; left: 50%; top: 56%; width: 12px; height: 12px;
+    margin: -6px 0 0 -6px; border-radius: 50%;
+    border: 1.6px solid #e2e2e6; border-top-color: #c2c2cb;
+  }
+  .attach .meta { min-width: 0; }
+  .attach .name { font-size: 12.5px; color: rgba(255, 255, 255, 0.88); }
+  .attach .sz { margin-top: 3px; font-size: 10.5px; color: var(--text3); }
+  .attach .x {
+    margin-left: auto;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text3);
+    background: rgba(255, 255, 255, 0.05);
+    flex: none;
+  }
+
+  .inputrow { display: flex; align-items: center; gap: 10px; padding: 0 0 0 6px; }
+  .inputrow .ph { font-size: 13px; color: rgba(255, 255, 255, 0.42); }
+  .inputrow .cmd { margin-left: auto; font-size: 10.5px; color: var(--text3); letter-spacing: 0.4px; }
   .send {
     width: 34px; height: 34px; border-radius: 10px;
     background: var(--accent);
     color: #0b0d13;
     display: flex; align-items: center; justify-content: center;
+    flex: none;
   }
+  .clip { color: var(--text3); display: flex; align-items: center; }
+
+  .hint {
+    display: flex; align-items: center; gap: 6px;
+    margin: 8px 2px 0;
+    font-size: 10.5px; color: var(--text3);
+  }
+  .hint b { font-weight: 500; color: var(--text2); }
 
   /* ---------- 右栏 ---------- */
   .rail { display: flex; flex-direction: column; gap: 14px; }
@@ -228,6 +288,7 @@
   .row .est i { width: 6px; height: 6px; border-radius: 50%; background: var(--tomato); display: block; }
   .row .est.none { color: var(--text3); }
   .row .est.none i { background: rgba(255, 255, 255, 0.18); }
+  .row .est.vision i { background: var(--accent); }
 
   .foot {
     display: flex; align-items: center;
@@ -237,10 +298,12 @@
   }
   .foot b { margin-left: auto; font-weight: 500; color: var(--text2); }
 
-  .model-card .kv { display: flex; align-items: center; margin-top: 12px; font-size: 12px; }
+  .model-card .kv { display: flex; align-items: center; margin-top: 11px; font-size: 12px; }
   .model-card .kv span { color: var(--text3); }
   .model-card .kv b { margin-left: auto; font-weight: 500; color: rgba(255, 255, 255, 0.86); }
+  .model-card .kv b.off { color: var(--text3); font-weight: 400; }
   .model-card p { margin: 12px 0 0; font-size: 11px; line-height: 1.65; color: var(--text3); }
+  .model-card p code { font-family: "SF Mono", ui-monospace, monospace; font-size: 10.5px; color: var(--text2); }
 
   /* ---------- 模型配置 ---------- */
   #config { position: relative; }
@@ -276,6 +339,16 @@
   }
   .field .box.ph { color: var(--text3); }
   .field .box .dots { letter-spacing: 2px; color: var(--text2); }
+  .field .box .pill-on {
+    margin-left: auto;
+    font-size: 10.5px;
+    color: var(--accent);
+    border: 1px solid rgba(143, 168, 232, 0.3);
+    background: rgba(143, 168, 232, 0.1);
+    border-radius: 999px;
+    padding: 3px 9px;
+    letter-spacing: 0;
+  }
   .note {
     margin-top: 16px;
     font-size: 11px;
@@ -289,7 +362,7 @@
     border-top: 1px solid var(--line);
     background: rgba(255, 255, 255, 0.015);
   }
-  .dialog .df .hint { font-size: 11px; color: var(--text3); }
+  .dialog .df .hint { margin: 0; font-size: 11px; color: var(--text3); }
   .btn {
     height: 32px; padding: 0 16px;
     display: flex; align-items: center;
@@ -301,14 +374,14 @@
 
   .spacer { height: 60px; background: #000; }
 
-  /* 截图用：?/#config 时只显示模型配置那一屏（Chrome --screenshot 不跳锚点） */
+  /* 截图用：#config 时只显示模型配置那一屏（Chrome --screenshot 不跳锚点） */
   body:has(#config:target) #assistant,
   body:has(#config:target) .spacer { display: none; }
 </style>
 </head>
 <body>
 
-<!-- ==================== 01 · 助手 ==================== -->
+<!-- ==================== 01 · 助手（含图片输入） ==================== -->
 <div class="win" id="assistant">
   <div class="titlebar">
     <div class="lights"><i></i><i></i><i></i></div>
@@ -322,7 +395,7 @@
         <div class="sub">今天 · 3 件主线 · 4 件临时</div>
       </div>
       <div class="right">
-        <div class="model-pill"><span class="dot"></span><b>DeepSeek</b> · deepseek-chat</div>
+        <div class="model-pill"><span class="dot"></span><b>Qwen</b> · qwen-vl-max · 支持图片</div>
         <div class="icon-btn">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2v.2a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0-1.2-2.9H3a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.4-2.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3h.1A1.7 1.7 0 0 0 10.8 3V3a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 2.9 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9v.1a1.7 1.7 0 0 0 1.5 1H22a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.4 1.1z"/></svg>
         </div>
@@ -333,33 +406,61 @@
       <div class="chat">
         <div class="scroll">
           <div class="divider"><span>今天 · 已带入今日计划</span></div>
-          <div class="ai">早，今天主线 3 件、临时 3 件，上午还剩一块整时间。要我先念一遍今天的安排吗？</div>
-          <div class="me">把「评审设计稿」加进今天，估两个番茄</div>
-          <div class="ai">加好了：作为<span class="strong">临时任务</span>进的今天，预估 2 个番茄。主线还是 3 件，临时 4 件。</div>
+
+          <div class="ai">早。今天主线 3 件、临时 4 件；截图直接 ⌘V 贴进来就能问。</div>
+
+          <div class="me">
+            <span class="shot">
+              <span class="bar"><i></i><i></i></span>
+              <span class="canvas"><span class="ring"></span><span class="shotnote">面板空白 · 没有渲染内容</span></span>
+            </span>
+            <span class="cap">这个自定义组件调试页白屏了，看图能定位吗？</span>
+          </div>
+
+          <div class="ai">截图里只有一片白和转圈，没有报错栈，不像代码崩了。更像容器拿到了空快照：<span class="strong">调试模块没注册</span>，或者 <span class="strong">h5 资源没拉下来</span>。我这边的任务备注是空的，先看模块列表？</div>
 
           <div class="tool">
             <div class="h">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-              已执行 1 个操作
+              已执行 2 个操作
             </div>
             <div class="b">
-              · 新增临时任务「<em>评审设计稿</em>」，预估 2 个番茄<br>
-              · 今天的临时任务 <span class="k">3 → 4</span> 件
+              · 读图 1 张 <span class="k">—</span> 2452 × 1536 · 未命中崩溃栈<br>
+              · 读取「<em>自定义组件的调试查看</em>」<span class="k">—</span> 备注为空
             </div>
-            <div class="a"><b>查看</b><span>撤销</span><span class="time">2 秒前</span></div>
+            <div class="a"><b>查看</b><span>撤销</span><span class="time">4 秒前</span></div>
           </div>
 
-          <div class="ai">现在开一轮 25 分钟吗？今天主线里「FMP改造」还没动过。</div>
-
-          <div class="chips"><span class="chip">现在开始</span><span class="chip">今天还剩几件</span><span class="chip">昨天专注多久</span></div>
+          <div class="chips"><span class="chip">打开这条任务</span><span class="chip">记一条复现步骤</span><span class="chip">现在开始 25 分钟</span></div>
         </div>
 
-        <div class="inputbar">
-          <span class="ph">说点什么，或者让我帮你排今天…</span>
-          <span class="cmd">⌘↩</span>
-          <div class="send">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+        <!-- 输入区：可以 ⌘V 粘贴图片，也可以拖进来 -->
+        <div class="composer">
+          <div class="attach">
+            <span class="thumb"><span class="mini"></span></span>
+            <div class="meta">
+              <div class="name">Screenshot 2026-11-26 10.04.32.png</div>
+              <div class="sz">2452 × 1536 · 2.1 MB · 已压缩到 1024 px 再发</div>
+            </div>
+            <span class="x">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </span>
           </div>
+
+          <div class="inputrow">
+            <span class="clip">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.4 11.05 12.3 20.2a5.5 5.5 0 0 1-7.8-7.8l9.2-9.2a3.7 3.7 0 0 1 5.2 5.2l-9.2 9.2a1.8 1.8 0 0 1-2.6-2.6l8.5-8.5"/></svg>
+            </span>
+            <span class="ph">白屏了，帮我看下是什么问题…</span>
+            <span class="cmd">⌘↩</span>
+            <div class="send">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="hint">
+          <b>⌘V</b> 粘贴图片 · 也能把文件拖进窗口 · 单张上限 10 MB，超了先压到 1024 px
         </div>
       </div>
 
@@ -383,10 +484,11 @@
 
         <div class="panel model-card">
           <div class="ph-head"><h3>模型</h3><span>已连上</span></div>
-          <div class="kv"><span>服务</span><b>api.deepseek.com</b></div>
-          <div class="kv"><span>模型</span><b>deepseek-chat</b></div>
+          <div class="kv"><span>服务</span><b>dashscope.aliyuncs.com</b></div>
+          <div class="kv"><span>模型</span><b>qwen-vl-max</b></div>
+          <div class="kv"><span>图片</span><b>支持 · 一次最多 4 张</b></div>
           <div class="kv"><span>Key</span><b>系统 Keychain</b></div>
-          <p>每次只把你输入的那句话、今天的状态和工具结果发给这个服务；任务库本身不上传。</p>
+          <p>只把这一句、贴进来的图和工具结果发给这个服务；任务库本身不上传。换成不支持读图的模型时，输入框会先拦住。</p>
         </div>
       </div>
     </div>
@@ -411,11 +513,11 @@
     <div class="dc">
       <div class="field">
         <label>服务地址</label>
-        <div class="box">https://api.deepseek.com/v1</div>
+        <div class="box">https://dashscope.aliyuncs.com/compatible-mode/v1</div>
       </div>
       <div class="field">
         <label>模型名</label>
-        <div class="box">deepseek-chat</div>
+        <div class="box">qwen-vl-max<span class="pill-on">支持图片</span></div>
       </div>
       <div class="field">
         <label>API Key</label>
@@ -427,8 +529,9 @@
       </div>
 
       <div class="note">
-        只要 OpenAI 兼容的 <code>/chat/completions</code> 都能用：DeepSeek、vLLM、Ollama、OpenCode Go。<br>
-        Key 存系统 Keychain（<code>com.freedom-shen.jingli.llm.apikey</code>），其余存 UserDefaults；仓库里永远没有密钥。
+        只要 OpenAI 兼容的 <code>/chat/completions</code> 都能用：qwen-vl、gpt-4o、vLLM、Ollama。<br>
+        能不能贴图取决于这个模型吃不吃图；不支持时输入框会提示换模型。<br>
+        Key 存系统 Keychain（<code>com.freedom-shen.jingli.llm.apikey</code>），其余存 UserDefaults。
       </div>
     </div>
 
@@ -443,12 +546,6 @@
 
 <script>
   document.getElementById('configBg').innerHTML = document.getElementById('assistant').innerHTML;
-
-  // 截图用：带 #frame-id 打开时把那一屏滚到视口顶部（Chrome --screenshot 不会自己跳锚点）
-  if (location.hash.length > 1) {
-    const target = document.querySelector(location.hash);
-    if (target) requestAnimationFrame(() => target.scrollIntoView({ block: 'start' }));
-  }
 </script>
 </body>
 </html>
