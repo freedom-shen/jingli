@@ -35,25 +35,7 @@ public struct OpenAICompatibleProvider: ModelProvider {
     }
 
     public func complete(messages: [ChatMessage], tools: [ToolSpec]) async throws -> ModelResponse {
-        var body: [String: Any] = [
-            "model": config.model,
-            "messages": messages.map(Self.encode),
-            "temperature": 0.2,
-            "stream": false,
-        ]
-        if !tools.isEmpty {
-            body["tools"] = tools.map { spec in
-                [
-                    "type": "function",
-                    "function": [
-                        "name": spec.name,
-                        "description": spec.summary,
-                        "parameters": spec.schema,
-                    ],
-                ]
-            }
-            body["tool_choice"] = "auto"
-        }
+        let body = Self.requestBody(model: config.model, messages: messages, tools: tools)
 
         var request = URLRequest(url: config.baseURL.appendingPathComponent("chat/completions"))
         request.httpMethod = "POST"
@@ -96,10 +78,49 @@ public struct OpenAICompatibleProvider: ModelProvider {
         return ModelResponse(text: text?.isEmpty == true ? nil : text, toolCalls: calls)
     }
 
-    private static func encode(_ message: ChatMessage) -> [String: Any] {
+    /// 单独拎出来，好在测试里直接看请求体长什么样。
+    static func requestBody(model: String, messages: [ChatMessage], tools: [ToolSpec]) -> [String: Any] {
+        var body: [String: Any] = [
+            "model": model,
+            "messages": messages.map(encode),
+            "temperature": 0.2,
+            "stream": false,
+        ]
+        if !tools.isEmpty {
+            body["tools"] = tools.map { spec in
+                [
+                    "type": "function",
+                    "function": [
+                        "name": spec.name,
+                        "description": spec.summary,
+                        "parameters": spec.schema,
+                    ],
+                ]
+            }
+            body["tool_choice"] = "auto"
+        }
+        return body
+    }
+
+    static func encode(_ message: ChatMessage) -> [String: Any] {
         switch message.role {
         case .system, .user:
-            return ["role": message.role.rawValue, "content": message.content ?? ""]
+            let text = message.content ?? ""
+            guard !message.images.isEmpty else {
+                return ["role": message.role.rawValue, "content": text]
+            }
+            // 带图：content 变成分段数组，文字在前、图片在后
+            var parts: [[String: Any]] = []
+            if !text.isEmpty {
+                parts.append(["type": "text", "text": text])
+            }
+            for image in message.images {
+                parts.append([
+                    "type": "image_url",
+                    "image_url": ["url": image.dataURL],
+                ])
+            }
+            return ["role": message.role.rawValue, "content": parts]
         case .assistant:
             var body: [String: Any] = ["role": "assistant"]
             body["content"] = message.content ?? NSNull()

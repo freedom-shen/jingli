@@ -17,18 +17,29 @@ public struct ChatMessage: Sendable, Equatable {
 
     public let role: Role
     public let content: String?
+    /// 只有 user 消息会带图；带图时 content 会编成 text + image_url 分段。
+    public let images: [ImageAttachment]
     public let toolCalls: [ModelToolCall]
     public let toolCallID: String?
 
-    public init(role: Role, content: String?, toolCalls: [ModelToolCall] = [], toolCallID: String? = nil) {
+    public init(
+        role: Role,
+        content: String?,
+        images: [ImageAttachment] = [],
+        toolCalls: [ModelToolCall] = [],
+        toolCallID: String? = nil
+    ) {
         self.role = role
         self.content = content
+        self.images = images
         self.toolCalls = toolCalls
         self.toolCallID = toolCallID
     }
 
     public static func system(_ text: String) -> ChatMessage { .init(role: .system, content: text) }
-    public static func user(_ text: String) -> ChatMessage { .init(role: .user, content: text) }
+    public static func user(_ text: String, images: [ImageAttachment] = []) -> ChatMessage {
+        .init(role: .user, content: text, images: images)
+    }
     public static func assistant(_ text: String?, calls: [ModelToolCall] = []) -> ChatMessage {
         .init(role: .assistant, content: text, toolCalls: calls)
     }

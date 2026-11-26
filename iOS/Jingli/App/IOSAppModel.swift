@@ -43,7 +43,15 @@ final class IOSAppModel {
         let id = UUID()
         let role: Role
         let text: String
+        let images: [ImageAttachment]
         let tools: [ExecutedTool]
+
+        init(role: Role, text: String, images: [ImageAttachment] = [], tools: [ExecutedTool]) {
+            self.role = role
+            self.text = text
+            self.images = images
+            self.tools = tools
+        }
     }
 
     private(set) var chat: [ChatItem] = []
@@ -64,10 +72,10 @@ final class IOSAppModel {
         ))
     }
 
-    func send(_ text: String) async {
+    func send(_ text: String, images: [ImageAttachment] = []) async {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty, !assistantBusy else { return }
-        chat.append(ChatItem(role: .user, text: trimmed, tools: []))
+        guard !trimmed.isEmpty || !images.isEmpty, !assistantBusy else { return }
+        chat.append(ChatItem(role: .user, text: trimmed, images: images, tools: []))
         persistChatHistory()
         assistantBusy = true
         defer { assistantBusy = false }
@@ -80,7 +88,7 @@ final class IOSAppModel {
         let router = AgentCommandRouter(database: database, focus: nil, onChange: nil, actor: "ios-agent")
         let agent = JingliAgent(provider: provider, runner: ToolRunner(router: router))
         do {
-            let reply = try await agent.send(trimmed)
+            let reply = try await agent.send(trimmed, images: images)
             chat.append(ChatItem(role: .assistant, text: reply.text, tools: reply.toolCalls))
             persistChatHistory()
             refresh()
@@ -99,6 +107,8 @@ final class IOSAppModel {
             ChatItem(
                 role: item.role == "user" ? .user : .assistant,
                 text: item.text,
+                // 图片不落盘（base64 太占地方），重启后只回来文字和工具名
+                images: [],
                 tools: item.tools.map {
                     ExecutedTool(name: $0.name, argumentsJSON: "", ok: $0.ok, output: "")
                 }

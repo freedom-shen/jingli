@@ -51,10 +51,14 @@ public final class JingliAgent: @unchecked Sendable {
         self.maxRounds = maxRounds
     }
 
-    public func send(_ text: String, history: [ChatMessage] = []) async throws -> AgentReply {
+    public func send(
+        _ text: String,
+        images: [ImageAttachment] = [],
+        history: [ChatMessage] = []
+    ) async throws -> AgentReply {
         var messages: [ChatMessage] = [.system(systemPrompt)]
         messages.append(contentsOf: history)
-        messages.append(.user(text))
+        messages.append(.user(text, images: images))
 
         var executed: [ExecutedTool] = []
         var lastText: String?
