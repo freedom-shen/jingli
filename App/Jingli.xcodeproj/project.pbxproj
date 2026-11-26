@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		061F3E97990C4AD0A5AF8D7C /* RemoteWebController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E71A52905BC5D389E48E54 /* RemoteWebController.swift */; };
+		08E8BFA331AE4C211104927A /* AssistantLiveModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8976B16BE9D40786D5FC7B5B /* AssistantLiveModelTests.swift */; };
 		0B73EB33180FF0CAEC713BC8 /* TaskEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D9911A61D3379CC6094732C /* TaskEditorView.swift */; };
 		0B7B8F7EA2AE9DC695147F99 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDE6A7E06DB79DA4FE43E59 /* AppDelegate.swift */; };
 		115F92C67CB33A4D41CA3C3D /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69C109D6B349355695ABB984 /* Theme.swift */; };
@@ -85,6 +86,7 @@
 		7E13E357DCCBD85D8BA129B9 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
 		81B1C4AAD464F2EE7768EFD7 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
 		83D70C90B6CB19BF9F0720D9 /* Jingli.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Jingli.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8976B16BE9D40786D5FC7B5B /* AssistantLiveModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssistantLiveModelTests.swift; sourceTree = "<group>"; };
 		8ECA132F9266F52FDF28D189 /* JingliCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = JingliCore; path = ../Packages/JingliCore; sourceTree = SOURCE_ROOT; };
 		8EDE6A7E06DB79DA4FE43E59 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		938ED09AFAC7425161A796E1 /* ProjectListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectListView.swift; sourceTree = "<group>"; };
@@ -206,6 +208,7 @@
 		76DEF368BF4925F0C26E5ABC /* JingliTests */ = {
 			isa = PBXGroup;
 			children = (
+				8976B16BE9D40786D5FC7B5B /* AssistantLiveModelTests.swift */,
 				BC9132AD735BBAC0E9757EBB /* AssistantPasteTests.swift */,
 				ED92CD930859807E237E8141 /* FocusStreakAppTests.swift */,
 				BDD74A624DACE35D5575E551 /* JingliTests.swift */,
@@ -481,6 +484,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				08E8BFA331AE4C211104927A /* AssistantLiveModelTests.swift in Sources */,
 				2C317F7F9F8919C54C7E38AB /* AssistantPasteTests.swift in Sources */,
 				132EEDD3F864BE1F8EEA7F16 /* FocusStreakAppTests.swift in Sources */,
 				F09691D382E6B33E87DDDAA4 /* JingliTests.swift in Sources */,
