@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import JingliCore
+import JingliAgent
 
 @MainActor
 enum SnapshotRunner {
@@ -197,7 +198,16 @@ enum SnapshotRunner {
         _ = try store.updateTask(id: second.id, title: second.title, note: second.note, estimate: 2)
         _ = try store.updateTask(id: third.id, title: third.title, note: third.note, estimate: 2)
 
-        let assistant = AssistantModel()
+        let historyURL = URL(fileURLWithPath: "/tmp/jingli-snapshot-assistant.json")
+        try? FileManager.default.removeItem(at: historyURL)
+        // 固定一份假配置：不受本机 Keychain / UserDefaults 影响，基线才可复现
+        let snapshotConfig = LLMConfig(
+            baseURL: "https://opencode.ai/inference/go/openai/v1",
+            model: "deepseek-v4.1-flash",
+            session: "dsh-opencodego-shen",
+            apiKey: "snapshot-key"
+        )
+        let assistant = AssistantModel(config: snapshotConfig, historyURL: historyURL)
         assistant.seedSnapshotConversation()
         AppServices.shared.model.reload()
         AppServices.shared.model.openAssistant()

@@ -7,12 +7,21 @@ import JingliCore
 /// 「输入框能贴图」这件事的可执行版本：剪贴板 → 压缩 → 待发送区。
 final class AssistantPasteTests: XCTestCase {
 
+    /// 每个用例一份临时历史文件，别碰真实支持目录。
+    private func tempHistoryURL() -> URL {
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent("jingli-test-assistant-\(UUID().uuidString).json")
+        addTeardownBlock { try? FileManager.default.removeItem(at: url) }
+        return url
+    }
+
     @MainActor
     private func makeModel() throws -> AssistantModel {
         let database = try JingliDatabase.inMemory()
         return AssistantModel(
             database: database,
             config: LLMConfig(baseURL: "https://example.com/v1", model: "test", session: "", apiKey: "k"),
+            historyURL: tempHistoryURL(),
             onChange: {}
         )
     }
@@ -76,6 +85,7 @@ final class AssistantPasteTests: XCTestCase {
         let model = AssistantModel(
             database: database,
             config: LLMConfig(baseURL: "", model: "", session: "", apiKey: ""),
+            historyURL: tempHistoryURL(),
             onChange: {}
         )
         model.send("加一件临时任务")

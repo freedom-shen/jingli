@@ -2,9 +2,12 @@ import AppKit
 import SwiftUI
 import UniformTypeIdentifiers
 import JingliCore
+import JingliAgent
 
 struct SettingsView: View {
     @ObservedObject var model: AppModel
+    @ObservedObject private var assistant = AssistantModel.shared
+    @State private var confirmingClearChat = false
 
     @State private var missingShortcuts: [String] = []
     @State private var launchAtLogin = LaunchAtLogin.isEnabled
@@ -64,6 +67,30 @@ struct SettingsView: View {
                     Text("计时固定 25 分钟；每轮后休息 5 分钟，连续完成 4 个钟长休 25 分钟；休息可跳过，不计入统计。")
                         .font(.system(size: 11))
                         .foregroundStyle(Theme.textSecondary)
+                }
+
+                section("助手") {
+                    HStack {
+                        Text("会话记录")
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(Theme.textPrimary)
+                        Spacer()
+                        Text("\(assistant.storedHistoryCount) 条 · \(Self.sizeText(assistant.storedHistoryBytes))")
+                            .font(.system(size: 11))
+                            .foregroundStyle(Theme.textSecondary)
+                    }
+
+                    Text("助手对话存在本机支持目录（assistant-history.json），最多保留最近 \(AssistantHistoryStore.limit) 条；带图的记录存的是发出去那份压缩副本，不是原图。")
+                        .font(.system(size: 11))
+                        .foregroundStyle(Theme.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Button("清空会话记录") {
+                        confirmingClearChat = true
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                    .accessibilityIdentifier("assistant-clear-history")
                 }
 
                 section("新的一天") {
@@ -196,6 +223,14 @@ struct SettingsView: View {
         .padding(.top, 4)
         .accessibilityIdentifier("settings-page")
         .onAppear(perform: checkShortcuts)
+        .alert("清空助手会话记录？", isPresented: $confirmingClearChat) {
+            Button("取消", role: .cancel) {}
+            Button("清空", role: .destructive) {
+                assistant.clearChat()
+            }
+        } message: {
+            Text("这会删掉本机保存的 \(assistant.storedHistoryCount) 条记录和其中的图片，不可撤销。任务数据不受影响。")
+        }
         .alert(
             "提示",
             isPresented: Binding(
@@ -210,6 +245,12 @@ struct SettingsView: View {
         } message: {
             Text(errorMessage ?? backupMessage ?? "")
         }
+    }
+
+    private static func sizeText(_ bytes: Int) -> String {
+        if bytes < 1024 { return "\(bytes) B" }
+        if bytes < 1024 * 1024 { return String(format: "%.0f KB", Double(bytes) / 1024) }
+        return String(format: "%.1f MB", Double(bytes) / 1024 / 1024)
     }
 
     private func section<Content: View>(

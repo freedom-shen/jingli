@@ -17,7 +17,6 @@
 		390A0715593B0CD34313D61C /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F92BC65678CFBDB340EB288 /* StatsView.swift */; };
 		39F6C0CCB79988C421F870B7 /* JingliWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 596365C37ACAE9360CD54339 /* JingliWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3CD50276B18EC3A9C2FBBC04 /* JingliSync in Frameworks */ = {isa = PBXBuildFile; productRef = 68F5DE2D81D8C9C4EBC6B8B1 /* JingliSync */; };
-		408A50E8A409F593BF440ACB /* ChatHistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E994E13B883814E1FD5EB28 /* ChatHistoryStore.swift */; };
 		4506A2347CC56A49CE0FCBBB /* CompletionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD7A6112EF268FFFA3842620 /* CompletionSheet.swift */; };
 		4F270223BD4E02FBF433A5D8 /* TaskDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 999E063A1C0C38F59C897B70 /* TaskDetailView.swift */; };
 		55C99EBE4E9EBC61FE8A4BBB /* NotificationScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EC5DD3FEF40C5D4840C361A /* NotificationScheduler.swift */; };
@@ -79,7 +78,6 @@
 		52259A025FBADDF236368319 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		55714AEEEE8B49D57E21ED9B /* CloudKitDiagnostics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitDiagnostics.swift; sourceTree = "<group>"; };
 		596365C37ACAE9360CD54339 /* JingliWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = JingliWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		5E994E13B883814E1FD5EB28 /* ChatHistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatHistoryStore.swift; sourceTree = "<group>"; };
 		67D83A0B37B580F15B3BA038 /* Tokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tokens.swift; sourceTree = "<group>"; };
 		689D9A00DB2D1D13C2BA8E55 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		6BF2BAA604BE26C901931B5B /* JingliLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JingliLiveActivity.swift; sourceTree = "<group>"; };
@@ -308,7 +306,6 @@
 			isa = PBXGroup;
 			children = (
 				3971FCA657FFF3EC4AAEFB17 /* AddTaskIntent.swift */,
-				5E994E13B883814E1FD5EB28 /* ChatHistoryStore.swift */,
 				55714AEEEE8B49D57E21ED9B /* CloudKitDiagnostics.swift */,
 				3E21D64797BDA89522113657 /* FocusActivityManager.swift */,
 				7725BAEB1AECAA6F13EF9E9D /* IOSAppModel.swift */,
@@ -435,7 +432,6 @@
 				CCDCDCAF3E3F7B69ACCB414E /* AddTaskIntent.swift in Sources */,
 				323BE329083FD84C434877F4 /* AddTaskView.swift in Sources */,
 				C5C7BD4840CF8D4C26A5BAAE /* AssistantView.swift in Sources */,
-				408A50E8A409F593BF440ACB /* ChatHistoryStore.swift in Sources */,
 				798A5D3E613C5B55F839FC81 /* CloudKitDiagnostics.swift in Sources */,
 				4506A2347CC56A49CE0FCBBB /* CompletionSheet.swift in Sources */,
 				2E29B1746F39E1025D19C0F8 /* DayStartView.swift in Sources */,

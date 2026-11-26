@@ -8,7 +8,7 @@ struct RootView: View {
     @StateObject private var assistant: AssistantModel
 
     init(assistant: AssistantModel? = nil) {
-        _assistant = StateObject(wrappedValue: assistant ?? AssistantModel())
+        _assistant = StateObject(wrappedValue: assistant ?? .shared)
     }
 
     var body: some View {

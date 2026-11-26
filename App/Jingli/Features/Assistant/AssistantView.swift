@@ -26,7 +26,23 @@ struct AssistantView: View {
         .sheet(isPresented: $showModelConfig) {
             ModelConfigSheet(model: model)
         }
-        .onAppear { inputFocused = true }
+        // 进页面就把光标放进输入框：等一次 run loop，输入框才真正在响应链上
+        .task { focusInputSoon() }
+        .onChange(of: app.page) { _, page in
+            guard page == .assistant else { return }
+            focusInputSoon()
+        }
+    }
+
+    /// 截图基线里不要光标闪烁，否则同一份代码两次渲染会对不上。
+    private var isSnapshotRun: Bool { CommandLine.arguments.contains("--snapshot") }
+
+    private func focusInputSoon() {
+        guard !isSnapshotRun else { return }
+        _Concurrency.Task {
+            try? await _Concurrency.Task.sleep(for: .milliseconds(60))
+            inputFocused = true
+        }
     }
 
     // MARK: - 左：对话

@@ -11,8 +11,8 @@ import JingliCore
 @MainActor
 final class AssistantModel: ObservableObject {
     struct ChatItem: Identifiable {
-        enum Role { case user, assistant }
-        let id = UUID()
+        enum Role: String { case user, assistant }
+        let id: UUID
         let role: Role
         let text: String
         let images: [ImageAttachment]
@@ -20,12 +20,14 @@ final class AssistantModel: ObservableObject {
         let at: Date
 
         init(
+            id: UUID = UUID(),
             role: Role,
             text: String,
             images: [ImageAttachment] = [],
             tools: [ExecutedTool] = [],
             at: Date = Date()
         ) {
+            self.id = id
             self.role = role
             self.text = text
             self.images = images
@@ -43,20 +45,27 @@ final class AssistantModel: ObservableObject {
     @Published var config: LLMConfig
     @Published var notice: String?
 
+    /// 全 App 一份：设置页清空会话时清的是同一个实例。
+    static let shared = AssistantModel()
+
     private let database: JingliDatabase
+    private let historyURL: URL
     private let onChange: @MainActor () -> Void
 
     init(
         database: JingliDatabase? = nil,
         config: LLMConfig? = nil,
+        historyURL: URL = AssistantHistoryStore.defaultURL,
         onChange: (@MainActor () -> Void)? = nil
     ) {
         self.database = database ?? AppServices.shared.database
         self.config = config ?? LLMConfigStore.fromEnvironment() ?? LLMConfigStore.load()
+        self.historyURL = historyURL
         self.onChange = onChange ?? {
             AppServices.shared.model.reload()
             AppServices.shared.model.refreshStats()
         }
+        chat = Self.restore(from: AssistantHistoryStore.load(from: historyURL))
     }
 
     // MARK: - 配置
@@ -164,12 +173,14 @@ final class AssistantModel: ObservableObject {
         chat.append(ChatItem(role: .user, text: trimmed, images: images))
         attachments.removeAll()
         notice = nil
+        persist()
 
         guard let provider = config.makeProvider() else {
             chat.append(ChatItem(
                 role: .assistant,
                 text: "还没有配模型：右上角齿轮里填服务地址、模型名和 API Key。"
             ))
+            persist()
             return
         }
 
@@ -183,6 +194,7 @@ final class AssistantModel: ObservableObject {
                 let reply = try await agent.send(trimmed, images: images)
                 self?.chat.append(ChatItem(role: .assistant, text: reply.text, tools: reply.toolCalls))
                 self?.busy = false
+                self?.persist()
                 if !reply.toolCalls.isEmpty { onChange() }
             } catch {
                 self?.chat.append(ChatItem(
@@ -190,6 +202,7 @@ final class AssistantModel: ObservableObject {
                     text: "出错了：\(error.localizedDescription)"
                 ))
                 self?.busy = false
+                self?.persist()
             }
         }
     }
@@ -265,5 +278,40 @@ final class AssistantModel: ObservableObject {
         chat.removeAll()
         attachments.removeAll()
         notice = nil
+        AssistantHistoryStore.clear(at: historyURL)
+    }
+
+    /// 设置页显示用：现在存了多少条、占多大。
+    var storedHistoryCount: Int { chat.count }
+    var storedHistoryBytes: Int { AssistantHistoryStore.byteCount(at: historyURL) }
+
+    private func persist() {
+        AssistantHistoryStore.save(chat.map(Self.item), to: historyURL)
+    }
+
+    private static func item(_ chat: ChatItem) -> AssistantHistoryItem {
+        AssistantHistoryItem(
+            id: chat.id,
+            role: chat.role.rawValue,
+            text: chat.text,
+            tools: chat.tools.map { .init(name: $0.name, ok: $0.ok) },
+            images: chat.images.map(AssistantHistoryStore.stored(from:)),
+            at: chat.at
+        )
+    }
+
+    private static func restore(from items: [AssistantHistoryItem]) -> [ChatItem] {
+        items.map { item in
+            ChatItem(
+                id: item.id,
+                role: item.role == "user" ? .user : .assistant,
+                text: item.text,
+                images: item.images.map(AssistantHistoryStore.attachment(from:)),
+                tools: item.tools.map {
+                    ExecutedTool(name: $0.name, argumentsJSON: "", ok: $0.ok, output: "")
+                },
+                at: item.at
+            )
+        }
     }
 }

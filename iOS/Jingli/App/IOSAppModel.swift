@@ -40,13 +40,20 @@ final class IOSAppModel {
 
     struct ChatItem: Identifiable {
         enum Role { case user, assistant }
-        let id = UUID()
+        let id: UUID
         let role: Role
         let text: String
         let images: [ImageAttachment]
         let tools: [ExecutedTool]
 
-        init(role: Role, text: String, images: [ImageAttachment] = [], tools: [ExecutedTool]) {
+        init(
+            id: UUID = UUID(),
+            role: Role,
+            text: String,
+            images: [ImageAttachment] = [],
+            tools: [ExecutedTool]
+        ) {
+            self.id = id
             self.role = role
             self.text = text
             self.images = images
@@ -91,14 +98,14 @@ final class IOSAppModel {
 
     /// 聊天记录本地持久化：启动时读回来，每次追加后写回。
     private func loadChatHistory() {
-        let items = ChatHistoryStore.load()
+        let items = AssistantHistoryStore.load()
         guard !items.isEmpty else { return }
         chat = items.map { item in
             ChatItem(
+                id: item.id,
                 role: item.role == "user" ? .user : .assistant,
                 text: item.text,
-                // 图片不落盘（base64 太占地方），重启后只回来文字和工具名
-                images: [],
+                images: item.images.map(AssistantHistoryStore.attachment(from:)),
                 tools: item.tools.map {
                     ExecutedTool(name: $0.name, argumentsJSON: "", ok: $0.ok, output: "")
                 }
@@ -107,12 +114,14 @@ final class IOSAppModel {
     }
 
     private func persistChatHistory() {
-        ChatHistoryStore.save(
+        AssistantHistoryStore.save(
             chat.map { item in
-                ChatHistoryStore.Item(
+                AssistantHistoryItem(
+                    id: item.id,
                     role: item.role == .user ? "user" : "assistant",
                     text: item.text,
-                    tools: item.tools.map { ChatHistoryStore.Tool(name: $0.name, ok: $0.ok) },
+                    tools: item.tools.map { .init(name: $0.name, ok: $0.ok) },
+                    images: item.images.map(AssistantHistoryStore.stored(from:)),
                     at: Date()
                 )
             }
@@ -121,7 +130,7 @@ final class IOSAppModel {
 
     func clearChatHistory() {
         chat.removeAll()
-        ChatHistoryStore.clear()
+        AssistantHistoryStore.clear()
     }
 
     /// 本地写入完成后调用：去抖 2 秒再同步。

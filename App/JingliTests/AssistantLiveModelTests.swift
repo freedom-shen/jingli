@@ -46,7 +46,14 @@ final class AssistantLiveModelTests: XCTestCase {
         }
 
         let database = try JingliDatabase.inMemory()
-        let model = AssistantModel(database: database, config: config, onChange: {})
+        let historyURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("jingli-live-assistant.json")
+        let model = AssistantModel(
+            database: database,
+            config: config,
+            historyURL: historyURL,
+            onChange: {}
+        )
         let prompt = "加一件临时任务：助手联调验证，估一个番茄"
         model.send(prompt)
 
