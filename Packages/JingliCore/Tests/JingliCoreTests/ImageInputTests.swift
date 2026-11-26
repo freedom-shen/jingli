@@ -165,3 +165,112 @@ final class ImageInputTests: XCTestCase {
         return buffer as Data
     }
 }
+
+/// 走一遍真实的 URLSession：请求体里要有 image_url，回来的 tool_call 要解析得出来。
+final class OpenAIWireFormatTests: XCTestCase {
+    nonisolated(unsafe) private static var capturedBody: Data?
+    nonisolated(unsafe) private static var stubResponse: Data = Data()
+
+    override func setUp() {
+        super.setUp()
+        Self.capturedBody = nil
+        StubURLProtocol.handler = { request, body in
+            Self.capturedBody = body
+            return Self.stubResponse
+        }
+    }
+
+    private func makeProvider() -> OpenAICompatibleProvider {
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [StubURLProtocol.self]
+        return OpenAICompatibleProvider(
+            config: OpenAICompatibleConfig(
+                baseURL: URL(string: "https://stub.local/v1")!,
+                model: "vision-test",
+                apiKey: "test-key"
+            ),
+            session: URLSession(configuration: configuration)
+        )
+    }
+
+    func testImageMessageReachesTheWireAsImageURL() async throws {
+        Self.stubResponse = Data("""
+        {"choices":[{"message":{"role":"assistant","content":"看到了"}}]}
+        """.utf8)
+
+        let image = ImageAttachment(
+            mimeType: "image/jpeg",
+            base64: Data([0xAA, 0xBB]).base64EncodedString(),
+            pixelWidth: 1024,
+            pixelHeight: 640
+        )
+        let reply = try await makeProvider().complete(
+            messages: [.user("这个白屏了", images: [image])],
+            tools: []
+        )
+
+        XCTAssertEqual(reply.text, "看到了")
+
+        let body = try XCTUnwrap(Self.capturedBody)
+        let root = try XCTUnwrap(try JSONSerialization.jsonObject(with: body) as? [String: Any])
+        let messages = try XCTUnwrap(root["messages"] as? [[String: Any]])
+        let parts = try XCTUnwrap(messages.first?["content"] as? [[String: Any]])
+
+        XCTAssertEqual(root["model"] as? String, "vision-test")
+        XCTAssertEqual(parts.count, 2)
+        XCTAssertEqual(parts.first?["type"] as? String, "text")
+        XCTAssertEqual(parts.last?["type"] as? String, "image_url")
+        XCTAssertEqual(
+            (parts.last?["image_url"] as? [String: Any])?["url"] as? String,
+            image.dataURL
+        )
+    }
+
+    func testToolCallsAreParsedFromResponse() async throws {
+        Self.stubResponse = Data("""
+        {"choices":[{"message":{"role":"assistant","content":null,"tool_calls":[
+          {"id":"call_1","type":"function","function":{"name":"today_get","arguments":"{}"}}
+        ]}}]}
+        """.utf8)
+
+        let reply = try await makeProvider().complete(messages: [.user("看今天")], tools: ToolCatalog.all)
+        XCTAssertNil(reply.text)
+        XCTAssertEqual(reply.toolCalls, [ModelToolCall(id: "call_1", name: "today_get", argumentsJSON: "{}")])
+    }
+}
+
+private final class StubURLProtocol: URLProtocol {
+    nonisolated(unsafe) static var handler: ((URLRequest, Data) -> Data)?
+
+    override class func canInit(with request: URLRequest) -> Bool { true }
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+
+    override func startLoading() {
+        let body = request.httpBody ?? request.httpBodyStream.map(Self.readAll) ?? Data()
+        let data = Self.handler?(request, body) ?? Data()
+        let response = HTTPURLResponse(
+            url: request.url ?? URL(string: "https://stub.local")!,
+            statusCode: 200,
+            httpVersion: "HTTP/1.1",
+            headerFields: ["Content-Type": "application/json"]
+        )!
+        client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+        client?.urlProtocol(self, didLoad: data)
+        client?.urlProtocolDidFinishLoading(self)
+    }
+
+    override func stopLoading() {}
+
+    private static func readAll(_ stream: InputStream) -> Data {
+        stream.open()
+        defer { stream.close() }
+        var data = Data()
+        var buffer = [UInt8](repeating: 0, count: 4096)
+        while stream.hasBytesAvailable {
+            let read = stream.read(&buffer, maxLength: buffer.count)
+            if read <= 0 { break }
+            data.append(buffer, count: read)
+        }
+        return data
+    }
+}
